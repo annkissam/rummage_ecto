@@ -1,7 +1,7 @@
-defmodule RummageEcto.Paginate do
+defmodule Rummage.Ecto.Hooks.Paginate do
   import Ecto.Query
 
-  @behaviour RummageEcto.Hook
+  @behaviour Rummage.Ecto.Hook
 
   def run(query, rummage) do
     paginate_params = Map.get(rummage, "paginate")
@@ -13,10 +13,12 @@ defmodule RummageEcto.Paginate do
   end
 
   defp handle_paginate(query, paginate_params) do
-    per_page = Map.get(paginate_params, "per_page", RummageEcto.per_page)
+    per_page = paginate_params
+      |> Map.get("per_page", Rummage.Ecto.per_page)
       |> String.to_integer
 
-    page = Map.get(paginate_params, "page", "1")
+    page = paginate_params
+      |> Map.get("page", "1")
       |> String.to_integer
 
     per_page = if per_page < 1, do: 1, else: per_page

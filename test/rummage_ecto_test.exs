@@ -1,6 +1,6 @@
-defmodule RummageEctoTest do
+defmodule Rummage.EctoTest do
   use ExUnit.Case
-  doctest RummageEcto
+  doctest Rummage.Ecto
 
   test "the truth" do
     assert 1 + 1 == 2

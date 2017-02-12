@@ -1,7 +1,7 @@
-defmodule RummageEcto.Sort do
+defmodule Rummage.Ecto.Hooks.Sort do
   import Ecto.Query
 
-  @behaviour RummageEcto.Hook
+  @behaviour Rummage.Ecto.Hook
 
   def run(query, rummage) do
     sort_params = Map.get(rummage, "sort")

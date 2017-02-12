@@ -1,7 +1,8 @@
-defmodule RummageEcto.Mixfile do
+defmodule Rummage.Ecto.Mixfile do
   use Mix.Project
 
-  @version "0.1.0"
+  @version "0.1.1"
+  @url "https://github.com/Excipients/rummage_ecto"
 
   def project do
     [
@@ -17,12 +18,8 @@ defmodule RummageEcto.Mixfile do
       package: package(),
 
       # Docs
-      name: "Rumamge Ecto",
-      docs: [
-        main: "Rummage Ecto",
-        canonical: "http://hexdocs.pm/rummage_ecto",
-        source_url: "https://github.com/Excipients/rummage_ecto",
-      ]
+      name: "Rumamge.Ecto",
+      docs: docs(),
     ]
   end
 
@@ -43,7 +40,7 @@ defmodule RummageEcto.Mixfile do
     files: ["lib", "mix.exs"],
     maintainers: ["Adi Iyengar"],
     licenses: ["MIT"],
-    links: %{"Github" => "https://github.com/Excipients/rummage_ecto"},
+    links: %{"Github" => @url},
   ]
 end
 
@@ -58,5 +55,13 @@ end
     """
     A simple library that allows us to search, sort and paginate ecto queries
     """
+  end
+
+  def docs do
+    [
+      source_url: "https://github.com/Excipients/rummage_ecto",
+      extras: ["README.md"],
+      source_ref: "v#{@version}"
+    ]
   end
 end

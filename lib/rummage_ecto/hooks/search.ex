@@ -1,7 +1,7 @@
-defmodule RummageEcto.Search do
+defmodule Rummage.Ecto.Hooks.Search do
   import Ecto.Query
 
-  @behaviour RummageEcto.Hook
+  @behaviour Rummage.Ecto.Hook
 
   def run(query, rummage) do
     search_params = Map.get(rummage, "search")

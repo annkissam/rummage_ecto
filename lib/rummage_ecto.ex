@@ -1,55 +1,42 @@
-defmodule RummageEcto do
-  @moduledoc """
-  A module that provides Searching, Sorting and Paginating Ecto queries for Elixir applications.
-  This also provides support for phoenix views and templates.
+defmodule Rummage.Ecto do
+  @moduledoc ~S"""
+  Rummage.Ecto is a simple framework that can be used to alter Ecto queries with
+  Search, Sort and Paginate operations.
 
-  ## Configuration
-  ## Modules MyApp.Sort and MyApp.Search should implement RummageEcto.Hook behavior
+  It accomplishes the above operations by using `Hooks`, which are modules that
+  implement `Rumamge.Ecto.Hook` behavior. Each operation: Search, Sort and Paginate
+  have their hooks defined in Rummage. By doing this, we have made rummage completely
+  configurable. For example, if you don't like one of the implementations of Rummage,
+  but like the other two, you can configure Rummage to not use it.
 
-    config :rummage_ecto, RummageEcto
-      default_sort: MyApp.Sort,
-      default_search: MyApp.Search,
-      default_paginate: MyApp.Paginate
-
+  If you want to check a sample application that uses Rummage, please check
+  [this link](https://github.com/Excipients/rummage_ecto).
   """
 
-  @doc false
-  def default_search do
-    config(:default_search, RummageEcto.Search)
-  end
+  alias Rummage.Ecto.Config
 
-  @doc false
-  def default_sort do
-    config(:default_sort, RummageEcto.Sort)
-  end
+  def rummage(query, rummage) when is_nil(rummage) or rummage == %{} do
+    rummage = %{"search" => %{},
+      "sort"=> [],
+      "paginate" => %{"per_page" => Config.default_per_page, "page" => "1"}
+    }
 
-  def default_paginate do
-    config(:default_paginate, RummageEcto.Paginate)
-  end
+    query = query
+    |> Config.default_paginate.run(rummage)
 
-  def per_page do
-    config(:per_page, "10")
-  end
-
-  @doc false
-  def config do
-    Application.get_env(:rummage_ecto, RummageEcto, [])
-  end
-
-  @doc false
-  def config(key, default \\ nil) do
-    config()
-    |> Keyword.get(key, default)
-    |> resolve_config(default)
+    {query, rummage}
   end
 
   def rummage(query, rummage) do
-    RummageEcto.Ecto.rummage(query, rummage)
+    query = query
+      |> Config.default_search.run(rummage)
+      |> Config.default_sort.run(rummage)
+      |> Config.default_paginate.run(rummage)
+
+    {query, rummage}
   end
 
-  defp resolve_config({:system, var_name}, default) do
-    System.get_env(var_name) || default
+  def per_page do
+    Config.default_per_page
   end
-
-  defp resolve_config(value, _default), do: value
 end
