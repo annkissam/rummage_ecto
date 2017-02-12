@@ -1,15 +1,28 @@
 defmodule RummageEcto.Mixfile do
   use Mix.Project
 
+  @version "0.1.0"
+
   def project do
     [
       app: :rummage_ecto,
-      version: "0.1.0",
+      version: @version,
       elixir: "~> 1.4",
+      deps: deps(),
       build_embedded: Mix.env == :prod,
       start_permanent: Mix.env == :prod,
-      package: package,
-      deps: deps
+
+      # Hex
+      description: description(),
+      package: package(),
+
+      # Docs
+      name: "Rumamge Ecto",
+      docs: [
+        main: "Rummage Ecto",
+        canonical: "http://hexdocs.pm/rummage_ecto",
+        source_url: "https://github.com/Excipients/rummage_ecto",
+      ]
     ]
   end
 
@@ -37,6 +50,13 @@ end
   defp deps do
     [
       {:ecto, "~> 2.1"},
+      {:ex_doc, ">= 0.0.0", only: :dev},
     ]
+  end
+
+  defp description do
+    """
+    A simple library that allows us to search, sort and paginate ecto queries
+    """
   end
 end
