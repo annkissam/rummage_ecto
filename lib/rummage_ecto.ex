@@ -25,15 +25,29 @@ defmodule Rummage.Ecto do
           "paginate" => %{"per_page" => per_page(), "page" => "1"}
         }
 
-        query
+        rummage = case unquote(opts[:paginate_hook]) do
+          nil -> before_paginate(query, rummage)
+          _ -> rummage
+        end
+
+        query = query
         |> paginate_hook_call(rummage)
+
+        {query, rummage}
       end
 
       def rummage(query, rummage) do
-        query
+        rummage = case unquote(opts[:paginate_hook]) do
+          nil -> before_paginate(query, rummage)
+          _ -> rummage
+        end
+
+        query = query
         |> search_hook_call(rummage)
         |> sort_hook_call(rummage)
         |> paginate_hook_call(rummage)
+
+        {query, rummage}
       end
 
       def per_page do
@@ -49,19 +63,7 @@ defmodule Rummage.Ecto do
       end
 
       defp paginate_hook_call(query, rummage) do
-        unquote do
-          case opts[:paginate_hook] do
-            nil ->
-              quote do
-                rummage = before_paginate(query, rummage)
-                {unquote(Config.default_paginate).run(query, rummage), rummage}
-              end
-            _ ->
-              quote do
-                {unquote(opts[:paginate_hook]).run(query, rummage), rummage}
-              end
-          end
-        end
+        unquote(opts[:paginate_hook] || Config.default_paginate).run(query, rummage)
       end
 
       defp before_paginate(query, rummage) do
