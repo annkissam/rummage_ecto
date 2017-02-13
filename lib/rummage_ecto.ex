@@ -37,13 +37,15 @@ defmodule Rummage.Ecto do
       end
 
       def rummage(query, rummage) do
+        query = query
+        |> search_hook_call(rummage)
+
         rummage = case unquote(opts[:paginate_hook]) do
           nil -> before_paginate(query, rummage)
           _ -> rummage
         end
 
         query = query
-        |> search_hook_call(rummage)
         |> sort_hook_call(rummage)
         |> paginate_hook_call(rummage)
 
@@ -95,15 +97,19 @@ defmodule Rummage.Ecto do
 
             page = cond do
               page < 1 ->  1
-              max_page && page > max_page -> max_page
+              max_page > 0 && page > max_page -> max_page
               true -> page
             end
 
             paginate_params = paginate_params
             |> Map.put("page", Integer.to_string(page))
-            |> Map.put("page", Integer.to_string(per_page))
+            |> Map.put("per_page", Integer.to_string(per_page))
             |> Map.put("total_count", Integer.to_string(total_count))
             |> Map.put("max_page", Integer.to_string(max_page))
+
+            IO.puts "!!!!!!!!!!!!!"
+            IO.inspect paginate_params
+            IO.puts "!!!!!!!!!!!!!"
 
             Map.put(rummage, "paginate", paginate_params)
         end
