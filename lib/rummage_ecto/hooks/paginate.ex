@@ -9,7 +9,7 @@ defmodule Rummage.Ecto.Hooks.Paginate do
 
   import Ecto.Query
 
-  # @behaviour Rummage.Ecto.Hook
+  @behaviour Rummage.Ecto.Hook
 
   @doc """
   Builds a paginate query on top of the given `query` from the rummage parameters
