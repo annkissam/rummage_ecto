@@ -70,7 +70,7 @@ defmodule Rummage.Ecto do
         paginate_params = Map.get(rummage, "paginate")
 
         case paginate_params do
-          nil -> {query, rummage}
+          nil -> rummage
           _ ->
             total_count = case unquote(opts[:repo]) do
               nil -> raise "No Repo provided for Rummage struct"
@@ -107,8 +107,6 @@ defmodule Rummage.Ecto do
 
             Map.put(rummage, "paginate", paginate_params)
         end
-
-        rummage
       end
     end
   end
