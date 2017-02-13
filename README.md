@@ -1,4 +1,4 @@
-# Rummage
+# Rummage.Ecto
 
 Rummage.Ecto is a simple framework that can be used to alter Ecto queries with Search, Sort and Paginate operations.
 
@@ -14,7 +14,7 @@ is why Rumamge has been made configurable.**
 
 ## Installation
 
-If [available in Hex](https://hex.pm/docs/publish), the package can be installed as:
+This package is [available in Hex](https://hexdocs.pm/rummage_ecto/api-reference.html), and can be installed as:
 
   1. Add `rummage` to your list of dependencies in `mix.exs`:
 
