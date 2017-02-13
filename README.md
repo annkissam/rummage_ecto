@@ -16,19 +16,19 @@ is why Rumamge has been made configurable.**
 
 This package is [available in Hex](https://hexdocs.pm/rummage_ecto/api-reference.html), and can be installed as:
 
-  1. Add `rummage` to your list of dependencies in `mix.exs`:
+  1. Add `rummage_ecto` to your list of dependencies in `mix.exs`:
 
     ```elixir
     def deps do
-      [{:rummage, "~> 0.2.0"}]
+      [{:rummage_ecto, "~> 0.2.0"}]
     end
     ```
 
-  2. Ensure `rummage` is started before your application:
+  2. Ensure `rummage_ecto` is started before your application:
 
     ```elixir
     def application do
-      [applications: [:rummage]]
+      [applications: [:rummage_ecto]]
     end
     ```
 
