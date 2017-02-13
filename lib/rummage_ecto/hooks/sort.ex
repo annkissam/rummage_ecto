@@ -38,8 +38,8 @@ defmodule Rummage.Ecto.Hooks.Sort do
 
       iex> alias Rummage.Ecto.Hooks.Sort
       iex> import Ecto.Query
-      iex> rummage = %{"sort" => ["field_1.asc"]}
-      %{"sort" => ["field_1.asc"]}
+      iex> rummage = %{"sort" => "field_1.asc"}
+      %{"sort" => "field_1.asc"}
       iex> query = from u in "parents"
       #Ecto.Query<from p in "parents">
       iex> Sort.run(query, rummage)
@@ -55,15 +55,12 @@ defmodule Rummage.Ecto.Hooks.Sort do
   end
 
   defp handle_sort(query, sort_params) do
-    order_params =
-      Enum.reduce(sort_params, [], fn(unparsed_field, order_params) ->
-        cond do
-          Regex.match?(~r/\w.asc+$/, unparsed_field) or
-            Regex.match?(~r/\w.desc+$/, unparsed_field) ->
-              add_order_params(order_params, unparsed_field)
-          true -> order_params
-        end
-      end)
+    order_params = cond do
+      Regex.match?(~r/\w.asc+$/, sort_params) or
+        Regex.match?(~r/\w.desc+$/, sort_params) ->
+          add_order_params([], sort_params)
+      true -> []
+    end
 
     query |> order_by(^order_params)
   end
