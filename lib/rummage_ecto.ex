@@ -15,28 +15,44 @@ defmodule Rummage.Ecto do
 
   alias Rummage.Ecto.Config
 
-  def rummage(query, rummage) when is_nil(rummage) or rummage == %{} do
-    rummage = %{"search" => %{},
-      "sort"=> [],
-      "paginate" => %{"per_page" => Config.default_per_page, "page" => "1"}
-    }
+  defmacro __using__(opts) do
+    quote do
+      def rummage(query, rummage) when is_nil(rummage) or rummage == %{} do
+        rummage = %{"search" => %{},
+          "sort"=> [],
+          "paginate" => %{"per_page" => per_page, "page" => "1"}
+        }
 
-    query = query
-    |> Config.default_paginate.run(rummage)
+        query = query
+        |> paginate_hook_call(rummage)
 
-    {query, rummage}
-  end
+        {query, rummage}
+      end
 
-  def rummage(query, rummage) do
-    query = query
-      |> Config.default_search.run(rummage)
-      |> Config.default_sort.run(rummage)
-      |> Config.default_paginate.run(rummage)
+      def rummage(query, rummage) do
+        query = query
+          |> search_hook_call(rummage)
+          |> sort_hook_call(rummage)
+          |> paginate_hook_call(rummage)
 
-    {query, rummage}
-  end
+        {query, rummage}
+      end
 
-  def per_page do
-    Config.default_per_page
+      defp search_hook_call(query, rummage) do
+        unquote(opts[:search_hook] || Config.default_search).run(query, rummage)
+      end
+
+      defp sort_hook(query, rummage) do
+        unquote(opts[:sort_hook] || Config.default_sort).run(query, rummage)
+      end
+
+      defp paginate_hook(query, rummage) do
+        unquote(opts[:paginate_hook] || Config.default_paginate).run(query, rummage)
+      end
+
+      defp per_page do
+        unquote(Integer.to_string(opts[:per_page]) || Config.default_per_page)
+      end
+    end
   end
 end

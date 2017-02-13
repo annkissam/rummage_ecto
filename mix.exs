@@ -27,9 +27,7 @@ defmodule Rummage.Ecto.Mixfile do
     [
       applications: [
         :logger,
-        :phoenix,
-        :phoenix_ecto,
-        :phoenix_html
+        :ecto,
       ]
     ]
   end
