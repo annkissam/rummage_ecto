@@ -17,6 +17,8 @@ defmodule Rummage.Ecto do
 
   defmacro __using__(opts) do
     quote do
+      import Ecto.Query
+
       def rummage(query, rummage) when is_nil(rummage) or rummage == %{} do
         rummage = %{"search" => %{},
           "sort"=> [],
@@ -43,12 +45,19 @@ defmodule Rummage.Ecto do
       end
 
       def paginate_hook_call(query, rummage) do
-        case unquote(opts[:paginate_hook]) do
-          nil ->
-            rummage = before_paginate(query, rummage)
-            {unquote(Config.default_paginate).run(query, rummage), rummage}
-          _ ->
-            {unquote(opts[:paginate_hook]).run(query, rummage), rummage}
+        unquote do
+          case opts[:paginate_hook] do
+            nil ->
+              quote do
+                rummage = before_paginate(query, rummage)
+                {unquote(Config.default_paginate).run(query, rummage), rummage}
+              end
+            _ ->
+              quote do
+                {unquote(opts[:paginate_hook]).run(query, rummage), rummage}
+              end
+          end
+        end
       end
 
       def per_page do
@@ -81,7 +90,6 @@ defmodule Rummage.Ecto do
             max_page = (total_count / per_page)
               |> Float.ceil
               |> round
-            end
 
             page = cond do
               page < 1 ->  1
@@ -95,8 +103,10 @@ defmodule Rummage.Ecto do
             |> Map.put("total_count", Integer.to_string(total_count))
             |> Map.put("max_page", Integer.to_string(max_page))
 
-            Map.put("paginate", paginate_params)
+            Map.put(rummage, "paginate", paginate_params)
         end
+
+        {query, rummage}
       end
     end
   end
