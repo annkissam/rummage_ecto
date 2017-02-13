@@ -107,10 +107,6 @@ defmodule Rummage.Ecto do
             |> Map.put("total_count", Integer.to_string(total_count))
             |> Map.put("max_page", Integer.to_string(max_page))
 
-            IO.puts "!!!!!!!!!!!!!"
-            IO.inspect paginate_params
-            IO.puts "!!!!!!!!!!!!!"
-
             Map.put(rummage, "paginate", paginate_params)
         end
       end
