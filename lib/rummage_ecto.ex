@@ -106,7 +106,7 @@ defmodule Rummage.Ecto do
             Map.put(rummage, "paginate", paginate_params)
         end
 
-        {query, rummage}
+        rummage
       end
     end
   end
