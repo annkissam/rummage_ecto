@@ -34,15 +34,15 @@ defmodule Rummage.Ecto do
         |> paginate_hook_call(rummage)
       end
 
-      defp search_hook_call(query, rummage) do
+      def search_hook_call(query, rummage) do
         unquote(opts[:search_hook] || Config.default_search).run(query, rummage)
       end
 
-      defp sort_hook_call(query, rummage) do
+      def sort_hook_call(query, rummage) do
         unquote(opts[:sort_hook] || Config.default_sort).run(query, rummage)
       end
 
-      defp paginate_hook_call(query, rummage) do
+      def paginate_hook_call(query, rummage) do
         case unquote(opts[:paginate_hook]) do
           nil ->
             rummage = before_paginate(query, rummage)
@@ -51,11 +51,11 @@ defmodule Rummage.Ecto do
             {unquote(opts[:paginate_hook]).run(query, rummage), rummage}
       end
 
-      defp per_page do
+      def per_page do
         unquote(Integer.to_string(opts[:per_page]) || Config.default_per_page)
       end
 
-      defp before_paginate(query, rummage) do
+      def before_paginate(query, rummage) do
         paginate_params = Map.get(rummage, "paginate")
 
         case paginate_params do
