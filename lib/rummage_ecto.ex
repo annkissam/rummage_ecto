@@ -47,7 +47,7 @@ defmodule Rummage.Ecto do
       end
 
       defp paginate_hook_call(query, rummage) do
-        unquote(opts[:paginate_hook] || Config.default_paginate).run(query, rummage)
+        unquote(opts[:paginate_hook] || Config.default_paginate).run(query, rummage, unquote(opts[:repo]))
       end
 
       defp per_page do

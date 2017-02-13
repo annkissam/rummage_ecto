@@ -9,7 +9,7 @@ defmodule Rummage.Ecto.Hooks.Paginate do
 
   import Ecto.Query
 
-  @behaviour Rummage.Ecto.Hook
+  # @behaviour Rummage.Ecto.Hook
 
   @doc """
   Builds a paginate query on top of the given `query` from the rummage parameters
@@ -45,7 +45,7 @@ defmodule Rummage.Ecto.Hooks.Paginate do
       iex> Paginate.run(query, rummage)
       #Ecto.Query<from p in "parents", limit: ^1, offset: ^0>
   """
-  def run(query, rummage) do
+  def run(query, rummage, repo) do
     paginate_params = Map.get(rummage, "paginate")
 
     case paginate_params do
@@ -54,7 +54,7 @@ defmodule Rummage.Ecto.Hooks.Paginate do
     end
   end
 
-  defp handle_paginate(query, paginate_params) do
+  defp handle_paginate(query, paginate_params, repo) do
     per_page = paginate_params
       |> Map.get("per_page")
       |> String.to_integer
@@ -63,8 +63,21 @@ defmodule Rummage.Ecto.Hooks.Paginate do
       |> Map.get("page", "1")
       |> String.to_integer
 
+    total_count = query
+      |> select([b], count(b.id))
+      |> repo.one
+
     per_page = if per_page < 1, do: 1, else: per_page
-    page = if page < 1, do: 1, else: page
+
+    max_page = (total_count / per_page)
+      |> Float.ceil
+      |> round
+
+    page = cond do
+      page < 1 ->  1
+      page > max_page -> max_page
+      true -> page
+    end
 
     offset = per_page * (page - 1)
 

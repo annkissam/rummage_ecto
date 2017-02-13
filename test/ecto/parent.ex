@@ -1,4 +1,4 @@
-defmodule Parent do
+defmodule Rummage.Ecto.Test.Parent do
   use Ecto.Schema
 
   embedded_schema do

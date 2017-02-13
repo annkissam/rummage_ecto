@@ -28,7 +28,9 @@ defmodule Rummage.Ecto.Mixfile do
       applications: [
         :logger,
         :ecto,
+        :postgrex,
       ]
+      mod: {Rummage.Ecto.Test.Starter, []}
     ]
   end
 
@@ -46,6 +48,7 @@ end
     [
       {:ecto, "~> 2.1"},
       {:ex_doc, ">= 0.0.0", only: :dev},
+      {:postgrex, ">= 0.0.0", only: :test, :doc},
     ]
   end
 
