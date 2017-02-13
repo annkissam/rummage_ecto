@@ -1,8 +1,8 @@
 # Rummage.Ecto
 
-Rummage.Ecto is a simple framework that can be used to alter Ecto queries with Search, Sort and Paginate operations.
+`Rummage.Ecto` is a simple framework that can be used to alter Ecto queries with Search, Sort and Paginate operations.
 
-It accomplishes the above operations by using `Hooks`, which are modules thatimplement `Rumamge.Ecto.Hook` behavior.
+It accomplishes the above operations by using `Hooks`, which are modules that implement `Rumamge.Ecto.Hook` behavior.
 Each operation: Search, Sort and Paginate have their hooks defined in Rummage. By doing this, Rummage is completely
 configurable. For example, if you don't like one of the implementations of Rummage, but like the other two,
  you can configure Rummage to not use it.

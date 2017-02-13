@@ -20,7 +20,7 @@ defmodule Rummage.Ecto do
       def rummage(query, rummage) when is_nil(rummage) or rummage == %{} do
         rummage = %{"search" => %{},
           "sort"=> [],
-          "paginate" => %{"per_page" => per_page, "page" => "1"}
+          "paginate" => %{"per_page" => per_page(), "page" => "1"}
         }
 
         query = query
@@ -42,11 +42,11 @@ defmodule Rummage.Ecto do
         unquote(opts[:search_hook] || Config.default_search).run(query, rummage)
       end
 
-      defp sort_hook(query, rummage) do
+      defp sort_hook_call(query, rummage) do
         unquote(opts[:sort_hook] || Config.default_sort).run(query, rummage)
       end
 
-      defp paginate_hook(query, rummage) do
+      defp paginate_hook_call(query, rummage) do
         unquote(opts[:paginate_hook] || Config.default_paginate).run(query, rummage)
       end
 
