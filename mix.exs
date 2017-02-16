@@ -1,7 +1,7 @@
 defmodule Rummage.Ecto.Mixfile do
   use Mix.Project
 
-  @version "0.5.0"
+  @version "0.6.0"
   @url "https://github.com/Excipients/rummage_ecto"
 
   def project do
