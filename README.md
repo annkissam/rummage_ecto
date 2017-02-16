@@ -10,7 +10,7 @@ configurable. For example, if you don't like one of the implementations of Rumma
 
 **NOTE: Rummage is not like Ransack, and doesn't intend to be either. It doesn't add functions based on search params.
 If you'd like to have that for a model, you can always configure Rummage to use your Search module for that model. This
-is why Rumamge has been made configurable.**
+is why Rummage has been made configurable.**
 
 ## Installation
 
