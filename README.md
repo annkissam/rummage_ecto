@@ -20,7 +20,7 @@ This package is [available in Hex](https://hexdocs.pm/rummage_ecto/api-reference
 
     ```elixir
     def deps do
-      [{:rummage_ecto, "~> 0.2.0"}]
+      [{:rummage_ecto, "~> 0.5.0"}]
     end
     ```
 
