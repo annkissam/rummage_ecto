@@ -1,7 +1,9 @@
 # Rummage.Ecto
 
+[![Build Status](https://travis-ci.org/Excipients/rummage_ecto.svg?branch=master)](https://travis-ci.org/Excipients/rummage_ecto) [![Hex Version](http://img.shields.io/hexpm/v/rummage_ecto.svg?style=flat)](https://hex.pm/packages/rummage_ecto) [![Hex docs](http://img.shields.io/badge/hex.pm-docs-green.svg?style=flat)](https://hexdocs.pm/rummage_ecto)
+
 **If you're looking for `Phoenix` support, you might wanna check `Rummage.Phoenix` instead by clicking
-[here](https://github.com/Excipients/rummage_phoenix)**
+[here](https://github.com/Excipients/rummage_ecto)**
 
 `Rummage.Ecto` is a simple framework that can be used to alter `Ecto` queries with Search, Sort and Paginate operations.
 
