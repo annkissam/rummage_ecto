@@ -17,7 +17,7 @@ is why Rummage has been made configurable.**
 
 ## Installation
 
-This package is [available in Hex](https://hexdocs.pm/rummage_ecto/api-reference.html), and can be installed as:
+This package is [available in Hex](https://hexdocs.pm/rummage_ecto/), and can be installed as:
 
   - Add `rummage_ecto` to your list of dependencies in `mix.exs`:
 
