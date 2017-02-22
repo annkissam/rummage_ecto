@@ -1,7 +1,7 @@
 # Rummage.Ecto
 
 [![Build Status](https://travis-ci.org/Excipients/rummage_ecto.svg?branch=master)](https://travis-ci.org/Excipients/rummage_ecto)
-[![Coverage Status](https://coveralls.io/repos/github/Excipients/rummage_ecto/badge.svg?branch=master)](https://coveralls.io/github/Excipients/rummage_ecto)
+[![Coverage Status](https://coveralls.io/repos/github/Excipients/rummage_ecto/badge.svg?branch=master)](https://coveralls.io/github/Excipients/rummage_ecto?branch=master)
 [![MIT licensed](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/Excipients/rummage_ecto/master/LICENSE)
 [![docs](https://inch-ci.org/github/Excipients/rummage_ecto.svg)](http://inch-ci.org/github/Excipients/rummage_ecto)
 [![Hex Version](http://img.shields.io/hexpm/v/rummage_ecto.svg?style=flat)](https://hex.pm/packages/rummage_ecto)
