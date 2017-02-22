@@ -99,7 +99,7 @@ defmodule Rummage.Ecto.Hooks.Sort do
     end
   end
 
-  defmacro case_insensitive(field) do
+  defmacrop case_insensitive(field) do
     quote do
       fragment("lower(?)", unquote(field))
     end
