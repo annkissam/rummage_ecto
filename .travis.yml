@@ -6,7 +6,8 @@ matrix:
 sudo: false
 script:
   - mix test
-  - mix credo
+  - mix coveralls.travis
 after_script:
+  - mix credo
   - mix deps.get --only docs
   - MIX_ENV=docs mix inch
