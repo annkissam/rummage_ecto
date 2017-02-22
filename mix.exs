@@ -43,6 +43,7 @@ end
 
   defp deps do
     [
+      {:credo, "~> 0.5", only: [:dev, :test]},
       {:ecto, "~> 2.1"},
       {:ex_doc, "~> 0.14", only: :dev, runtime: false},
     ]

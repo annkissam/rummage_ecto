@@ -124,19 +124,26 @@ defmodule Rummage.Ecto.Hooks.Sort do
       true -> []
     end
 
-    order_type = Enum.at(order_params, 0) |> elem(0)
-    order_field = Enum.at(order_params, 0) |> elem(1)
+    order_type = order_params
+      |> Enum.at(0)
+      |> elem(0)
+
+    order_field = order_params
+      |> Enum.at(0)
+      |> elem(1)
 
     query |> order_by([{^order_type, case_insensitive(^order_field)}])
   end
 
   defp add_order_params(order_params, unparsed_field) do
-    parsed_field = String.split(unparsed_field, ".")
+    parsed_field = unparsed_field
+      |> String.split(".")
       |> Enum.drop(-1)
       |> Enum.join(".")
       |> String.to_atom
 
-    order_type = String.split(unparsed_field, ".")
+    order_type = unparsed_field
+      |> String.split(".")
       |> Enum.at(-1)
       |> String.to_atom
 
