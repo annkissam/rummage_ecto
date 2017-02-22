@@ -46,7 +46,7 @@ This package is [available in Hex](https://hexdocs.pm/rummage_ecto/), and can be
 
   - Other config options are: `default_sort`, `default_paginate`, `default_per_page`
 
-  - `Rumamge.Ectp` can be configured globally with a `default_per_page` value (which can be overriden for a model).
+  - `Rumamge.Ecto` can be configured globally with a `default_per_page` value (which can be overriden for a model).
     This is **NOT** the preferred way to set `per_page` as it might lead to conflicts. It is recommended to
     do it per model as show below in the [Initial Setup](#initial-setup) section. If you wanna set per_page
     for all the models, add it to `model` function in `web.ex`
