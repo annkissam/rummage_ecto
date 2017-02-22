@@ -3,12 +3,34 @@ defmodule Rummage.Ecto.Hooks.Sort do
   `Rummage.Ecto.Hooks.Sort` is the default sort hook that comes shipped
   with `Rummage`.
 
+  Usage:
+  For a regular sort:
+
+  ```elixir
+  alias Rummage.Ecto.Hooks.Sort
+
+  # This returns a query which upon running will give a list of `Parent`(s)
+  # sorted by ascending field_1
+  sorted_query = Sort.run(Parent, %{"sort" => "field_1.asc"})
+  ```
+
+  For a case-insensitive sort:
+
+  ```elixir
+  alias Rummage.Ecto.Hooks.Sort
+
+  # This returns a query which upon running will give a list of `Parent`(s)
+  # sorted by ascending case insensitive field_1
+  # Keep in mind that case insensitive can only be called for text fields
+  sorted_query = Sort.run(Parent, %{"sort" => "field_1.asc.ci"})
+  ```
+
+
   This module can be overridden with a custom module while using `Rummage.Ecto`
   in `Ecto` struct module.
   """
 
   import Ecto.Query
-  import Ecto
 
   @behaviour Rummage.Ecto.Hook
 
@@ -56,7 +78,7 @@ defmodule Rummage.Ecto.Hooks.Sort do
       iex> query = from u in "parents"
       #Ecto.Query<from p in "parents">
       iex> Sort.run(query, rummage)
-      #Ecto.Query<from p in "parents", order_by: [asc: fragment("lower(?)", p.field_1)]>
+      #Ecto.Query<from p in "parents", order_by: [asc: fragment("lower(?)", ^:field_1)]>
   """
   def run(query, rummage) do
     sort_params = Map.get(rummage, "sort")
@@ -65,7 +87,13 @@ defmodule Rummage.Ecto.Hooks.Sort do
       a when a in [nil, [], ""] -> query
       _ ->
         case Regex.match?(~r/\w.ci+$/, sort_params) do
-          true -> handle_ci_sort(query, sort_params)
+          true ->
+            sort_params = sort_params
+              |> String.split(".")
+              |> Enum.drop(-1)
+              |> Enum.join(".")
+
+            handle_ci_sort(query, sort_params)
           _ -> handle_sort(query, sort_params)
         end
     end
@@ -90,15 +118,16 @@ defmodule Rummage.Ecto.Hooks.Sort do
 
   defp handle_ci_sort(query, sort_params) do
     order_params = cond do
-      Regex.match?(~r/\w.asc.ci+$/, sort_params) or
-        Regex.match?(~r/\w.desc.ci+$/, sort_params) ->
+      Regex.match?(~r/\w.asc+$/, sort_params) or
+        Regex.match?(~r/\w.desc+$/, sort_params) ->
           add_order_params([], sort_params)
       true -> []
     end
 
-    query |> order_by(^(order_params |> Enum.map(fn({key, value}) ->
-      {key, case_insensitive(value)}
-    end)))
+    order_type = Enum.at(order_params, 0) |> elem(0)
+    order_field = Enum.at(order_params, 0) |> elem(1)
+
+    query |> order_by([{^order_type, case_insensitive(^order_field)}])
   end
 
   defp add_order_params(order_params, unparsed_field) do
