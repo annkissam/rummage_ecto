@@ -45,6 +45,7 @@ defmodule Rummage.Ecto.Hooks.Paginate do
       iex> Paginate.run(query, rummage)
       #Ecto.Query<from p in "parents", limit: ^1, offset: ^0>
   """
+  @spec run(Ecto.Query.t, map) :: {Ecto.Query.t, map}
   def run(query, rummage) do
     paginate_params = Map.get(rummage, "paginate")
 

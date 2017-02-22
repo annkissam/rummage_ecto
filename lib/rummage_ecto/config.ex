@@ -22,12 +22,12 @@ defmodule Rummage.Ecto.Config do
   end
 
   @doc false
-  def config do
+  defp config do
     Application.get_env(:rummage_ecto, Rummage.Ecto, [])
   end
 
   @doc false
-  def config(key, default \\ nil) do
+  defp config(key, default) do
     config()
     |> Keyword.get(key, default)
     |> resolve_config(default)

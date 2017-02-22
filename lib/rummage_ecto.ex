@@ -19,37 +19,38 @@ defmodule Rummage.Ecto do
     quote do
       import Ecto.Query
 
+      @spec rummage(Ecto.Query.t, map) :: {Ecto.Query.t, map}
       def rummage(query, rummage) when is_nil(rummage) or rummage == %{} do
-        rummage = %{"search" => %{},
+        params = %{"search" => %{},
           "sort"=> [],
           "paginate" => %{"per_page" => per_page(), "page" => "1"},
         }
 
         rummage = case unquote(opts[:paginate_hook]) do
-          nil -> before_paginate(query, rummage)
-          _ -> rummage
+          nil -> before_paginate(query, params)
+          _ -> params
         end
 
         query = query
-        |> paginate_hook_call(rummage)
+          |> paginate_hook_call(rummage)
 
         {query, rummage}
       end
 
       def rummage(query, rummage) do
-        query = query
-        |> search_hook_call(rummage)
+        searched_query = query
+          |> search_hook_call(rummage)
 
         rummage = case unquote(opts[:paginate_hook]) do
           nil -> before_paginate(query, rummage)
           _ -> rummage
         end
 
-        query = query
-        |> sort_hook_call(rummage)
-        |> paginate_hook_call(rummage)
+        rummaged_query = searched_query
+          |> sort_hook_call(rummage)
+          |> paginate_hook_call(rummage)
 
-        {query, rummage}
+        {query, rummaged_query}
       end
 
       def default_per_page do
@@ -74,24 +75,14 @@ defmodule Rummage.Ecto do
         case paginate_params do
           nil -> rummage
           _ ->
-            total_count = case unquote(opts[:repo]) do
-              nil -> raise "No Repo provided for Rummage struct"
-              _ -> query
-              |> select([b], count(b.id))
-              |> unquote(opts[:repo]).one
-            end
+            total_count = get_total_count(query)
 
-            per_page = paginate_params
-              |> Map.get("per_page", default_per_page())
-              |> String.to_integer
-
-            page = paginate_params
-              |> Map.get("page", "1")
-              |> String.to_integer
+            {page, per_page} = parse_page_and_per_page(paginate_params)
 
             per_page = if per_page < 1, do: 1, else: per_page
 
-            max_page = (total_count / per_page)
+            max_page_fl = total_count / per_page
+            max_page = max_page_fl
               |> Float.ceil
               |> round
 
@@ -102,13 +93,35 @@ defmodule Rummage.Ecto do
             end
 
             paginate_params = paginate_params
-            |> Map.put("page", Integer.to_string(page))
-            |> Map.put("per_page", Integer.to_string(per_page))
-            |> Map.put("total_count", Integer.to_string(total_count))
-            |> Map.put("max_page", Integer.to_string(max_page))
+              |> Map.put("page", Integer.to_string(page))
+              |> Map.put("per_page", Integer.to_string(per_page))
+              |> Map.put("total_count", Integer.to_string(total_count))
+              |> Map.put("max_page", Integer.to_string(max_page))
 
             Map.put(rummage, "paginate", paginate_params)
         end
+      end
+
+      defp get_total_count(query) do
+        case unquote(opts[:repo]) do
+          nil -> raise "No Repo provided for Rummage struct"
+          _ ->
+            query
+            |> select([b], count(b.id))
+            |> unquote(opts[:repo]).one
+        end
+      end
+
+      defp parse_page_and_per_page(paginate_params) do
+        per_page = paginate_params
+          |> Map.get("per_page", default_per_page())
+          |> String.to_integer
+
+        page = paginate_params
+          |> Map.get("page", "1")
+          |> String.to_integer
+
+        {page, per_page}
       end
     end
   end

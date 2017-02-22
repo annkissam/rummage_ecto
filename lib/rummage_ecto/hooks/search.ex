@@ -45,6 +45,7 @@ defmodule Rummage.Ecto.Hooks.Search do
       iex> Search.run(query, rummage)
       #Ecto.Query<from p in "parents", where: like(p.field_1, ^"%field_!%")>
   """
+  @spec run(Ecto.Query.t, map) :: {Ecto.Query.t, map}
   def run(query, rummage) do
     search_params = Map.get(rummage, "search")
 
@@ -57,12 +58,18 @@ defmodule Rummage.Ecto.Hooks.Search do
   defp handle_search(query, search_params) do
     search_params
     |> Map.to_list
-    |> Enum.reduce(query, fn(param, q) ->
-        field = elem(param, 0)
-          |> String.to_atom
-        term = elem(param, 1)
+    |> Enum.reduce(query, &make_search_query(&1, &2))
+  end
 
-        q |> where([b], like(field(b, ^field), ^"%#{String.replace(term, "%", "\\%")}%"))
-      end)
+  defp make_search_query(param, query) do
+    field = param
+      |> elem(0)
+      |> String.to_atom
+
+    term = elem(param, 1)
+
+    query
+    |> where([b],
+      like(field(b, ^field), ^"%#{String.replace(term, "%", "\\%")}%"))
   end
 end

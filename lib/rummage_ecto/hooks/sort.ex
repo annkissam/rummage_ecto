@@ -80,6 +80,7 @@ defmodule Rummage.Ecto.Hooks.Sort do
       iex> Sort.run(query, rummage)
       #Ecto.Query<from p in "parents", order_by: [asc: fragment("lower(?)", ^:field_1)]>
   """
+  @spec run(Ecto.Query.t, map) :: {Ecto.Query.t, map}
   def run(query, rummage) do
     sort_params = Map.get(rummage, "sort")
 
@@ -105,34 +106,25 @@ defmodule Rummage.Ecto.Hooks.Sort do
     end
   end
 
-  defp handle_sort(query, sort_params) do
-    order_params = cond do
-      Regex.match?(~r/\w.asc+$/, sort_params) or
-        Regex.match?(~r/\w.desc+$/, sort_params) ->
-          add_order_params([], sort_params)
-      true -> []
-    end
-
-    query |> order_by(^order_params)
-  end
+  defp handle_sort(query, sort_params), do: query |> order_by(^consolidate_order_params(sort_params))
 
   defp handle_ci_sort(query, sort_params) do
-    order_params = cond do
-      Regex.match?(~r/\w.asc+$/, sort_params) or
-        Regex.match?(~r/\w.desc+$/, sort_params) ->
-          add_order_params([], sort_params)
-      true -> []
+    order_param = sort_params
+      |> consolidate_order_params
+      |> Enum.at(0)
+
+    query
+    |> order_by([{^elem(order_param, 0),
+      case_insensitive(^elem(order_param, 1))}])
+  end
+
+  defp consolidate_order_params(sort_params) do
+    case Regex.match?(~r/\w.asc+$/, sort_params)
+      or Regex.match?(~r/\w.desc+$/, sort_params)
+      do
+      true -> add_order_params([], sort_params)
+      _ -> []
     end
-
-    order_type = order_params
-      |> Enum.at(0)
-      |> elem(0)
-
-    order_field = order_params
-      |> Enum.at(0)
-      |> elem(1)
-
-    query |> order_by([{^order_type, case_insensitive(^order_field)}])
   end
 
   defp add_order_params(order_params, unparsed_field) do
