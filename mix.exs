@@ -13,6 +13,10 @@ defmodule Rummage.Ecto.Mixfile do
       build_embedded: Mix.env == :prod,
       start_permanent: Mix.env == :prod,
 
+      # Test
+      test_coverage: [tool: ExCoveralls],
+      preferred_cli_env: [coveralls: :test],
+
       # Hex
       description: description(),
       package: package(),
@@ -45,6 +49,7 @@ end
     [
       {:credo, "~> 0.5", only: [:dev, :test]},
       {:ecto, "~> 2.1"},
+      {:excoveralls, "~> 0.3", only: :test},
       {:ex_doc, "~> 0.14", only: :dev, runtime: false},
       {:inch_ex, "~> 0.5", only: [:dev, :test]},
     ]
