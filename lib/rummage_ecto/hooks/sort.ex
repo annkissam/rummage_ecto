@@ -3,6 +3,29 @@ defmodule Rummage.Ecto.Hooks.Sort do
   `Rummage.Ecto.Hooks.Sort` is the default sort hook that comes shipped
   with `Rummage`.
 
+  Usage:
+  For a regular sort:
+
+  ```elixir
+  alias Rummage.Ecto.Hooks.Sort
+
+  # This returns a query which upon running will give a list of `Parent`(s)
+  # sorted by ascending field_1
+  sorted_query = Sort.run(Parent, %{"sort" => "field_1.asc"})
+  ```
+
+  For a case-insensitive sort:
+
+  ```elixir
+  alias Rummage.Ecto.Hooks.Sort
+
+  # This returns a query which upon running will give a list of `Parent`(s)
+  # sorted by ascending case insensitive field_1
+  # Keep in mind that case insensitive can only be called for text fields
+  sorted_query = Sort.run(Parent, %{"sort" => "field_1.asc.ci"})
+  ```
+
+
   This module can be overridden with a custom module while using `Rummage.Ecto`
   in `Ecto` struct module.
   """
@@ -44,13 +67,41 @@ defmodule Rummage.Ecto.Hooks.Sort do
       #Ecto.Query<from p in "parents">
       iex> Sort.run(query, rummage)
       #Ecto.Query<from p in "parents", order_by: [asc: p.field_1]>
+
+  When rummage struct passed has case-insensitive sort, it returns
+  a sorted version of the query with case_insensitive arguments:
+
+      iex> alias Rummage.Ecto.Hooks.Sort
+      iex> import Ecto.Query
+      iex> rummage = %{"sort" => "field_1.asc.ci"}
+      %{"sort" => "field_1.asc.ci"}
+      iex> query = from u in "parents"
+      #Ecto.Query<from p in "parents">
+      iex> Sort.run(query, rummage)
+      #Ecto.Query<from p in "parents", order_by: [asc: fragment("lower(?)", ^:field_1)]>
   """
   def run(query, rummage) do
     sort_params = Map.get(rummage, "sort")
 
     case sort_params do
       a when a in [nil, [], ""] -> query
-      _ -> handle_sort(query, sort_params)
+      _ ->
+        case Regex.match?(~r/\w.ci+$/, sort_params) do
+          true ->
+            sort_params = sort_params
+              |> String.split(".")
+              |> Enum.drop(-1)
+              |> Enum.join(".")
+
+            handle_ci_sort(query, sort_params)
+          _ -> handle_sort(query, sort_params)
+        end
+    end
+  end
+
+  defmacro case_insensitive(field) do
+    quote do
+      fragment("lower(?)", unquote(field))
     end
   end
 
@@ -63,6 +114,20 @@ defmodule Rummage.Ecto.Hooks.Sort do
     end
 
     query |> order_by(^order_params)
+  end
+
+  defp handle_ci_sort(query, sort_params) do
+    order_params = cond do
+      Regex.match?(~r/\w.asc+$/, sort_params) or
+        Regex.match?(~r/\w.desc+$/, sort_params) ->
+          add_order_params([], sort_params)
+      true -> []
+    end
+
+    order_type = Enum.at(order_params, 0) |> elem(0)
+    order_field = Enum.at(order_params, 0) |> elem(1)
+
+    query |> order_by([{^order_type, case_insensitive(^order_field)}])
   end
 
   defp add_order_params(order_params, unparsed_field) do
