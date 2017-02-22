@@ -52,7 +52,7 @@ defmodule Rummage.Ecto do
         {query, rummage}
       end
 
-      def per_page do
+      def default_per_page do
         unquote(Integer.to_string(opts[:per_page]) || Config.default_per_page)
       end
 
@@ -82,7 +82,7 @@ defmodule Rummage.Ecto do
             end
 
             per_page = paginate_params
-              |> Map.get("per_page", per_page())
+              |> Map.get("per_page", default_per_page())
               |> String.to_integer
 
             page = paginate_params
