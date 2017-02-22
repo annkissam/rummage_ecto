@@ -1,5 +1,5 @@
 defmodule Rummage.Ecto.Hooks.Search do
-  @moduledoc ~S"""
+  @moduledoc """
   `Rummage.Ecto.Hooks.Search` is the default search hook that comes shipped
   with `Rummage`.
 

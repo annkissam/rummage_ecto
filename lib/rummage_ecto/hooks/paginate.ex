@@ -1,5 +1,5 @@
 defmodule Rummage.Ecto.Hooks.Paginate do
-  @moduledoc ~S"""
+  @moduledoc """
   `Rummage.Ecto.Hooks.Paginate` is the default pagination hook that comes shipped
   with `Rummage`.
 

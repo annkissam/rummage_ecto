@@ -1,5 +1,5 @@
 defmodule Rummage.Ecto.Hooks.Sort do
-  @moduledoc ~S"""
+  @moduledoc """
   `Rummage.Ecto.Hooks.Sort` is the default sort hook that comes shipped
   with `Rummage`.
 

@@ -34,8 +34,7 @@ defmodule Rummage.Ecto.Mixfile do
 
   def package do
   [
-    name: :rummage_ecto,
-    files: ["lib", "mix.exs"],
+    files: ["lib", "mix.exs", "README.md"],
     maintainers: ["Adi Iyengar"],
     licenses: ["MIT"],
     links: %{"Github" => @url},
@@ -45,7 +44,7 @@ end
   defp deps do
     [
       {:ecto, "~> 2.1"},
-      {:ex_doc, ">= 0.0.0", only: :dev},
+      {:ex_doc, "~> 0.14", only: :dev, runtime: false},
     ]
   end
 
@@ -57,9 +56,9 @@ end
 
   def docs do
     [
-      main: "readme",
+      main: "Rummage.Ecto",
       source_url: "https://github.com/Excipients/rummage_ecto",
-      extras: ["README.md"],
+      extras: ["doc_readme.md"],
       source_ref: "v#{@version}"
     ]
   end
