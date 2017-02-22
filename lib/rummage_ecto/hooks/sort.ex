@@ -8,6 +8,7 @@ defmodule Rummage.Ecto.Hooks.Sort do
   """
 
   import Ecto.Query
+  import Ecto
 
   @behaviour Rummage.Ecto.Hook
 
@@ -36,7 +37,7 @@ defmodule Rummage.Ecto.Hooks.Sort do
   When rummage struct passed has the key "sort", with "field" and "order"
   it returns a sorted version of the query passed in as the argument:
 
-      iex> alias Rummage.Ecto.Hooks.Sort
+      iex> alias Rummage.Ecto.Hooks.sort
       iex> import Ecto.Query
       iex> rummage = %{"sort" => "field_1.asc"}
       %{"sort" => "field_1.asc"}
@@ -50,7 +51,17 @@ defmodule Rummage.Ecto.Hooks.Sort do
 
     case sort_params do
       a when a in [nil, [], ""] -> query
-      _ -> handle_sort(query, sort_params)
+      _ ->
+        case Regex.match?(~r/\w.ci+$/, sort_params) do
+          true -> handle_ci_sort(query, sort_params)
+          _ -> handle_sort(query, sort_params)
+        end
+    end
+  end
+
+  defmacro case_insensitive(field) do
+    quote do
+      fragment("lower(?)", unquote(field))
     end
   end
 
@@ -63,6 +74,19 @@ defmodule Rummage.Ecto.Hooks.Sort do
     end
 
     query |> order_by(^order_params)
+  end
+
+  defp handle_ci_sort(query, sort_params) do
+    order_params = cond do
+      Regex.match?(~r/\w.asc.ci+$/, sort_params) or
+        Regex.match?(~r/\w.desc.ci+$/, sort_params) ->
+          add_order_params([], sort_params)
+      true -> []
+    end
+
+    query |> order_by(^(order_params |> Enum.map(fn({key, value}) ->
+      {key, case_insensitive(value)}
+    end)))
   end
 
   defp add_order_params(order_params, unparsed_field) do
