@@ -37,7 +37,7 @@ defmodule Rummage.Ecto.Hooks.Sort do
   When rummage struct passed has the key "sort", with "field" and "order"
   it returns a sorted version of the query passed in as the argument:
 
-      iex> alias Rummage.Ecto.Hooks.sort
+      iex> alias Rummage.Ecto.Hooks.Sort
       iex> import Ecto.Query
       iex> rummage = %{"sort" => "field_1.asc"}
       %{"sort" => "field_1.asc"}
@@ -45,6 +45,18 @@ defmodule Rummage.Ecto.Hooks.Sort do
       #Ecto.Query<from p in "parents">
       iex> Sort.run(query, rummage)
       #Ecto.Query<from p in "parents", order_by: [asc: p.field_1]>
+
+  When rummage struct passed has case-insensitive sort, it returns
+  a sorted version of the query with case_insensitive arguments:
+
+      iex> alias Rummage.Ecto.Hooks.Sort
+      iex> import Ecto.Query
+      iex> rummage = %{"sort" => "field_1.asc.ci"}
+      %{"sort" => "field_1.asc.ci"}
+      iex> query = from u in "parents"
+      #Ecto.Query<from p in "parents">
+      iex> Sort.run(query, rummage)
+      #Ecto.Query<from p in "parents", order_by: [asc: fragment("lower(?)", p.field_1)]>
   """
   def run(query, rummage) do
     sort_params = Map.get(rummage, "sort")
