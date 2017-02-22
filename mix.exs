@@ -51,7 +51,7 @@ end
       {:ecto, "~> 2.1"},
       {:excoveralls, "~> 0.3", only: :test},
       {:ex_doc, "~> 0.14", only: :dev, runtime: false},
-      {:inch_ex, "~> 0.5", only: [:dev, :test]},
+      {:inch_ex, "~> 0.5", only: [:dev, :test, :docs]},
     ]
   end
 

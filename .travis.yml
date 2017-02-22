@@ -12,4 +12,4 @@ script:
 after_script:
   - mix credo
   - mix deps.get --only docs
-  - mix inch
+  - MIX_ENV=docs mix inch.report
