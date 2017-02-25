@@ -67,7 +67,7 @@ defmodule Rummage.Ecto.Hooks.AssocSort do
       iex> query = from u in "parents"
       #Ecto.Query<from p in "parents">
       iex> AssocSort.run(query, rummage)
-      #Ecto.Query<from p0 in "parents", join: p1 in Parent, on: p0.field_2 == p1.field_1, join: p2 in Parent, on: p0.field_2 == p2.field_1, order_by: [asc: p2.field_1]>
+      #Ecto.Query<from p0 in "parents", join: p1 in Parent, on: p0.field_2 == p1.field_1, join: p2 in Parent, on: p1.field_2 == p2.field_1, order_by: [asc: p2.field_1]>
 
   # When rummage struct passed has case-insensitive assoc_sort, it returns
   # a assoc_sorted version of the query with case_insensitive arguments:
