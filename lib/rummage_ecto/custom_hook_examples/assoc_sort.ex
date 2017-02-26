@@ -34,6 +34,26 @@ defmodule Rummage.Ecto.Hooks.AssocSort do
 
   @behaviour Rummage.Ecto.Hook
 
+  defmacrop order_by_macro(query, order_param, order_type, parsed_field) do
+    quote do
+      unquote(query)
+      |> order_by([p0, ..., p2], [{
+        ^String.to_atom(unquote(order_type)),
+        field(p2, ^String.to_atom(unquote(parsed_field)))
+        }])
+    end
+  end
+
+  defmacrop join_by_association_macro(association, query) do
+    quote do
+      unquote(query)
+      |> join(:inner, [p0, ..., p1],
+        p2 in ^elem(unquote(association), 0),
+        field(p2, ^String.to_atom(elem(unquote(association), 1))) ==
+        field(p1, ^String.to_atom(elem(unquote(association), 2))))
+    end
+  end
+
   @doc """
   Builds a assoc_sort query on top of the given `query` from the rummage parameters
   from the given `rummage` struct.
@@ -56,6 +76,19 @@ defmodule Rummage.Ecto.Hooks.AssocSort do
       iex>  AssocSort.run(query, %{})
       #Ecto.Query<from p in "parents">
 
+  When rummage struct passed has the key "sort", but empty associations array
+  it calls to default rummage sort hook:
+
+      iex> alias Rummage.Ecto.Hooks.AssocSort
+      iex> import Ecto.Query
+      iex> rummage = %{"sort" => {[], "field_1.asc"}}
+      %{"sort" => {[],
+        "field_1.asc"}}
+      iex> query = from u in "parents"
+      #Ecto.Query<from p in "parents">
+      iex> AssocSort.run(query, rummage)
+      #Ecto.Query<from p in "parents", order_by: [asc: p.field_1]>
+
   When rummage struct passed has the key "sort", with "field" and "order"
   it returns a assoc_sorted version of the query passed in as the argument:
 
@@ -67,7 +100,7 @@ defmodule Rummage.Ecto.Hooks.AssocSort do
       iex> query = from u in "parents"
       #Ecto.Query<from p in "parents">
       iex> AssocSort.run(query, rummage)
-      #Ecto.Query<from p0 in "parents", join: p1 in Parent, on: p0.field_2 == p1.field_1, join: p2 in Parent, on: p1.field_2 == p2.field_1, order_by: [asc: p2.field_1]>
+      #Ecto.Query<from p0 in "parents", join: p1 in Parent, on: p1.field_2 == p0.field_1, join: p2 in Parent, on: p2.field_2 == p1.field_1, order_by: [asc: p2.field_1]>
 
   # When rummage struct passed has case-insensitive assoc_sort, it returns
   # a assoc_sorted version of the query with case_insensitive arguments:
@@ -92,13 +125,6 @@ defmodule Rummage.Ecto.Hooks.AssocSort do
     end
   end
 
-  defmacrop order_by_macro(query, order_param, order_type, parsed_field) do
-    quote do
-      unquote(query)
-      |> order_by([p, p1, p2], [{:asc, p2.field_1}])
-    end
-  end
-
   defp handle_assoc_sort(query, assoc_sort_params) do
     order_param = assoc_sort_params
       |> elem(1)
@@ -107,6 +133,7 @@ defmodule Rummage.Ecto.Hooks.AssocSort do
       |> elem(0)
 
     query = association_names
+    |> Enum.with_index
     |> Enum.reduce(query, &join_by_association(&1, &2))
 
     case Regex.match?(~r/\w.asc+$/, order_param)
@@ -117,55 +144,26 @@ defmodule Rummage.Ecto.Hooks.AssocSort do
           |> String.split(".")
           |> Enum.drop(-1)
           |> Enum.join(".")
-          |> String.to_atom
 
         order_type = order_param
           |> String.split(".")
           |> Enum.at(-1)
-          |> String.to_atom
-
-        IO.inspect order_type
 
         query |> order_by_macro(order_param, order_type, parsed_field)
        _ -> query
     end
   end
 
-  defmacrop join_by_association_macro(association, query) do
-    quote do
-      unquote(query)
-      |> join(:inner, [p, p1, p2],
-        p1 in ^elem(unquote(association), 0),
-        field(p, ^String.to_atom(elem(unquote(association), 1))) ==
-        field(p1, ^String.to_atom(elem(unquote(association), 2))))
+  defp join_by_association({association, index}, query) do
+    case index do
+      a when a < 1 ->
+        query
+        |> join(:inner, [p],
+          p1 in ^elem(association, 0),
+          field(p1, ^String.to_atom(elem(association, 1))) ==
+          field(p, ^String.to_atom(elem(association, 2))))
+      _ ->
+        join_by_association_macro(association, query)
     end
-  end
-
-  defp join_by_association(association, query) do
-    join_by_association_macro(association, query)
-  end
-
-  defp consolidate_order_params(assoc_sort_params) do
-    case Regex.match?(~r/\w.asc+$/, assoc_sort_params)
-      or Regex.match?(~r/\w.desc+$/, assoc_sort_params)
-      do
-      true -> add_order_params([], assoc_sort_params)
-      _ -> []
-    end
-  end
-
-  defp add_order_params(order_params, unparsed_field) do
-    parsed_field = unparsed_field
-      |> String.split(".")
-      |> Enum.drop(-1)
-      |> Enum.join(".")
-      |> String.to_atom
-
-    order_type = unparsed_field
-      |> String.split(".")
-      |> Enum.at(-1)
-      |> String.to_atom
-
-    Keyword.put(order_params, order_type, parsed_field)
   end
 end
