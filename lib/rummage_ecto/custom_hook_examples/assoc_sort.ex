@@ -92,6 +92,13 @@ defmodule Rummage.Ecto.Hooks.AssocSort do
     end
   end
 
+  defmacrop order_by_macro(query, order_param, order_type, parsed_field) do
+    quote do
+      unquote(query)
+      |> order_by([p, p1, p2], [{:asc, p2.field_1}])
+    end
+  end
+
   defp handle_assoc_sort(query, assoc_sort_params) do
     order_param = assoc_sort_params
       |> elem(1)
@@ -102,16 +109,35 @@ defmodule Rummage.Ecto.Hooks.AssocSort do
     query = association_names
     |> Enum.reduce(query, &join_by_association(&1, &2))
 
-    index =  Enum.at(query.joins, -1).on.expr |> elem(2) |> Enum.at(1) |> elem(0) |> elem(2) |> hd |> elem(2) |> hd |> to_string
-    table_alias = (Enum.at(query.joins, -1).source |> elem(1) |> to_string |> String.split(".") |> Enum.at(-1) |> String.codepoints |> hd |> String.downcase) <> index
+    case Regex.match?(~r/\w.asc+$/, order_param)
+      or Regex.match?(~r/\w.desc+$/, order_param)
+      do
+      true ->
+        parsed_field = order_param
+          |> String.split(".")
+          |> Enum.drop(-1)
+          |> Enum.join(".")
+          |> String.to_atom
 
-    query |> order_by(^consolidate_order_params(order_param, table_alias))
+        order_type = order_param
+          |> String.split(".")
+          |> Enum.at(-1)
+          |> String.to_atom
+
+        IO.inspect order_type
+
+        query |> order_by_macro(order_param, order_type, parsed_field)
+       _ -> query
+    end
   end
 
   defmacrop join_by_association_macro(association, query) do
     quote do
       unquote(query)
-      |> join(:inner, [c], a in ^elem(unquote(association), 0), field(c, ^String.to_atom(elem(unquote(association), 1))) == field(a, ^String.to_atom(elem(unquote(association), 2))))
+      |> join(:inner, [p, p1, p2],
+        p1 in ^elem(unquote(association), 0),
+        field(p, ^String.to_atom(elem(unquote(association), 1))) ==
+        field(p1, ^String.to_atom(elem(unquote(association), 2))))
     end
   end
 
@@ -119,22 +145,20 @@ defmodule Rummage.Ecto.Hooks.AssocSort do
     join_by_association_macro(association, query)
   end
 
-  defp consolidate_order_params(assoc_sort_params, table_alias) do
+  defp consolidate_order_params(assoc_sort_params) do
     case Regex.match?(~r/\w.asc+$/, assoc_sort_params)
       or Regex.match?(~r/\w.desc+$/, assoc_sort_params)
       do
-      true -> add_order_params([], assoc_sort_params, table_alias)
+      true -> add_order_params([], assoc_sort_params)
       _ -> []
     end
   end
 
-  defp add_order_params(order_params, unparsed_field, table_alias) do
+  defp add_order_params(order_params, unparsed_field) do
     parsed_field = unparsed_field
       |> String.split(".")
       |> Enum.drop(-1)
       |> Enum.join(".")
-
-    field = table_alias <> "." <> parsed_field
       |> String.to_atom
 
     order_type = unparsed_field
@@ -142,6 +166,6 @@ defmodule Rummage.Ecto.Hooks.AssocSort do
       |> Enum.at(-1)
       |> String.to_atom
 
-    Keyword.put(order_params, order_type, field)
+    Keyword.put(order_params, order_type, parsed_field)
   end
 end
