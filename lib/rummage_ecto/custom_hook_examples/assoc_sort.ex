@@ -84,25 +84,37 @@ defmodule Rummage.Ecto.Hooks.AssocSort do
   # When rummage struct passed has case-insensitive assoc_sort, it returns
   # a assoc_sorted version of the query with case_insensitive arguments:
 
-  #     iex> alias Rummage.Ecto.Hooks.AssocSort
-  #     iex> import Ecto.Query
-  #     iex> rummage = %{"sort" => "field_1.asc.ci"}
-  #     %{"assoc_sort" => "field_1.asc.ci"}
-  #     iex> query = from u in "parents"
-  #     #Ecto.Query<from p in "parents">
-  #     iex> AssocSort.run(query, rummage)
-  #     #Ecto.Query<from p in "parents", order_by: [asc: fragment("lower(?)", ^:field_1)]>
+      iex> alias Rummage.Ecto.Hooks.AssocSort
+      iex> import Ecto.Query
+      iex> rummage = %{"sort" => {["parent", "parent"], "field_1.asc.ci"}}
+      %{"sort" => {["parent", "parent"], "field_1.asc.ci"}}
+      iex> query = from u in "parents"
+      #Ecto.Query<from p in "parents">
+      iex> AssocSort.run(query, rummage)
+      #Ecto.Query<from p0 in "parents", join: p1 in assoc(p0, :parent), join: p2 in assoc(p1, :parent), order_by: [asc: fragment("lower(?)", p2.field_1)]>
   """
   @spec run(Ecto.Query.t, map) :: {Ecto.Query.t, map}
   def run(query, rummage) do
     case Map.get(rummage, "sort") do
       a when a in [nil, {}, ""] -> query
       {[], fields} -> Rummage.Ecto.Hooks.Sort.run(query, %{"sort" => fields})
-      assoc_sort_params -> handle_assoc_sort(query, assoc_sort_params)
+      assoc_sort_params ->
+        case Regex.match?(~r/\w.ci+$/, elem(assoc_sort_params, 1)) do
+          true ->
+            order_param = elem(assoc_sort_params, 1)
+              |> String.split(".")
+              |> Enum.drop(-1)
+              |> Enum.join(".")
+
+            assoc_sort_params = {elem(assoc_sort_params, 0), order_param}
+
+            handle_assoc_sort(query, assoc_sort_params, true)
+          _ -> handle_assoc_sort(query, assoc_sort_params)
+        end
     end
   end
 
-  defp handle_assoc_sort(query, assoc_sort_params) do
+  defp handle_assoc_sort(query, assoc_sort_params, ci \\ false) do
     order_param = assoc_sort_params
       |> elem(1)
 
@@ -111,10 +123,16 @@ defmodule Rummage.Ecto.Hooks.AssocSort do
 
     association_names
     |> Enum.reduce(query, &join_by_association(&1, &2))
-    |> handle_ordering(order_param)
+    |> handle_ordering(order_param, ci)
   end
 
-  defp handle_ordering(query, order_param) do
+  defmacrop case_insensitive(field) do
+    quote do
+      fragment("lower(?)", unquote(field))
+    end
+  end
+
+  defp handle_ordering(query, order_param, ci) do
     case Regex.match?(~r/\w.asc+$/, order_param)
       or Regex.match?(~r/\w.desc+$/, order_param) do
       true ->
@@ -127,12 +145,20 @@ defmodule Rummage.Ecto.Hooks.AssocSort do
           |> String.split(".")
           |> Enum.at(-1)
 
-        query |> order_by_assoc(order_type, parsed_field)
+        query |> order_by_assoc(order_type, parsed_field, ci)
        _ -> query
     end
   end
 
-  defp join_by_association(association, query), do: query |> join(:inner, [..., p1], p2 in assoc(p1, ^String.to_atom(association)))
+  defp join_by_association(association, query) do
+    join(query, :inner, [..., p1], p2 in assoc(p1, ^String.to_atom(association)))
+  end
 
-  defp order_by_assoc(query, order_type, parsed_field), do: query |> order_by([p0, ..., p2], [{^String.to_atom(order_type), field(p2, ^String.to_atom(parsed_field))}])
+  defp order_by_assoc(query, order_type, parsed_field, false) do
+    order_by(query, [p0, ..., p2], [{^String.to_atom(order_type), field(p2, ^String.to_atom(parsed_field))}])
+  end
+
+  defp order_by_assoc(query, order_type, parsed_field, true) do
+    order_by(query, [p0, ..., p2], [{^String.to_atom(order_type), case_insensitive(field(p2, ^String.to_atom(parsed_field)))}])
+  end
 end
