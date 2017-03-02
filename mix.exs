@@ -1,7 +1,7 @@
 defmodule Rummage.Ecto.Mixfile do
   use Mix.Project
 
-  @version "0.6.0"
+  @version "1.0.0"
   @url "https://github.com/Excipients/rummage_ecto"
 
   def project do
@@ -57,7 +57,7 @@ end
 
   defp description do
     """
-    A simple library that allows us to search, sort and paginate ecto queries
+    A library that allows us to search, sort and paginate ecto queries
     """
   end
 
