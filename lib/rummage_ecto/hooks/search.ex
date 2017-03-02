@@ -5,6 +5,35 @@ defmodule Rummage.Ecto.Hooks.Search do
 
   This module can be overridden with a custom module while using `Rummage.Ecto`
   in `Ecto` struct module.
+
+  Usage:
+  For a regular search:
+
+  This returns a `queryable` which upon running will give a list of `Parent`(s)
+  searched by ascending `field_1`
+
+  ```elixir
+  alias Rummage.Ecto.Hooks.Search
+
+  searched_queryable = Search.run(Parent, %{"search" => %{"field_1" => "field_!"}})
+  ```
+
+  For a case-insensitive search:
+
+  This returns a `queryable` which upon running will give a list of `Parent`(s)
+  searched by ascending case insensitive `field_1`.
+
+  Keep in mind that `case_insensitive` can only be called for `text` fields
+
+  ```elixir
+  alias Rummage.Ecto.Hooks.Search
+
+  searched_queryable = Search.run(Parent, %{"search" => %{"field_1.ci" => "field_!"}})
+  ```
+
+
+  This module can be overridden with a custom module while using `Rummage.Ecto`
+  in `Ecto` struct module.
   """
 
   import Ecto.Query
@@ -62,6 +91,18 @@ defmodule Rummage.Ecto.Hooks.Search do
       #Ecto.Query<from p in "parents">
       iex> Search.run(queryable, rummage)
       #Ecto.Query<from p in "parents", where: like(p.field_1, ^"%field_!%")>
+
+  When rummage struct passed has case-insensitive search, it returns
+  a searched version of the queryable with case_insensitive arguments:
+
+      iex> alias Rummage.Ecto.Hooks.Search
+      iex> import Ecto.Query
+      iex> rummage = %{"search" => %{"field_1.ci" => "field_!"}}
+      %{"search" => %{"field_1.ci" => "field_!"}}
+      iex> queryable = from u in "parents"
+      #Ecto.Query<from p in "parents">
+      iex> Search.run(queryable, rummage)
+      #Ecto.Query<from p in "parents", where: ilike(p.field_1, ^"%field_!%")>
   """
   @spec run(Ecto.Query.t, map) :: {Ecto.Query.t, map}
   def run(queryable, rummage) do
