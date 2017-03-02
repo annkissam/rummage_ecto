@@ -12,50 +12,50 @@ defmodule Rummage.Ecto.Hooks.Paginate do
   @behaviour Rummage.Ecto.Hook
 
   @doc """
-  Builds a paginate query on top of the given `query` from the rummage parameters
+  Builds a paginate queryable on top of the given `queryable` from the rummage parameters
   from the given `rummage` struct.
 
   ## Examples
   When rummage struct passed doesn't have the key "paginate", it simply returns the
-  query itself:
+  queryable itself:
 
       iex> alias Rummage.Ecto.Hooks.Paginate
       iex> import Ecto.Query
       iex> Paginate.run(Parent, %{})
       Parent
 
-  When the query passed is not just a struct:
+  When the queryable passed is not just a struct:
 
       iex> alias Rummage.Ecto.Hooks.Paginate
       iex> import Ecto.Query
-      iex> query = from u in "parents"
+      iex> queryable = from u in "parents"
       #Ecto.Query<from p in "parents">
-      iex> Paginate.run(query, %{})
+      iex> Paginate.run(queryable, %{})
       #Ecto.Query<from p in "parents">
 
   When rummage struct passed has the key "paginate", with "per_page" and "page" keys
-  it returns a paginated version of the query passed in as the argument:
+  it returns a paginated version of the queryable passed in as the argument:
 
       iex> alias Rummage.Ecto.Hooks.Paginate
       iex> import Ecto.Query
       iex> rummage = %{"paginate" => %{"per_page" => "1", "page" => "1"}}
       %{"paginate" => %{"page" => "1", "per_page" => "1"}}
-      iex> query = from u in "parents"
+      iex> queryable = from u in "parents"
       #Ecto.Query<from p in "parents">
-      iex> Paginate.run(query, rummage)
+      iex> Paginate.run(queryable, rummage)
       #Ecto.Query<from p in "parents", limit: ^1, offset: ^0>
   """
   @spec run(Ecto.Query.t, map) :: {Ecto.Query.t, map}
-  def run(query, rummage) do
+  def run(queryable, rummage) do
     paginate_params = Map.get(rummage, "paginate")
 
     case paginate_params do
-      a when a in [nil, [], "", %{}] -> query
-      _ -> handle_paginate(query, paginate_params)
+      a when a in [nil, [], "", %{}] -> queryable
+      _ -> handle_paginate(queryable, paginate_params)
     end
   end
 
-  defp handle_paginate(query, paginate_params) do
+  defp handle_paginate(queryable, paginate_params) do
     per_page = paginate_params
       |> Map.get("per_page")
       |> String.to_integer
@@ -66,7 +66,7 @@ defmodule Rummage.Ecto.Hooks.Paginate do
 
     offset = per_page * (page - 1)
 
-    query
+    queryable
     |> limit(^per_page)
     |> offset(^offset)
   end

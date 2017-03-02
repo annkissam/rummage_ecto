@@ -20,62 +20,62 @@ defmodule Rummage.Ecto do
       import Ecto.Query
 
       @spec rummage(Ecto.Query.t, map) :: {Ecto.Query.t, map}
-      def rummage(query, rummage) when is_nil(rummage) or rummage == %{} do
+      def rummage(queryable, rummage) when is_nil(rummage) or rummage == %{} do
         params = %{"search" => %{},
           "sort"=> [],
           "paginate" => %{"per_page" => per_page(), "page" => "1"},
         }
 
         rummage = case unquote(opts[:paginate_hook]) do
-          nil -> before_paginate(query, params)
+          nil -> before_paginate(queryable, params)
           _ -> params
         end
 
-        query = query
+        queryable = queryable
           |> paginate_hook_call(rummage)
 
-        {query, rummage}
+        {queryable, rummage}
       end
 
-      def rummage(query, rummage) do
-        searched_query = query
+      def rummage(queryable, rummage) do
+        searched_queryable = queryable
           |> search_hook_call(rummage)
 
         rummage = case unquote(opts[:paginate_hook]) do
-          nil -> before_paginate(query, rummage)
+          nil -> before_paginate(queryable, rummage)
           _ -> rummage
         end
 
-        rummaged_query = searched_query
+        rummaged_queryable = searched_queryable
           |> sort_hook_call(rummage)
           |> paginate_hook_call(rummage)
 
-        {query, rummaged_query}
+        {queryable, rummaged_queryable}
       end
 
       def default_per_page do
         unquote(Integer.to_string(opts[:per_page]) || Config.default_per_page)
       end
 
-      defp search_hook_call(query, rummage) do
-        unquote(opts[:search_hook] || Config.default_search).run(query, rummage)
+      defp search_hook_call(queryable, rummage) do
+        unquote(opts[:search_hook] || Config.default_search).run(queryable, rummage)
       end
 
-      defp sort_hook_call(query, rummage) do
-        unquote(opts[:sort_hook] || Config.default_sort).run(query, rummage)
+      defp sort_hook_call(queryable, rummage) do
+        unquote(opts[:sort_hook] || Config.default_sort).run(queryable, rummage)
       end
 
-      defp paginate_hook_call(query, rummage) do
-        unquote(opts[:paginate_hook] || Config.default_paginate).run(query, rummage)
+      defp paginate_hook_call(queryable, rummage) do
+        unquote(opts[:paginate_hook] || Config.default_paginate).run(queryable, rummage)
       end
 
-      defp before_paginate(query, rummage) do
+      defp before_paginate(queryable, rummage) do
         paginate_params = Map.get(rummage, "paginate")
 
         case paginate_params do
           nil -> rummage
           _ ->
-            total_count = get_total_count(query)
+            total_count = get_total_count(queryable)
 
             {page, per_page} = parse_page_and_per_page(paginate_params)
 
@@ -102,11 +102,11 @@ defmodule Rummage.Ecto do
         end
       end
 
-      defp get_total_count(query) do
+      defp get_total_count(queryable) do
         case unquote(opts[:repo]) do
           nil -> raise "No Repo provided for Rummage struct"
           _ ->
-            query
+            queryable
             |> select([b], count(b.id))
             |> unquote(opts[:repo]).one
         end
