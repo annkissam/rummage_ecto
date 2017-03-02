@@ -36,6 +36,14 @@ defmodule Rummage.Ecto.Config do
     config(:default_per_page, "10")
   end
 
+  @doc """
+  `:default_repo` hook can also be set at run time
+  in the config.exs file
+  """
+  def default_repo do
+    config(:default_repo, nil)
+  end
+
   defp config do
     Application.get_env(:rummage_ecto, Rummage.Ecto, [])
   end
