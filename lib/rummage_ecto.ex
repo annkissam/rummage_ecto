@@ -50,7 +50,7 @@ defmodule Rummage.Ecto do
           |> sort_hook_call(rummage)
           |> paginate_hook_call(rummage)
 
-        {queryable, rummaged_queryable}
+        {rummaged_queryable, rummage}
       end
 
       def default_per_page do
