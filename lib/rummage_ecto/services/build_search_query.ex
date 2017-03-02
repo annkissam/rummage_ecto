@@ -27,6 +27,74 @@ defmodule Rummage.Ecto.Services.BuildSearchQuery do
 
   @search_types ~w(like ilike eq gt lt gteq lteq)
 
+  @doc """
+  Builds a searched `queryable` on top of the given `queryable` using `field`, `search_type`
+  and `search_term`.
+
+  ## Examples
+  When `field`, `search_type` and `queryable` are passed with `search_type` of `like`:
+
+      iex> alias Rummage.Ecto.Services.BuildSearchQuery
+      iex> import Ecto.Query
+      iex> queryable = from u in "parents"
+      #Ecto.Query<from p in "parents">
+      iex> BuildSearchQuery.run(queryable, :field_1, "like", "field_!")
+      #Ecto.Query<from p in "parents", where: like(p.field_1, ^"%field_!%")>
+
+  When `field`, `search_type` and `queryable` are passed with `search_type` of `ilike`:
+
+        iex> alias Rummage.Ecto.Services.BuildSearchQuery
+        iex> import Ecto.Query
+        iex> queryable = from u in "parents"
+        #Ecto.Query<from p in "parents">
+        iex> BuildSearchQuery.run(queryable, :field_1, "ilike", "field_!")
+        #Ecto.Query<from p in "parents", where: ilike(p.field_1, ^"%field_!%")>
+
+  When `field`, `search_type` and `queryable` are passed with `search_type` of `eq`:
+
+      iex> alias Rummage.Ecto.Services.BuildSearchQuery
+      iex> import Ecto.Query
+      iex> queryable = from u in "parents"
+      #Ecto.Query<from p in "parents">
+      iex> BuildSearchQuery.run(queryable, :field_1, "eq", "field_!")
+      #Ecto.Query<from p in "parents", where: p.field_1 == ^"field_!">
+
+  When `field`, `search_type` and `queryable` are passed with `search_type` of `gt`:
+
+      iex> alias Rummage.Ecto.Services.BuildSearchQuery
+      iex> import Ecto.Query
+      iex> queryable = from u in "parents"
+      #Ecto.Query<from p in "parents">
+      iex> BuildSearchQuery.run(queryable, :field_1, "gt", "field_!")
+      #Ecto.Query<from p in "parents", where: p.field_1 > ^"field_!">
+
+  When `field`, `search_type` and `queryable` are passed with `search_type` of `lt`:
+
+      iex> alias Rummage.Ecto.Services.BuildSearchQuery
+      iex> import Ecto.Query
+      iex> queryable = from u in "parents"
+      #Ecto.Query<from p in "parents">
+      iex> BuildSearchQuery.run(queryable, :field_1, "lt", "field_!")
+      #Ecto.Query<from p in "parents", where: p.field_1 < ^"field_!">
+
+ When `field`, `search_type` and `queryable` are passed with `search_type` of `gteq`:
+
+      iex> alias Rummage.Ecto.Services.BuildSearchQuery
+      iex> import Ecto.Query
+      iex> queryable = from u in "parents"
+      #Ecto.Query<from p in "parents">
+      iex> BuildSearchQuery.run(queryable, :field_1, "gteq", "field_!")
+      #Ecto.Query<from p in "parents", where: p.field_1 >= ^"field_!">
+
+ When `field`, `search_type` and `queryable` are passed with `search_type` of `lteq`:
+
+      iex> alias Rummage.Ecto.Services.BuildSearchQuery
+      iex> import Ecto.Query
+      iex> queryable = from u in "parents"
+      #Ecto.Query<from p in "parents">
+      iex> BuildSearchQuery.run(queryable, :field_1, "lteq", "field_!")
+      #Ecto.Query<from p in "parents", where: p.field_1 <= ^"field_!">
+  """
   @spec run(Ecto.Query.t, atom, String.t, term) :: {Ecto.Query.t}
   def run(queryable, field, search_type, search_term) do
     case Enum.member?(@search_types, search_type) do
