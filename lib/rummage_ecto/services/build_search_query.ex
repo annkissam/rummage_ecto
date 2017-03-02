@@ -103,42 +103,139 @@ defmodule Rummage.Ecto.Services.BuildSearchQuery do
     end
   end
 
+  @doc """
+  Builds a searched `queryable` on top of the given `queryable` using `field` and `search_type`
+  when the `search_term` is `like`.
+
+  ## Examples
+
+      iex> alias Rummage.Ecto.Services.BuildSearchQuery
+      iex> import Ecto.Query
+      iex> queryable = from u in "parents"
+      #Ecto.Query<from p in "parents">
+      iex> BuildSearchQuery.handle_like(queryable, :field_1, "field_!")
+      #Ecto.Query<from p in "parents", where: like(p.field_1, ^"%field_!%")>
+  """
   def handle_like(queryable, field, search_term) do
     queryable
     |> where([..., b],
       like(field(b, ^field), ^"%#{String.replace(search_term, "%", "\\%")}%"))
   end
 
+
+  @doc """
+  Builds a searched `queryable` on top of the given `queryable` using `field` and `search_type`
+  when the `search_term` is `ilike`.
+
+  ## Examples
+
+      iex> alias Rummage.Ecto.Services.BuildSearchQuery
+      iex> import Ecto.Query
+      iex> queryable = from u in "parents"
+      #Ecto.Query<from p in "parents">
+      iex> BuildSearchQuery.handle_ilike(queryable, :field_1, "field_!")
+      #Ecto.Query<from p in "parents", where: ilike(p.field_1, ^"%field_!%")>
+  """
   def handle_ilike(queryable, field, search_term) do
     queryable
     |> where([..., b],
       ilike(field(b, ^field), ^"%#{String.replace(search_term, "%", "\\%")}%"))
   end
 
+
+  @doc """
+  Builds a searched `queryable` on top of the given `queryable` using `field` and `search_type`
+  when the `search_term` is `eq`.
+
+  ## Examples
+
+      iex> alias Rummage.Ecto.Services.BuildSearchQuery
+      iex> import Ecto.Query
+      iex> queryable = from u in "parents"
+      #Ecto.Query<from p in "parents">
+      iex> BuildSearchQuery.handle_eq(queryable, :field_1, "field_!")
+      #Ecto.Query<from p in "parents", where: p.field_1 == ^"field_!">
+  """
   def handle_eq(queryable, field, search_term) do
     queryable
     |> where([..., b],
       field(b, ^field) == ^search_term)
   end
 
+
+  @doc """
+  Builds a searched `queryable` on top of the given `queryable` using `field` and `search_type`
+  when the `search_term` is `gt`.
+
+  ## Examples
+
+      iex> alias Rummage.Ecto.Services.BuildSearchQuery
+      iex> import Ecto.Query
+      iex> queryable = from u in "parents"
+      #Ecto.Query<from p in "parents">
+      iex> BuildSearchQuery.handle_gt(queryable, :field_1, "field_!")
+      #Ecto.Query<from p in "parents", where: p.field_1 > ^"field_!">
+  """
   def handle_gt(queryable, field, search_term) do
     queryable
     |> where([..., b],
       field(b, ^field) > ^search_term)
   end
 
+
+  @doc """
+  Builds a searched `queryable` on top of the given `queryable` using `field` and `search_type`
+  when the `search_term` is `lt`.
+
+  ## Examples
+
+      iex> alias Rummage.Ecto.Services.BuildSearchQuery
+      iex> import Ecto.Query
+      iex> queryable = from u in "parents"
+      #Ecto.Query<from p in "parents">
+      iex> BuildSearchQuery.handle_lt(queryable, :field_1, "field_!")
+      #Ecto.Query<from p in "parents", where: p.field_1 < ^"field_!">
+  """
   def handle_lt(queryable, field, search_term) do
     queryable
     |> where([..., b],
       field(b, ^field) < ^search_term)
   end
 
+
+  @doc """
+  Builds a searched `queryable` on top of the given `queryable` using `field` and `search_type`
+  when the `search_term` is `gteq`.
+
+  ## Examples
+
+      iex> alias Rummage.Ecto.Services.BuildSearchQuery
+      iex> import Ecto.Query
+      iex> queryable = from u in "parents"
+      #Ecto.Query<from p in "parents">
+      iex> BuildSearchQuery.handle_gteq(queryable, :field_1, "field_!")
+      #Ecto.Query<from p in "parents", where: p.field_1 >= ^"field_!">
+  """
   def handle_gteq(queryable, field, search_term) do
     queryable
     |> where([..., b],
       field(b, ^field) >= ^search_term)
   end
 
+
+  @doc """
+  Builds a searched `queryable` on top of the given `queryable` using `field` and `search_type`
+  when the `search_term` is `lteq`.
+
+  ## Examples
+
+      iex> alias Rummage.Ecto.Services.BuildSearchQuery
+      iex> import Ecto.Query
+      iex> queryable = from u in "parents"
+      #Ecto.Query<from p in "parents">
+      iex> BuildSearchQuery.handle_lteq(queryable, :field_1, "field_!")
+      #Ecto.Query<from p in "parents", where: p.field_1 <= ^"field_!">
+  """
   def handle_lteq(queryable, field, search_term) do
     queryable
     |> where([..., b],
