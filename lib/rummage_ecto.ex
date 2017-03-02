@@ -103,17 +103,30 @@ defmodule Rummage.Ecto do
       end
 
       defp get_total_count(queryable) do
-        case repo() do
+        repo = get_repo()
+
+        case repo do
           nil -> raise "No Repo provided for Rummage struct"
           _ ->
-            queryable
+            queryable = queryable
             |> select([b], count(b.id))
-            |> repo().one
+
+            apply(repo, :one, [queryable])
         end
       end
 
-      defp repo do
-        unquote(opts[:repo]) || Config.default_repo || Repo
+      defp get_repo do
+        unquote(opts[:repo]) ||
+          Config.default_repo ||
+          make_repo_name_from_topmost_namespace
+      end
+
+      defp make_repo_name_from_topmost_namespace do
+        "#{__MODULE__}"
+        |> String.split(".")
+        |> Enum.at(1)
+        |> (& "Elixir." <> &1 <> ".Repo").()
+        |> String.to_atom
       end
 
       defp parse_page_and_per_page(paginate_params) do
