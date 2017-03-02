@@ -78,11 +78,11 @@ This package is [available in Hex](https://hexdocs.pm/rummage_ecto/), and can be
     "paginate" => %{"per_page" => "5", "page" => "1"}
   }
 
-  {query, rummage} = query
+  {queryable, rummage} = queryable
     |> Product.rummage(rummage)
 
-  products = query
-  |> Product.another_operation # <-- Since `Rummage` is Ecto, we can pipe the result query into another query operation.
+  products = queryable
+  |> Product.another_operation # <-- Since `Rummage` is Ecto, we can pipe the result queryable into another queryable operation.
   |> Repo.all
   ```
 
