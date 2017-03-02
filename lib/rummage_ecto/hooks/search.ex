@@ -33,6 +33,24 @@ defmodule Rummage.Ecto.Hooks.Search do
       iex>  Search.run(queryable, %{})
       #Ecto.Query<from p in "parents">
 
+  When rummage `struct` passed has the key `"search"`, but with a value of `%{}`, `""`
+  or `[]` it simply returns the `queryable` itself:
+
+      iex> alias Rummage.Ecto.Hooks.Search
+      iex> import Ecto.Query
+      iex> Search.run(Parent, %{"search" => %{}})
+      Parent
+
+      iex> alias Rummage.Ecto.Hooks.Search
+      iex> import Ecto.Query
+      iex> Search.run(Parent, %{"search" => ""})
+      Parent
+
+      iex> alias Rummage.Ecto.Hooks.Search
+      iex> import Ecto.Query
+      iex> Search.run(Parent, %{"search" => []})
+      Parent
+
   When rummage struct passed has the key "search", with "field" and "term"
   it returns a searched version of the queryable passed in as the argument:
 
@@ -50,7 +68,7 @@ defmodule Rummage.Ecto.Hooks.Search do
     search_params = Map.get(rummage, "search")
 
     case search_params do
-      a when a in [nil, [], ""] -> queryable
+      a when a in [nil, [], %{}, ""] -> queryable
       _ -> handle_search(queryable, search_params)
     end
   end

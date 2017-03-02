@@ -6,22 +6,25 @@ defmodule Rummage.Ecto.Hooks.Sort do
   Usage:
   For a regular sort:
 
+  This returns a `queryable` which upon running will give a list of `Parent`(s)
+  sorted by ascending `field_1`
+
   ```elixir
   alias Rummage.Ecto.Hooks.Sort
 
-  # This returns a queryable which upon running will give a list of `Parent`(s)
-  # sorted by ascending field_1
   sorted_queryable = Sort.run(Parent, %{"sort" => {[], "field_1.asc"}})
   ```
 
   For a case-insensitive sort:
 
+  This returns a `queryable` which upon running will give a list of `Parent`(s)
+  sorted by ascending case insensitive `field_1`.
+
+  Keep in mind that `case_insensitive` can only be called for `text` fields
+
   ```elixir
   alias Rummage.Ecto.Hooks.Sort
 
-  # This returns a queryable which upon running will give a list of `Parent`(s)
-  # sorted by ascending case insensitive field_1
-  # Keep in mind that case insensitive can only be called for text fields
   sorted_queryable = Sort.run(Parent, %{"sort" => {[], "field_1.asc.ci"}})
   ```
 
@@ -35,19 +38,19 @@ defmodule Rummage.Ecto.Hooks.Sort do
   @behaviour Rummage.Ecto.Hook
 
   @doc """
-  Builds a sort queryable on top of the given `queryable` from the rummage parameters
+  Builds a sort `queryable` on top of the given `queryable` from the rummage parameters
   from the given `rummage` struct.
 
   ## Examples
-  When rummage struct passed doesn't have the key "sort", it simply returns the
-  queryable itself:
+  When rummage `struct` passed doesn't have the key `"sort"`, it simply returns the
+  `queryable` itself:
 
       iex> alias Rummage.Ecto.Hooks.Sort
       iex> import Ecto.Query
       iex> Sort.run(Parent, %{})
       Parent
 
-  When the queryable passed is not just a struct:
+  When the `queryable` passed is not just a `struct`:
 
       iex> alias Rummage.Ecto.Hooks.Sort
       iex> import Ecto.Query
@@ -56,8 +59,26 @@ defmodule Rummage.Ecto.Hooks.Sort do
       iex>  Sort.run(queryable, %{})
       #Ecto.Query<from p in "parents">
 
-  When rummage struct passed has the key "sort", but empty associations array
-  it just orders it by the passed queryableable:
+  When rummage `struct` passed has the key `"sort"`, but with a value of `{}`, `""`
+  or `[]` it simply returns the `queryable` itself:
+
+      iex> alias Rummage.Ecto.Hooks.Sort
+      iex> import Ecto.Query
+      iex> Sort.run(Parent, %{"sort" => {}})
+      Parent
+
+      iex> alias Rummage.Ecto.Hooks.Sort
+      iex> import Ecto.Query
+      iex> Sort.run(Parent, %{"sort" => ""})
+      Parent
+
+      iex> alias Rummage.Ecto.Hooks.Sort
+      iex> import Ecto.Query
+      iex> Sort.run(Parent, %{"sort" => []})
+      Parent
+
+  When rummage `struct` passed has the key `"sort"`, but empty associations array
+  it just orders it by the passed `queryable`:
 
       iex> alias Rummage.Ecto.Hooks.Sort
       iex> import Ecto.Query
@@ -69,8 +90,31 @@ defmodule Rummage.Ecto.Hooks.Sort do
       iex> Sort.run(queryable, rummage)
       #Ecto.Query<from p in "parents", order_by: [asc: p.field_1]>
 
-  When rummage struct passed has the key "sort", with "field" and "order"
-  it returns a sorted version of the queryable passed in as the argument:
+      iex> alias Rummage.Ecto.Hooks.Sort
+      iex> import Ecto.Query
+      iex> rummage = %{"sort" => {[], "field_1.desc"}}
+      %{"sort" => {[],
+        "field_1.desc"}}
+      iex> queryable = from u in "parents"
+      #Ecto.Query<from p in "parents">
+      iex> Sort.run(queryable, rummage)
+      #Ecto.Query<from p in "parents", order_by: [desc: p.field_1]>
+
+  When no `order` is specified, it returns the `queryable` itself:
+
+      iex> alias Rummage.Ecto.Hooks.Sort
+      iex> import Ecto.Query
+      iex> rummage = %{"sort" => {[], "field_1"}}
+      %{"sort" => {[],
+        "field_1"}}
+      iex> queryable = from u in "parents"
+      #Ecto.Query<from p in "parents">
+      iex> Sort.run(queryable, rummage)
+      #Ecto.Query<from p in "parents">
+
+
+  When rummage `struct` passed has the key `"sort"`, with `field` and `order`
+  it returns a sorted version of the `queryable` passed in as the argument:
 
       iex> alias Rummage.Ecto.Hooks.Sort
       iex> import Ecto.Query
@@ -81,8 +125,30 @@ defmodule Rummage.Ecto.Hooks.Sort do
       iex> Sort.run(queryable, rummage)
       #Ecto.Query<from p0 in "parents", join: p1 in assoc(p0, :parent), join: p2 in assoc(p1, :parent), order_by: [asc: p2.field_1]>
 
-  # When rummage struct passed has case-insensitive sort, it returns
-  # a sorted version of the queryable with case_insensitive arguments:
+
+      iex> alias Rummage.Ecto.Hooks.Sort
+      iex> import Ecto.Query
+      iex> rummage = %{"sort" => {["parent", "parent"], "field_1.desc"}}
+      %{"sort" => {["parent", "parent"], "field_1.desc"}}
+      iex> queryable = from u in "parents"
+      #Ecto.Query<from p in "parents">
+      iex> Sort.run(queryable, rummage)
+      #Ecto.Query<from p0 in "parents", join: p1 in assoc(p0, :parent), join: p2 in assoc(p1, :parent), order_by: [desc: p2.field_1]>
+
+  When no `order` is specified even with the associations, it returns the `queryable` itself:
+
+      iex> alias Rummage.Ecto.Hooks.Sort
+      iex> import Ecto.Query
+      iex> rummage = %{"sort" => {["parent", "parent"], "field_1"}}
+      %{"sort" => {["parent", "parent"],
+        "field_1"}}
+      iex> queryable = from u in "parents"
+      #Ecto.Query<from p in "parents">
+      iex> Sort.run(queryable, rummage)
+      #Ecto.Query<from p0 in "parents", join: p1 in assoc(p0, :parent), join: p2 in assoc(p1, :parent)>
+
+  # When rummage `struct` passed has `case-insensitive` sort, it returns
+  # a sorted version of the `queryable` with `case_insensitive` arguments:
 
       iex> alias Rummage.Ecto.Hooks.Sort
       iex> import Ecto.Query
@@ -96,7 +162,7 @@ defmodule Rummage.Ecto.Hooks.Sort do
   @spec run(Ecto.Query.t, map) :: {Ecto.Query.t, map}
   def run(queryable, rummage) do
     case Map.get(rummage, "sort") do
-      a when a in [nil, {}, ""] -> queryable
+      a when a in [nil, [], {}, ""] -> queryable
       sort_params ->
         case Regex.match?(~r/\w.ci+$/, elem(sort_params, 1)) do
           true ->

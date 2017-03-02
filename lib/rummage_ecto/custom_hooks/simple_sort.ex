@@ -35,19 +35,19 @@ defmodule Rummage.Ecto.CustomHooks.SimpleSort do
   @behaviour Rummage.Ecto.Hook
 
   @doc """
-  Builds a sort queryable on top of the given `queryable` from the rummage parameters
+  Builds a sort `queryable` on top of the given `queryable` from the rummage parameters
   from the given `rummage` struct.
 
   ## Examples
-  When rummage struct passed doesn't have the key "sort", it simply returns the
-  queryable itself:
+  When rummage `struct` passed doesn't have the key `"sort"`, it simply returns the
+  `queryable` itself:
 
       iex> alias Rummage.Ecto.CustomHooks.SimpleSort
       iex> import Ecto.Query
       iex> SimpleSort.run(Parent, %{})
       Parent
 
-  When the queryable passed is not just a struct:
+  When the `queryable` passed is not just a `struct`:
 
       iex> alias Rummage.Ecto.CustomHooks.SimpleSort
       iex> import Ecto.Query
@@ -56,8 +56,26 @@ defmodule Rummage.Ecto.CustomHooks.SimpleSort do
       iex>  SimpleSort.run(queryable, %{})
       #Ecto.Query<from p in "parents">
 
-  When rummage struct passed has the key "sort", with "field" and "order"
-  it returns a sorted version of the queryable passed in as the argument:
+  When rummage `struct` passed has the key `"sort"`, but with a value of `{}`, `""`
+  or `[]` it simply returns the `queryable` itself:
+
+      iex> alias Rummage.Ecto.CustomHooks.SimpleSort
+      iex> import Ecto.Query
+      iex> SimpleSort.run(Parent, %{"sort" => {}})
+      Parent
+
+      iex> alias Rummage.Ecto.CustomHooks.SimpleSort
+      iex> import Ecto.Query
+      iex> SimpleSort.run(Parent, %{"sort" => ""})
+      Parent
+
+      iex> alias Rummage.Ecto.CustomHooks.SimpleSort
+      iex> import Ecto.Query
+      iex> SimpleSort.run(Parent, %{"sort" => []})
+      Parent
+
+  When rummage `struct` passed has the key `"sort"`, with `field` and `order`
+  it returns a sorted version of the `queryable` passed in as the argument:
 
       iex> alias Rummage.Ecto.CustomHooks.SimpleSort
       iex> import Ecto.Query
@@ -68,8 +86,30 @@ defmodule Rummage.Ecto.CustomHooks.SimpleSort do
       iex> SimpleSort.run(queryable, rummage)
       #Ecto.Query<from p in "parents", order_by: [asc: p.field_1]>
 
-  When rummage struct passed has case-insensitive sort, it returns
-  a sorted version of the queryable with case_insensitive arguments:
+
+      iex> alias Rummage.Ecto.CustomHooks.SimpleSort
+      iex> import Ecto.Query
+      iex> rummage = %{"sort" => "field_1.desc"}
+      %{"sort" => "field_1.desc"}
+      iex> queryable = from u in "parents"
+      #Ecto.Query<from p in "parents">
+      iex> SimpleSort.run(queryable, rummage)
+      #Ecto.Query<from p in "parents", order_by: [desc: p.field_1]>
+
+
+  When no `order` is specified, it returns the `queryable` itself:
+
+      iex> alias Rummage.Ecto.CustomHooks.SimpleSort
+      iex> import Ecto.Query
+      iex> rummage = %{"sort" => "field_1"}
+      %{"sort" => "field_1"}
+      iex> queryable = from u in "parents"
+      #Ecto.Query<from p in "parents">
+      iex> SimpleSort.run(queryable, rummage)
+      #Ecto.Query<from p in "parents", order_by: []>
+
+  When rummage `struct` passed has `case-insensitive` sort, it returns
+  a sorted version of the `queryable` with `case_insensitive` arguments:
 
       iex> alias Rummage.Ecto.CustomHooks.SimpleSort
       iex> import Ecto.Query
@@ -79,13 +119,22 @@ defmodule Rummage.Ecto.CustomHooks.SimpleSort do
       #Ecto.Query<from p in "parents">
       iex> SimpleSort.run(queryable, rummage)
       #Ecto.Query<from p in "parents", order_by: [asc: fragment("lower(?)", ^:field_1)]>
+
+      iex> alias Rummage.Ecto.CustomHooks.SimpleSort
+      iex> import Ecto.Query
+      iex> rummage = %{"sort" => "field_1.desc.ci"}
+      %{"sort" => "field_1.desc.ci"}
+      iex> queryable = from u in "parents"
+      #Ecto.Query<from p in "parents">
+      iex> SimpleSort.run(queryable, rummage)
+      #Ecto.Query<from p in "parents", order_by: [desc: fragment("lower(?)", ^:field_1)]>
   """
   @spec run(Ecto.Query.t, map) :: {Ecto.Query.t, map}
   def run(queryable, rummage) do
     sort_params = Map.get(rummage, "sort")
 
     case sort_params do
-      a when a in [nil, [], ""] -> queryable
+      a when a in [nil, [], {}, ""] -> queryable
       _ ->
         case Regex.match?(~r/\w.ci+$/, sort_params) do
           true ->

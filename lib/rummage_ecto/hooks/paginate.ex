@@ -33,6 +33,24 @@ defmodule Rummage.Ecto.Hooks.Paginate do
       iex> Paginate.run(queryable, %{})
       #Ecto.Query<from p in "parents">
 
+  When rummage `struct` passed has the key `"search"`, but with a value of `%{}`, `""`
+  or `[]` it simply returns the `queryable` itself:
+
+      iex> alias Rummage.Ecto.CustomHooks.SimpleSearch
+      iex> import Ecto.Query
+      iex> SimpleSearch.run(Parent, %{"search" => %{}})
+      Parent
+
+      iex> alias Rummage.Ecto.CustomHooks.SimpleSearch
+      iex> import Ecto.Query
+      iex> SimpleSearch.run(Parent, %{"search" => ""})
+      Parent
+
+      iex> alias Rummage.Ecto.CustomHooks.SimpleSearch
+      iex> import Ecto.Query
+      iex> SimpleSearch.run(Parent, %{"search" => []})
+      Parent
+
   When rummage struct passed has the key "paginate", with "per_page" and "page" keys
   it returns a paginated version of the queryable passed in as the argument:
 
@@ -44,6 +62,26 @@ defmodule Rummage.Ecto.Hooks.Paginate do
       #Ecto.Query<from p in "parents">
       iex> Paginate.run(queryable, rummage)
       #Ecto.Query<from p in "parents", limit: ^1, offset: ^0>
+
+      iex> alias Rummage.Ecto.Hooks.Paginate
+      iex> import Ecto.Query
+      iex> rummage = %{"paginate" => %{"per_page" => "5", "page" => "2"}}
+      %{"paginate" => %{"page" => "2", "per_page" => "5"}}
+      iex> queryable = from u in "parents"
+      #Ecto.Query<from p in "parents">
+      iex> Paginate.run(queryable, rummage)
+      #Ecto.Query<from p in "parents", limit: ^5, offset: ^5>
+
+  When no `"page"` key is passed, it defaults to `1`:
+
+      iex> alias Rummage.Ecto.Hooks.Paginate
+      iex> import Ecto.Query
+      iex> rummage = %{"paginate" => %{"per_page" => "10"}}
+      %{"paginate" => %{"per_page" => "10"}}
+      iex> queryable = from u in "parents"
+      #Ecto.Query<from p in "parents">
+      iex> Paginate.run(queryable, rummage)
+      #Ecto.Query<from p in "parents", limit: ^10, offset: ^0>
   """
   @spec run(Ecto.Query.t, map) :: {Ecto.Query.t, map}
   def run(queryable, rummage) do
