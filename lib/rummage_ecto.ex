@@ -23,7 +23,7 @@ defmodule Rummage.Ecto do
       def rummage(queryable, rummage) when is_nil(rummage) or rummage == %{} do
         params = %{"search" => %{},
           "sort"=> [],
-          "paginate" => %{"per_page" => per_page(), "page" => "1"},
+          "paginate" => %{"per_page" => default_per_page(), "page" => "1"},
         }
 
         rummage = case unquote(opts[:paginate_hook]) do
