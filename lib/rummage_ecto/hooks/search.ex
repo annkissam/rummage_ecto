@@ -1,7 +1,7 @@
 defmodule Rummage.Ecto.Hooks.Search do
   @moduledoc """
   `Rummage.Ecto.Hooks.Search` is the default search hook that comes shipped
-  with `Rummage`.
+  with `Rummage.Ecto`.
 
   This module can be overridden with a custom module while using `Rummage.Ecto`
   in `Ecto` struct module.
@@ -15,7 +15,7 @@ defmodule Rummage.Ecto.Hooks.Search do
   ```elixir
   alias Rummage.Ecto.Hooks.Search
 
-  searched_queryable = Search.run(Parent, %{"search" => %{"field_1" => "field_!"}})
+  searched_queryable = Search.run(Parent, %{"search" => %{"field_1" => {"like", "field_!"}}}
   ```
 
   For a case-insensitive search:
@@ -28,15 +28,40 @@ defmodule Rummage.Ecto.Hooks.Search do
   ```elixir
   alias Rummage.Ecto.Hooks.Search
 
-  searched_queryable = Search.run(Parent, %{"search" => %{"field_1.ci" => "field_!"}})
+  searched_queryable = Search.run(Parent, %{"search" => %{"field_1" => {"ilike", "field_!"}}}
   ```
 
+  There are many other `search_types`. Check out `Rummage.Ecto.Services.BuildSearchQuery`'s docs
+  to explore more `search_types`
 
   This module can be overridden with a custom module while using `Rummage.Ecto`
-  in `Ecto` struct module.
+  in `Ecto` struct module:
+
+  In the `Ecto` module:
+  ```elixir
+  defmodule SomeModule do
+    use Ecto.Schema
+    use Rummage.Ecto, search_hook: CustomHook
+  end
+  ```
+
+  OR
+
+  Globally for all models in `config.exs` (NOT Recommended):
+  ```elixir
+  config :rummage_ecto,
+    Rummage.Ecto,
+    default_search: CustomHook
+  ```
+
+  The `CustomHook` must implement `@behaviour Rummage.Ecto.Hook`. For examples of `CustomHook`, check out some
+    `custom_hooks` that are shipped with elixir:
+
+      * `Rummage.Ecto.CustomHooks.SimpleSearch`
+      * `Rummage.Ecto.CustomHooks.SimpleSort`
   """
 
-  import Ecto.Query
+  alias Rummage.Ecto.Services.BuildSearchQuery
 
   @behaviour Rummage.Ecto.Hook
 
@@ -80,29 +105,92 @@ defmodule Rummage.Ecto.Hooks.Search do
       iex> Search.run(Parent, %{"search" => []})
       Parent
 
-  When rummage struct passed has the key "search", with "field" and "term"
-  it returns a searched version of the queryable passed in as the argument:
+  When rummage `struct` passed has the key "search", with `field`, `search_type` and `term`
+  it returns a searched version of the `queryable` passed in as the argument:
+
+  When rummage `struct` passed has `search_type` of `like`, it returns
+  a searched version of the `queryable` with `like` search query:
 
       iex> alias Rummage.Ecto.Hooks.Search
       iex> import Ecto.Query
-      iex> rummage = %{"search" => %{"field_1" => "field_!"}}
-      %{"search" => %{"field_1" => "field_!"}}
+      iex> rummage = %{"search" => %{"field_1" => {"like", "field_!"}}}
+      %{"search" => %{"field_1" => {"like", "field_!"}}}
       iex> queryable = from u in "parents"
       #Ecto.Query<from p in "parents">
       iex> Search.run(queryable, rummage)
       #Ecto.Query<from p in "parents", where: like(p.field_1, ^"%field_!%")>
 
-  When rummage struct passed has case-insensitive search, it returns
-  a searched version of the queryable with case_insensitive arguments:
+  When rummage `struct` passed has `search_type` of `ilike` (case insensitive), it returns
+  a searched version of the `queryable` with `ilike` search query:
 
       iex> alias Rummage.Ecto.Hooks.Search
       iex> import Ecto.Query
-      iex> rummage = %{"search" => %{"field_1.ci" => "field_!"}}
-      %{"search" => %{"field_1.ci" => "field_!"}}
+      iex> rummage = %{"search" => %{"field_1" => {"ilike", "field_!"}}}
+      %{"search" => %{"field_1" => {"ilike", "field_!"}}}
       iex> queryable = from u in "parents"
       #Ecto.Query<from p in "parents">
       iex> Search.run(queryable, rummage)
       #Ecto.Query<from p in "parents", where: ilike(p.field_1, ^"%field_!%")>
+
+  When rummage `struct` passed has `search_type` of `eq`, it returns
+  a searched version of the `queryable` with `==` search query:
+
+      iex> alias Rummage.Ecto.Hooks.Search
+      iex> import Ecto.Query
+      iex> rummage = %{"search" => %{"field_1" => {"eq", "field_!"}}}
+      %{"search" => %{"field_1" => {"eq", "field_!"}}}
+      iex> queryable = from u in "parents"
+      #Ecto.Query<from p in "parents">
+      iex> Search.run(queryable, rummage)
+      #Ecto.Query<from p in "parents", where: p.field_1 == ^"field_!">
+
+  When rummage `struct` passed has `search_type` of `gt`, it returns
+  a searched version of the `queryable` with `>` search query:
+
+      iex> alias Rummage.Ecto.Hooks.Search
+      iex> import Ecto.Query
+      iex> rummage = %{"search" => %{"field_1" => {"gt", "field_!"}}}
+      %{"search" => %{"field_1" => {"gt", "field_!"}}}
+      iex> queryable = from u in "parents"
+      #Ecto.Query<from p in "parents">
+      iex> Search.run(queryable, rummage)
+      #Ecto.Query<from p in "parents", where: p.field_1 > ^"field_!">
+
+  When rummage `struct` passed has `search_type` of `lt`, it returns
+  a searched version of the `queryable` with `<` search query:
+
+      iex> alias Rummage.Ecto.Hooks.Search
+      iex> import Ecto.Query
+      iex> rummage = %{"search" => %{"field_1" => {"lt", "field_!"}}}
+      %{"search" => %{"field_1" => {"lt", "field_!"}}}
+      iex> queryable = from u in "parents"
+      #Ecto.Query<from p in "parents">
+      iex> Search.run(queryable, rummage)
+      #Ecto.Query<from p in "parents", where: p.field_1 < ^"field_!">
+
+  When rummage `struct` passed has `search_type` of `gteq`, it returns
+  a searched version of the `queryable` with `>=` search query:
+
+      iex> alias Rummage.Ecto.Hooks.Search
+      iex> import Ecto.Query
+      iex> rummage = %{"search" => %{"field_1" => {"gteq", "field_!"}}}
+      %{"search" => %{"field_1" => {"gteq", "field_!"}}}
+      iex> queryable = from u in "parents"
+      #Ecto.Query<from p in "parents">
+      iex> Search.run(queryable, rummage)
+      #Ecto.Query<from p in "parents", where: p.field_1 >= ^"field_!">
+
+  When rummage `struct` passed has `search_type` of `lteq`, it returns
+  a searched version of the `queryable` with `<=` search query:
+
+      iex> alias Rummage.Ecto.Hooks.Search
+      iex> import Ecto.Query
+      iex> rummage = %{"search" => %{"field_1" => {"lteq", "field_!"}}}
+      %{"search" => %{"field_1" => {"lteq", "field_!"}}}
+      iex> queryable = from u in "parents"
+      #Ecto.Query<from p in "parents">
+      iex> Search.run(queryable, rummage)
+      #Ecto.Query<from p in "parents", where: p.field_1 <= ^"field_!">
   """
   @spec run(Ecto.Query.t, map) :: {Ecto.Query.t, map}
   def run(queryable, rummage) do
@@ -123,28 +211,17 @@ defmodule Rummage.Ecto.Hooks.Search do
   defp search_queryable(param, queryable) do
     field = param
       |> elem(0)
+      |> String.to_atom
 
-    case Regex.match?(~r/\w.ci+$/, field) do
-      true ->
-        field = field
-          |> String.split(".")
-          |> Enum.drop(-1)
-          |> Enum.join(".")
-          |> String.to_atom
+    search_type = param
+      |> elem(1)
+      |> elem(0)
 
-          term = elem(param, 1)
+    search_term = param
+      |> elem(1)
+      |> elem(1)
 
-          queryable
-          |> where([b],
-            ilike(field(b, ^field), ^"%#{String.replace(term, "%", "\\%")}%"))
-      _ ->
-        field = String.to_atom(field)
-
-        term = elem(param, 1)
-
-        queryable
-        |> where([b],
-          like(field(b, ^field), ^"%#{String.replace(term, "%", "\\%")}%"))
-    end
+    queryable
+    |> BuildSearchQuery.run(field, search_type, search_term)
   end
 end

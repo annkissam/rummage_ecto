@@ -1,7 +1,7 @@
 defmodule Rummage.Ecto.CustomHooks.SimpleSort do
   @moduledoc """
-  `Rummage.Ecto.CustomHooks.SimpleSort` is the default sort hook that comes shipped
-  with `Rummage`.
+  `Rummage.Ecto.CustomHooks.SimpleSort` is a custom sort hook that comes shipped
+  with `Rummage.Ecto`.
 
   Usage:
   For a regular sort:
@@ -25,9 +25,25 @@ defmodule Rummage.Ecto.CustomHooks.SimpleSort do
   sorted_queryable = SimpleSort.run(Parent, %{"sort" => "field_1.asc.ci"})
   ```
 
+  This module can be used by overriding the default search module. This can be done
+  in the following ways:
 
-  This module can be overridden with a custom module while using `Rummage.Ecto`
-  in `Ecto` struct module.
+  In the `Ecto` module:
+  ```elixir
+  defmodule SomeModule do
+    use Ecto.Schema
+    use Rummage.Ecto, sort_hook: Rummage.Ecto.CustomHooks.SimpleSort
+  end
+  ```
+
+  OR
+
+  Globally for all models in `config.exs` (NOT Recommended):
+  ```elixir
+  config :rummage_ecto,
+    Rummage.Ecto,
+    default_search: Rummage.Ecto.CustomHooks.SimpleSort
+  ```
   """
 
   import Ecto.Query

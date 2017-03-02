@@ -1,10 +1,52 @@
 defmodule Rummage.Ecto.CustomHooks.SimpleSearch do
   @moduledoc """
-  `Rummage.Ecto.CustomHooks.SimpleSearch` is the default search hook that comes shipped
-  with `Rummage`.
+  `Rummage.Ecto.CustomHooks.SimpleSearch` is a custom search hook that comes shipped
+  with `Rummage.Ecto`.
 
-  This module can be overridden with a custom module while using `Rummage.Ecto`
-  in `Ecto` struct module.
+  Usage:
+  For a regular search:
+
+  This returns a `queryable` which upon running will give a list of `Parent`(s)
+  searched by ascending `field_1`
+
+  ```elixir
+  alias Rummage.Ecto.CustomHooks.SimpleSearch
+
+  searched_queryable = SimpleSearch.run(Parent, %{"search" => %{"field_1" => "field_!"}})
+  ```
+
+  For a case-insensitive search:
+
+  This returns a `queryable` which upon running will give a list of `Parent`(s)
+  searched by ascending case insensitive `field_1`.
+
+  Keep in mind that `case_insensitive` can only be called for `text` fields
+
+  ```elixir
+  alias Rummage.Ecto.CustomHooks.SimpleSearch
+
+  searched_queryable = SimpleSearch.run(Parent, %{"search" => %{"field_1.ci" => "field_!"}})
+  ```
+
+  This module can be used by overriding the default search module. This can be done
+  in the following ways:
+
+  In the `Ecto` module:
+  ```elixir
+  defmodule SomeModule do
+    use Ecto.Schema
+    use Rummage.Ecto, search_hook: Rummage.Ecto.CustomHooks.SimpleSearch
+  end
+  ```
+
+  OR
+
+  Globally for all models in `config.exs` (NOT Recommended):
+  ```elixir
+  config :rummage_ecto,
+    Rummage.Ecto,
+    default_search: Rummage.Ecto.CustomHooks.SimpleSearch
+  ```
   """
 
   import Ecto.Query

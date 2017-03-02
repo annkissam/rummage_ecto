@@ -1,10 +1,33 @@
 defmodule Rummage.Ecto.Hooks.Paginate do
   @moduledoc """
   `Rummage.Ecto.Hooks.Paginate` is the default pagination hook that comes shipped
-  with `Rummage`.
+  with `Rummage.Ecto`.
 
   This module can be overridden with a custom module while using `Rummage.Ecto`
   in `Ecto` struct module.
+
+  In the `Ecto` module:
+  ```elixir
+  defmodule SomeModule do
+    use Ecto.Schema
+    use Rummage.Ecto, paginate_hook: CustomHook
+  end
+  ```
+
+  OR
+
+  Globally for all models in `config.exs` (NOT Recommended):
+  ```elixir
+  config :rummage_ecto,
+    Rummage.Ecto,
+    default_paginate: CustomHook
+  ```
+
+  The `CustomHook` must implement `@behaviour Rummage.Ecto.Hook`. For examples of `CustomHook`, check out some
+    `custom_hooks` that are shipped with elixir:
+
+      * `Rummage.Ecto.CustomHooks.SimpleSearch`
+      * `Rummage.Ecto.CustomHooks.SimpleSort`
   """
 
   import Ecto.Query

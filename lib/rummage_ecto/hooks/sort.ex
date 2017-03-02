@@ -1,7 +1,7 @@
 defmodule Rummage.Ecto.Hooks.Sort do
   @moduledoc """
   `Rummage.Ecto.Hooks.Sort` is the default sort hook that comes shipped
-  with `Rummage`.
+  with `Rummage.Ecto`.
 
   Usage:
   For a regular sort:
@@ -31,6 +31,29 @@ defmodule Rummage.Ecto.Hooks.Sort do
 
   This module can be overridden with a custom module while using `Rummage.Ecto`
   in `Ecto` struct module.
+
+  In the `Ecto` module:
+  ```elixir
+  defmodule SomeModule do
+    use Ecto.Schema
+    use Rummage.Ecto, sort_hook: CustomHook
+  end
+  ```
+
+  OR
+
+  Globally for all models in `config.exs` (NOT Recommended):
+  ```elixir
+  config :rummage_ecto,
+    Rummage.Ecto,
+    default_sort: CustomHook
+  ```
+
+  The `CustomHook` must implement `@behaviour Rummage.Ecto.Hook`. For examples of `CustomHook`, check out some
+    `custom_hooks` that are shipped with elixir:
+
+      * `Rummage.Ecto.CustomHooks.SimpleSearch`
+      * `Rummage.Ecto.CustomHooks.SimpleSort`
   """
 
   import Ecto.Query
