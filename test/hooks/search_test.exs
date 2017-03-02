@@ -1,4 +1,4 @@
-defmodule Rummage.Ecto.SearchTest do
+defmodule Rummage.Ecto.Hooks.SearchTest do
   use ExUnit.Case
   doctest Rummage.Ecto.Hooks.Search
 

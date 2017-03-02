@@ -4,5 +4,5 @@ defmodule Rummage.Ecto.Hook do
   Custom Search, Sort and Paginate hooks should follow this behavior
   as well.
   """
-  @callback run(query :: Ecto.Query.t, rummage :: map) :: {query :: Ecto.Query.t, rummage :: map}
+  @callback run(queryable :: Ecto.Query.t, rummage :: map) :: {queryable :: Ecto.Query.t, rummage :: map}
 end
