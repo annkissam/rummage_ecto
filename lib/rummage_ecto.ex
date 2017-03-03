@@ -11,6 +11,8 @@ defmodule Rummage.Ecto do
 
   If you want to check a sample application that uses Rummage, please check
   [this link](https://github.com/Excipients/rummage_phoenix_example).
+
+
   """
 
   alias Rummage.Ecto.Config
@@ -26,10 +28,7 @@ defmodule Rummage.Ecto do
           "paginate" => %{"per_page" => default_per_page(), "page" => "1"},
         }
 
-        rummage = case unquote(opts[:paginate_hook]) do
-          nil -> before_paginate(queryable, params)
-          _ -> params
-        end
+        rummage = before_paginate(queryable, params)
 
         queryable = queryable
           |> paginate_hook_call(rummage)
@@ -41,10 +40,7 @@ defmodule Rummage.Ecto do
         searched_queryable = queryable
           |> search_hook_call(rummage)
 
-        rummage = case unquote(opts[:paginate_hook]) do
-          nil -> before_paginate(queryable, rummage)
-          _ -> rummage
-        end
+        rummage = before_paginate(queryable, rummage)
 
         rummaged_queryable = searched_queryable
           |> sort_hook_call(rummage)
@@ -54,7 +50,7 @@ defmodule Rummage.Ecto do
       end
 
       def default_per_page do
-        unquote(Integer.to_string(opts[:per_page]) || Config.default_per_page)
+        unquote(Integer.to_string(opts[:per_page] || Config.default_per_page))
       end
 
       defp search_hook_call(queryable, rummage) do
@@ -105,14 +101,10 @@ defmodule Rummage.Ecto do
       defp get_total_count(queryable) do
         repo = get_repo()
 
-        case repo do
-          nil -> raise "No Repo provided for Rummage struct"
-          _ ->
-            queryable = queryable
-            |> select([b], count(b.id))
+        queryable = queryable
+          |> select([b], count(b.id))
 
-            apply(repo, :one, [queryable])
-        end
+        apply(repo, :one, [queryable])
       end
 
       defp get_repo do
