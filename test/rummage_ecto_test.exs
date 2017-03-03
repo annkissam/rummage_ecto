@@ -232,4 +232,38 @@ defmodule Rummage.EctoTest do
       "search" => %{"category_name" => [["category"], "like", "1"]}
     }
   end
+
+  test "rummage call with search, sort and paginate" do
+    create_categories_and_products
+
+    rummage = %{
+      "paginate" => %{
+        "page" => "2",
+      },
+      "search" => %{"price" => ["lteq", 10]},
+      "sort" => ["name.asc"],
+    }
+
+    {queryable, rummage} = Product.rummage(Product, rummage)
+
+    products = Repo.all(queryable)
+
+    # Test length
+    assert length(products) == 2
+
+    # Test prices of products
+    # assert Enum.all?(Repo.preload(products, :category), & &1.category.category_name == "Category 1")
+
+    # Test rummage params
+    assert rummage == %{
+      "search" => %{"price" => ["lteq", 10]},
+      "sort" => ["name.asc"],
+      "paginate" => %{
+        "per_page" => "2",
+        "page" => "2",
+        "max_page" => "2",
+        "total_count" => "4",
+      },
+    }
+  end
 end

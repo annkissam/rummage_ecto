@@ -40,7 +40,7 @@ defmodule Rummage.Ecto do
         searched_queryable = queryable
           |> search_hook_call(rummage)
 
-        rummage = before_paginate(queryable, rummage)
+        rummage = before_paginate(searched_queryable, rummage)
 
         rummaged_queryable = searched_queryable
           |> sort_hook_call(rummage)
