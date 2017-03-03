@@ -33,7 +33,7 @@ defmodule Rummage.Ecto.Config do
   in the config.exs file
   """
   def default_per_page do
-    config(:default_per_page, "10")
+    config(:default_per_page, 10)
   end
 
   @doc """
