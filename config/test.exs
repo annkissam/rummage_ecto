@@ -1,6 +1,7 @@
 use Mix.Config
 
-config :logger, level: :warn
+config :logger, :console,
+  level: :error
 
 config :rummage_ecto, Rummage.Ecto,[
   default_repo: Rummage.Ecto.Repo,

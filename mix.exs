@@ -17,6 +17,7 @@ defmodule Rummage.Ecto.Mixfile do
       test_coverage: [tool: ExCoveralls],
       preferred_cli_env: [coveralls: :test],
       aliases: aliases(),
+      elixirc_paths: elixirc_paths(Mix.env),
 
       # Hex
       description: description(),
@@ -91,4 +92,7 @@ end
       ],
     ]
   end
+
+  defp elixirc_paths(:test), do: ["lib", "priv", "test/support"]
+  defp elixirc_paths(_),     do: ["lib"]
 end
