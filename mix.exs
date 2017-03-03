@@ -16,6 +16,7 @@ defmodule Rummage.Ecto.Mixfile do
       # Test
       test_coverage: [tool: ExCoveralls],
       preferred_cli_env: [coveralls: :test],
+      aliases: aliases(),
 
       # Hex
       description: description(),
@@ -32,6 +33,7 @@ defmodule Rummage.Ecto.Mixfile do
       applications: [
         :logger,
         :ecto,
+        :postgrex,
       ],
     ]
   end
@@ -52,6 +54,7 @@ end
       {:excoveralls, "~> 0.3", only: :test},
       {:ex_doc, "~> 0.14", only: :dev, runtime: false},
       {:inch_ex, "~> 0.5", only: [:dev, :test, :docs]},
+      {:postgrex, ">= 0.0.0", only: [:test]},
     ]
   end
 
@@ -67,6 +70,25 @@ end
       source_url: "https://github.com/Excipients/rummage_ecto",
       extras: ["doc_readme.md"],
       source_ref: "v#{@version}"
+    ]
+  end
+
+  defp aliases do
+    [
+      "ecto.setup": [
+        "ecto.create",
+        "ecto.migrate"
+      ],
+     "ecto.reset": [
+        "ecto.drop",
+        "ecto.setup"
+      ],
+     "test": [
+        # "ecto.drop",
+        "ecto.create --quiet",
+        "ecto.migrate",
+        "test"
+      ],
     ]
   end
 end
