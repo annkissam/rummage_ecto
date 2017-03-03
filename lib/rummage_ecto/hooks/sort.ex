@@ -185,8 +185,14 @@ defmodule Rummage.Ecto.Hooks.Sort do
   @spec run(Ecto.Query.t, map) :: {Ecto.Query.t, map}
   def run(queryable, rummage) do
     case Map.get(rummage, "sort") do
-      a when a in [nil, [], {}, ""] -> queryable
+      a when a in [nil, [], {}, [""], ""] -> queryable
       sort_params ->
+        sort_params = if length(sort_params) == 1 do
+          [[]] ++ sort_params
+        else
+          sort_params
+        end
+
         case Regex.match?(~r/\w.ci+$/, Enum.at(sort_params, 1)) do
           true ->
             order_param = Enum.at(sort_params, 1)
