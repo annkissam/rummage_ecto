@@ -145,7 +145,7 @@ defmodule Rummage.EctoTest do
     create_categories_and_products
 
     rummage = %{
-      "search" => %{"price" => ["lteq", 10]}
+      "search" => %{"price" => %{"search_type" => "lteq", "search_term" => 10}}
     }
 
     {queryable, rummage} = Product.rummage(Product, rummage)
@@ -160,7 +160,7 @@ defmodule Rummage.EctoTest do
 
     # Test rummage params
     assert rummage == %{
-      "search" => %{"price" => ["lteq", 10]}
+      "search" => %{"price" => %{"search_type" => "lteq", "search_term" => 10}}
     }
   end
 
@@ -168,7 +168,7 @@ defmodule Rummage.EctoTest do
     create_categories_and_products
 
     rummage = %{
-      "search" => %{"price" => ["eq", 10]}
+      "search" => %{"price" => %{"search_type" => "eq", "search_term" => 10}}
     }
 
     {queryable, rummage} = Product.rummage(Product, rummage)
@@ -183,7 +183,7 @@ defmodule Rummage.EctoTest do
 
     # Test rummage params
     assert rummage == %{
-      "search" => %{"price" => ["eq", 10]}
+      "search" => %{"price" => %{"search_type" => "eq", "search_term" => 10}}
     }
   end
 
@@ -191,7 +191,7 @@ defmodule Rummage.EctoTest do
     create_categories_and_products
 
     rummage = %{
-      "search" => %{"price" => ["gteq", 10]}
+      "search" => %{"price" => %{"search_type" => "gteq", "search_term" => 10}}
     }
 
     {queryable, rummage} = Product.rummage(Product, rummage)
@@ -206,7 +206,7 @@ defmodule Rummage.EctoTest do
 
     # Test rummage params
     assert rummage == %{
-      "search" => %{"price" => ["gteq", 10]}
+      "search" => %{"price" => %{"search_type" => "gteq", "search_term" => 10}}
     }
   end
 
@@ -214,7 +214,7 @@ defmodule Rummage.EctoTest do
     create_categories_and_products
 
     rummage = %{
-      "search" => %{"category_name" => [["category"], "like", "1"]}
+      "search" => %{"category_name" => %{"assoc" => ["category"], "search_type" => "like", "search_term" => "1"}}
     }
 
     {queryable, rummage} = Product.rummage(Product, rummage)
@@ -229,7 +229,7 @@ defmodule Rummage.EctoTest do
 
     # Test rummage params
     assert rummage == %{
-      "search" => %{"category_name" => [["category"], "like", "1"]}
+      "search" => %{"category_name" => %{"assoc" => ["category"], "search_type" => "like", "search_term" => "1"}}
     }
   end
 
@@ -240,7 +240,7 @@ defmodule Rummage.EctoTest do
       "paginate" => %{
         "page" => "2",
       },
-      "search" => %{"price" => ["lteq", 10]},
+      "search" => %{"price" => %{"search_type" => "lteq", "search_term" => 10}},
       "sort" => ["name.asc"],
     }
 
@@ -256,7 +256,7 @@ defmodule Rummage.EctoTest do
 
     # Test rummage params
     assert rummage == %{
-      "search" => %{"price" => ["lteq", 10]},
+      "search" => %{"price" => %{"search_type" => "lteq", "search_term" => 10}},
       "sort" => ["name.asc"],
       "paginate" => %{
         "per_page" => "2",

@@ -111,7 +111,7 @@ defmodule Rummage.Ecto.Hooks.Paginate do
     paginate_params = Map.get(rummage, "paginate")
 
     case paginate_params do
-      a when a in [nil, [], "", %{}] -> queryable
+      a when a in [nil, [], {}, [""], "", %{}] -> queryable
       _ -> handle_paginate(queryable, paginate_params)
     end
   end

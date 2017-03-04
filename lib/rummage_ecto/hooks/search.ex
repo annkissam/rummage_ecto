@@ -15,7 +15,7 @@ defmodule Rummage.Ecto.Hooks.Search do
   ```elixir
   alias Rummage.Ecto.Hooks.Search
 
-  searched_queryable = Search.run(Parent, %{"search" => %{"field_1" => [[], "like", "field_!"]}}
+  searched_queryable = Search.run(Parent, %{"search" => %{"field_1" => %{"assoc" => [], "search_type" => "like", "search_term" => "field_!"}}}
   ```
 
   For a case-insensitive search:
@@ -28,7 +28,7 @@ defmodule Rummage.Ecto.Hooks.Search do
   ```elixir
   alias Rummage.Ecto.Hooks.Search
 
-  searched_queryable = Search.run(Parent, %{"search" => %{"field_1" => [[], "ilike", "field_!"]}}
+  searched_queryable = Search.run(Parent, %{"search" => %{"field_1" => %{"assoc" => [], "search_type" => "ilike", "search_term" => "field_!"}}}
   ```
 
   There are many other `search_types`. Check out `Rummage.Ecto.Services.BuildSearchQuery`'s docs
@@ -104,7 +104,7 @@ defmodule Rummage.Ecto.Hooks.Search do
 
       iex> alias Rummage.Ecto.Hooks.Search
       iex> import Ecto.Query
-      iex> Search.run(Parent, %{"search" => []})
+      iex> Search.run(Parent, %{"search" => %{}})
       Parent
 
   When rummage `struct` passed has the key "search", with `field`, `associations`
@@ -117,8 +117,8 @@ defmodule Rummage.Ecto.Hooks.Search do
 
         iex> alias Rummage.Ecto.Hooks.Search
         iex> import Ecto.Query
-        iex> rummage = %{"search" => %{"field_1" => [[], "like", "field_!"]}}
-        %{"search" => %{"field_1" => [[], "like", "field_!"]}}
+        iex> rummage = %{"search" => %{"field_1" => %{"assoc" => [], "search_type" => "like", "search_term" => "field_!"}}}
+        %{"search" => %{"field_1" => %{"assoc" => [], "search_type" => "like", "search_term" => "field_!"}}}
         iex> queryable = from u in "parents"
         #Ecto.Query<from p in "parents">
         iex> Search.run(queryable, rummage)
@@ -129,8 +129,8 @@ defmodule Rummage.Ecto.Hooks.Search do
 
         iex> alias Rummage.Ecto.Hooks.Search
         iex> import Ecto.Query
-        iex> rummage = %{"search" => %{"field_1" => [[], "ilike", "field_!"]}}
-        %{"search" => %{"field_1" => [[], "ilike", "field_!"]}}
+        iex> rummage = %{"search" => %{"field_1" => %{"assoc" => [], "search_type" => "ilike", "search_term" => "field_!"}}}
+        %{"search" => %{"field_1" => %{"assoc" => [], "search_type" => "ilike", "search_term" => "field_!"}}}
         iex> queryable = from u in "parents"
         #Ecto.Query<from p in "parents">
         iex> Search.run(queryable, rummage)
@@ -141,8 +141,8 @@ defmodule Rummage.Ecto.Hooks.Search do
 
         iex> alias Rummage.Ecto.Hooks.Search
         iex> import Ecto.Query
-        iex> rummage = %{"search" => %{"field_1" => [[], "eq", "field_!"]}}
-        %{"search" => %{"field_1" => [[], "eq", "field_!"]}}
+        iex> rummage = %{"search" => %{"field_1" => %{"assoc" => [], "search_type" => "eq", "search_term" => "field_!"}}}
+        %{"search" => %{"field_1" => %{"assoc" => [], "search_type" => "eq", "search_term" => "field_!"}}}
         iex> queryable = from u in "parents"
         #Ecto.Query<from p in "parents">
         iex> Search.run(queryable, rummage)
@@ -153,8 +153,8 @@ defmodule Rummage.Ecto.Hooks.Search do
 
         iex> alias Rummage.Ecto.Hooks.Search
         iex> import Ecto.Query
-        iex> rummage = %{"search" => %{"field_1" => [[], "gt", "field_!"]}}
-        %{"search" => %{"field_1" => [[], "gt", "field_!"]}}
+        iex> rummage = %{"search" => %{"field_1" => %{"assoc" => [], "search_type" => "gt", "search_term" => "field_!"}}}
+        %{"search" => %{"field_1" => %{"assoc" => [], "search_type" => "gt", "search_term" => "field_!"}}}
         iex> queryable = from u in "parents"
         #Ecto.Query<from p in "parents">
         iex> Search.run(queryable, rummage)
@@ -165,8 +165,8 @@ defmodule Rummage.Ecto.Hooks.Search do
 
         iex> alias Rummage.Ecto.Hooks.Search
         iex> import Ecto.Query
-        iex> rummage = %{"search" => %{"field_1" => [[], "lt", "field_!"]}}
-        %{"search" => %{"field_1" => [[], "lt", "field_!"]}}
+        iex> rummage = %{"search" => %{"field_1" => %{"assoc" => [], "search_type" => "lt", "search_term" => "field_!"}}}
+        %{"search" => %{"field_1" => %{"assoc" => [], "search_type" => "lt", "search_term" => "field_!"}}}
         iex> queryable = from u in "parents"
         #Ecto.Query<from p in "parents">
         iex> Search.run(queryable, rummage)
@@ -177,8 +177,8 @@ defmodule Rummage.Ecto.Hooks.Search do
 
         iex> alias Rummage.Ecto.Hooks.Search
         iex> import Ecto.Query
-        iex> rummage = %{"search" => %{"field_1" => [[], "gteq", "field_!"]}}
-        %{"search" => %{"field_1" => [[], "gteq", "field_!"]}}
+        iex> rummage = %{"search" => %{"field_1" => %{"assoc" => [], "search_type" => "gteq", "search_term" => "field_!"}}}
+        %{"search" => %{"field_1" => %{"assoc" => [], "search_type" => "gteq", "search_term" => "field_!"}}}
         iex> queryable = from u in "parents"
         #Ecto.Query<from p in "parents">
         iex> Search.run(queryable, rummage)
@@ -189,8 +189,8 @@ defmodule Rummage.Ecto.Hooks.Search do
 
         iex> alias Rummage.Ecto.Hooks.Search
         iex> import Ecto.Query
-        iex> rummage = %{"search" => %{"field_1" => [[], "lteq", "field_!"]}}
-        %{"search" => %{"field_1" => [[], "lteq", "field_!"]}}
+        iex> rummage = %{"search" => %{"field_1" => %{"assoc" => [], "search_type" => "lteq", "search_term" => "field_!"}}}
+        %{"search" => %{"field_1" => %{"assoc" => [], "search_type" => "lteq", "search_term" => "field_!"}}}
         iex> queryable = from u in "parents"
         #Ecto.Query<from p in "parents">
         iex> Search.run(queryable, rummage)
@@ -202,8 +202,8 @@ defmodule Rummage.Ecto.Hooks.Search do
 
         iex> alias Rummage.Ecto.Hooks.Search
         iex> import Ecto.Query
-        iex> rummage = %{"search" => %{"field_1" => [["parent", "parent"], "like", "field_!"]}}
-        %{"search" => %{"field_1" => [["parent", "parent"], "like", "field_!"]}}
+        iex> rummage = %{"search" => %{"field_1" => %{"assoc" => ["parent", "parent"], "search_type" => "like", "search_term" => "field_!"}}}
+        %{"search" => %{"field_1" => %{"assoc" => ["parent", "parent"], "search_type" => "like", "search_term" => "field_!"}}}
         iex> queryable = from u in "parents"
         #Ecto.Query<from p in "parents">
         iex> Search.run(queryable, rummage)
@@ -214,8 +214,8 @@ defmodule Rummage.Ecto.Hooks.Search do
 
         iex> alias Rummage.Ecto.Hooks.Search
         iex> import Ecto.Query
-        iex> rummage = %{"search" => %{"field_1" => [["parent", "parent"], "lteq", "field_!"]}}
-        %{"search" => %{"field_1" => [["parent", "parent"], "lteq", "field_!"]}}
+        iex> rummage = %{"search" => %{"field_1" => %{"assoc" => ["parent", "parent"], "search_type" => "lteq", "search_term" => "field_!"}}}
+        %{"search" => %{"field_1" => %{"assoc" => ["parent", "parent"], "search_type" => "lteq", "search_term" => "field_!"}}}
         iex> queryable = from u in "parents"
         #Ecto.Query<from p in "parents">
         iex> Search.run(queryable, rummage)
@@ -226,7 +226,7 @@ defmodule Rummage.Ecto.Hooks.Search do
     search_params = Map.get(rummage, "search")
 
     case search_params do
-      a when a in [nil, [], %{}, ""] -> queryable
+      a when a in [nil, [], {}, [""], "", %{}] -> queryable
       _ -> handle_search(queryable, search_params)
     end
   end
@@ -245,20 +245,9 @@ defmodule Rummage.Ecto.Hooks.Search do
     field_params = param
       |> elem(1)
 
-    field_params = if length(field_params) == 2 do
-      [[]] ++ field_params
-    else
-      field_params
-    end
-
-    association_names = field_params
-      |> Enum.at(0)
-
-    search_type = field_params
-      |> Enum.at(1)
-
-    search_term = field_params
-      |> Enum.at(2)
+    association_names = if field_params["assoc"], do: field_params["assoc"], else: []
+    search_type = field_params["search_type"]
+    search_term = field_params["search_term"]
 
     association_names
     |> Enum.reduce(queryable, &join_by_association(&1, &2))
