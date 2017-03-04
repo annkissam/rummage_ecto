@@ -245,7 +245,7 @@ defmodule Rummage.Ecto.Hooks.Search do
     field_params = param
       |> elem(1)
 
-    association_names = if field_params["assoc"], do: field_params["assoc"], else: []
+    association_names = if is_nil(field_params["assoc"]) or field_params["assoc"] == "", do: [], else: field_params["assoc"]
     search_type = field_params["search_type"]
     search_term = field_params["search_term"]
 
