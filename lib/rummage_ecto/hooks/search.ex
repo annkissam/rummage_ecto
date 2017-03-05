@@ -220,6 +220,39 @@ defmodule Rummage.Ecto.Hooks.Search do
         #Ecto.Query<from p in "parents">
         iex> Search.run(queryable, rummage)
         #Ecto.Query<from p0 in "parents", join: p1 in assoc(p0, :parent), join: p2 in assoc(p1, :parent), where: p2.field_1 <= ^"field_!">
+
+    When rummage `struct` passed has an empty string as `search_term`, it returns the `queryable` itself:
+
+        iex> alias Rummage.Ecto.Hooks.Search
+        iex> import Ecto.Query
+        iex> rummage = %{"search" => %{"field_1" => %{"assoc" => ["parent", "parent"], "search_type" => "lteq", "search_term" => ""}}}
+        %{"search" => %{"field_1" => %{"assoc" => ["parent", "parent"], "search_type" => "lteq", "search_term" => ""}}}
+        iex> queryable = from u in "parents"
+        #Ecto.Query<from p in "parents">
+        iex> Search.run(queryable, rummage)
+        #Ecto.Query<from p in "parents">
+
+    When rummage `struct` passed has nil as `search_term`, it returns the `queryable` itself:
+
+        iex> alias Rummage.Ecto.Hooks.Search
+        iex> import Ecto.Query
+        iex> rummage = %{"search" => %{"field_1" => %{"assoc" => ["parent", "parent"], "search_type" => "lteq", "search_term" => nil}}}
+        %{"search" => %{"field_1" => %{"assoc" => ["parent", "parent"], "search_type" => "lteq", "search_term" => nil}}}
+        iex> queryable = from u in "parents"
+        #Ecto.Query<from p in "parents">
+        iex> Search.run(queryable, rummage)
+        #Ecto.Query<from p in "parents">
+
+    When rummage `struct` passed has an empty array as `search_term`, it returns the `queryable` itself:
+
+        iex> alias Rummage.Ecto.Hooks.Search
+        iex> import Ecto.Query
+        iex> rummage = %{"search" => %{"field_1" => %{"assoc" => ["parent", "parent"], "search_type" => "lteq", "search_term" => []}}}
+        %{"search" => %{"field_1" => %{"assoc" => ["parent", "parent"], "search_type" => "lteq", "search_term" => []}}}
+        iex> queryable = from u in "parents"
+        #Ecto.Query<from p in "parents">
+        iex> Search.run(queryable, rummage)
+        #Ecto.Query<from p in "parents">
   """
   @spec run(Ecto.Query.t, map) :: {Ecto.Query.t, map}
   def run(queryable, rummage) do
@@ -249,9 +282,13 @@ defmodule Rummage.Ecto.Hooks.Search do
     search_type = field_params["search_type"]
     search_term = field_params["search_term"]
 
-    association_names
-    |> Enum.reduce(queryable, &join_by_association(&1, &2))
-    |> BuildSearchQuery.run(field, search_type, search_term)
+    case search_term do
+      s when s in [nil, "", []] -> queryable
+      _ ->
+        association_names
+        |> Enum.reduce(queryable, &join_by_association(&1, &2))
+        |> BuildSearchQuery.run(field, search_type, search_term)
+    end
   end
 
   defp join_by_association(association, queryable) do
