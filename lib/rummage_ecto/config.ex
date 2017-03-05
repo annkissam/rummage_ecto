@@ -11,8 +11,8 @@ defmodule Rummage.Ecto.Config do
   ## Examples
   When no config is set, if returns the default hook
   (`Rummage.Ecto.Hooks.Search`):
-    iex> alias Rummage.Ecto.Config
-    iex> Config.default_search
+      iex> alias Rummage.Ecto.Config
+      iex> Config.default_search
     Rummage.Ecto.Hooks.Search
   """
   def default_search do
@@ -26,8 +26,8 @@ defmodule Rummage.Ecto.Config do
   ## Examples
   When no config is set, if returns the default hook
   (`Rummage.Ecto.Hooks.Sort`):
-    iex> alias Rummage.Ecto.Config
-    iex> Config.default_sort
+      iex> alias Rummage.Ecto.Config
+      iex> Config.default_sort
     Rummage.Ecto.Hooks.Sort
   """
   def default_sort do
@@ -41,8 +41,8 @@ defmodule Rummage.Ecto.Config do
   ## Examples
   When no config is set, if returns the default hook
   (`Rummage.Ecto.Hooks.Paginate`):
-    iex> alias Rummage.Ecto.Config
-    iex> Config.default_paginate
+      iex> alias Rummage.Ecto.Config
+      iex> Config.default_paginate
     Rummage.Ecto.Hooks.Paginate
   """
   def default_paginate do
@@ -56,8 +56,8 @@ defmodule Rummage.Ecto.Config do
   ## Examples
   Returns default `Repo` set in the config
   (`2 in `rummage_ecto`'s test env):
-    iex> alias Rummage.Ecto.Config
-    iex> Config.default_per_page
+      iex> alias Rummage.Ecto.Config
+      iex> Config.default_per_page
     2
   """
   def default_per_page do
@@ -71,8 +71,8 @@ defmodule Rummage.Ecto.Config do
   ## Examples
   Returns default `Repo` set in the config
   (`Rummage.Ecto.Repo` in `rummage_ecto`'s test env):
-    iex> alias Rummage.Ecto.Config
-    iex> Config.default_repo
+      iex> alias Rummage.Ecto.Config
+      iex> Config.default_repo
     Rummage.Ecto.Repo
   """
   def default_repo do
@@ -85,8 +85,8 @@ defmodule Rummage.Ecto.Config do
 
   ## Examples
   Returns value corresponding to a system variable config or returns the default value:
-    iex> alias Rummage.Ecto.Config
-    iex> Config.resolve_system_config({:system, "some random config"}, "default")
+      iex> alias Rummage.Ecto.Config
+      iex> Config.resolve_system_config({:system, "some random config"}, "default")
     "default"
   """
   @spec resolve_system_config(Tuple.t, term) :: {term}
