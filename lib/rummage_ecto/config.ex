@@ -13,7 +13,7 @@ defmodule Rummage.Ecto.Config do
   (`Rummage.Ecto.Hooks.Search`):
       iex> alias Rummage.Ecto.Config
       iex> Config.default_search
-    Rummage.Ecto.Hooks.Search
+      Rummage.Ecto.Hooks.Search
   """
   def default_search do
     config(:default_search, Rummage.Ecto.Hooks.Search)
@@ -28,7 +28,7 @@ defmodule Rummage.Ecto.Config do
   (`Rummage.Ecto.Hooks.Sort`):
       iex> alias Rummage.Ecto.Config
       iex> Config.default_sort
-    Rummage.Ecto.Hooks.Sort
+      Rummage.Ecto.Hooks.Sort
   """
   def default_sort do
     config(:default_sort, Rummage.Ecto.Hooks.Sort)
@@ -43,7 +43,7 @@ defmodule Rummage.Ecto.Config do
   (`Rummage.Ecto.Hooks.Paginate`):
       iex> alias Rummage.Ecto.Config
       iex> Config.default_paginate
-    Rummage.Ecto.Hooks.Paginate
+      Rummage.Ecto.Hooks.Paginate
   """
   def default_paginate do
     config(:default_paginate, Rummage.Ecto.Hooks.Paginate)
@@ -58,7 +58,7 @@ defmodule Rummage.Ecto.Config do
   (`2 in `rummage_ecto`'s test env):
       iex> alias Rummage.Ecto.Config
       iex> Config.default_per_page
-    2
+      2
   """
   def default_per_page do
     config(:default_per_page, 10)
@@ -73,7 +73,7 @@ defmodule Rummage.Ecto.Config do
   (`Rummage.Ecto.Repo` in `rummage_ecto`'s test env):
       iex> alias Rummage.Ecto.Config
       iex> Config.default_repo
-    Rummage.Ecto.Repo
+      Rummage.Ecto.Repo
   """
   def default_repo do
     config(:default_repo, nil)
@@ -87,7 +87,7 @@ defmodule Rummage.Ecto.Config do
   Returns value corresponding to a system variable config or returns the default value:
       iex> alias Rummage.Ecto.Config
       iex> Config.resolve_system_config({:system, "some random config"}, "default")
-    "default"
+      "default"
   """
   @spec resolve_system_config(Tuple.t, term) :: {term}
   def resolve_system_config({:system, var_name}, default) do
