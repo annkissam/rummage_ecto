@@ -5,6 +5,7 @@
 [![MIT licensed](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/Excipients/rummage_ecto/master/LICENSE)
 [![docs](https://inch-ci.org/github/Excipients/rummage_ecto.svg)](http://inch-ci.org/github/Excipients/rummage_ecto)
 [![Hex Version](http://img.shields.io/hexpm/v/rummage_ecto.svg?style=flat)](https://hex.pm/packages/rummage_ecto)
+[![hex.pm downloads](https://img.shields.io/hexpm/dt/rummage_ecto.svg)](https://hex.pm/packages/rummage_ecto)
 [![Hex docs](http://img.shields.io/badge/hex.pm-docs-green.svg?style=flat)](https://hexdocs.pm/rummage_ecto)
 
 **If you're looking for `Phoenix` support, you might wanna check `Rummage.Phoenix` instead by clicking
