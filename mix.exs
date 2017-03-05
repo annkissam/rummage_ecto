@@ -69,7 +69,7 @@ end
     [
       main: "Rummage.Ecto",
       source_url: "https://github.com/Excipients/rummage_ecto",
-      extras: ["doc_readme.md, CHANGELOG.md"],
+      extras: ["doc_readme.md", "CHANGELOG.md"],
       source_ref: "v#{@version}"
     ]
   end
