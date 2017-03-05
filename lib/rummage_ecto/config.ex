@@ -79,6 +79,20 @@ defmodule Rummage.Ecto.Config do
     config(:default_repo, nil)
   end
 
+  @doc """
+  `:default_repo` hook can also be set at run time
+  in the config.exs file
+
+  ## Examples
+  Returns value corresponding to a system variable config or returns the default value:
+    iex> alias Rummage.Ecto.Config
+    iex> Config.resolve_system_config({:system, "some random config"}, "default")
+    "default"
+  """
+  def resolve_system_config({:system, var_name}, default) do
+    System.get_env(var_name) || default
+  end
+
   defp config do
     Application.get_env(:rummage_ecto, Rummage.Ecto, [])
   end
@@ -87,10 +101,6 @@ defmodule Rummage.Ecto.Config do
     config()
     |> Keyword.get(key, default)
     |> resolve_config(default)
-  end
-
-  defp resolve_config({:system, var_name}, default) do
-    System.get_env(var_name) || default
   end
 
   defp resolve_config(value, _default), do: value
