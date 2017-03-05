@@ -94,6 +94,15 @@ defmodule Rummage.Ecto.Services.BuildSearchQuery do
       #Ecto.Query<from p in "parents">
       iex> BuildSearchQuery.run(queryable, :field_1, "lteq", "field_!")
       #Ecto.Query<from p in "parents", where: p.field_1 <= ^"field_!">
+
+When `field`, `search_type` and `queryable` are passed with an invalid `search_type`:
+
+      iex> alias Rummage.Ecto.Services.BuildSearchQuery
+      iex> import Ecto.Query
+      iex> queryable = from u in "parents"
+      #Ecto.Query<from p in "parents">
+      iex> BuildSearchQuery.run(queryable, :field_1, "pizza", "field_!")
+      #Ecto.Query<from p in "parents">
   """
   @spec run(Ecto.Query.t, atom, String.t, term) :: {Ecto.Query.t}
   def run(queryable, field, search_type, search_term) do

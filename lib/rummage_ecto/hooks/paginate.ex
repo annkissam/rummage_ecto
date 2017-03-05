@@ -56,22 +56,22 @@ defmodule Rummage.Ecto.Hooks.Paginate do
       iex> Paginate.run(queryable, %{})
       #Ecto.Query<from p in "parents">
 
-  When rummage `struct` passed has the key `"search"`, but with a value of `%{}`, `""`
+  When rummage `struct` passed has the key `"paginate"`, but with a value of `%{}`, `""`
   or `[]` it simply returns the `queryable` itself:
 
-      iex> alias Rummage.Ecto.CustomHooks.SimpleSearch
+      iex> alias Rummage.Ecto.Hooks.Paginate
       iex> import Ecto.Query
-      iex> SimpleSearch.run(Parent, %{"search" => %{}})
+      iex> Paginate.run(Parent, %{"paginate" => %{}})
       Parent
 
-      iex> alias Rummage.Ecto.CustomHooks.SimpleSearch
+      iex> alias Rummage.Ecto.Hooks.Paginate
       iex> import Ecto.Query
-      iex> SimpleSearch.run(Parent, %{"search" => ""})
+      iex> Paginate.run(Parent, %{"paginate" => ""})
       Parent
 
-      iex> alias Rummage.Ecto.CustomHooks.SimpleSearch
+      iex> alias Rummage.Ecto.Hooks.Paginate
       iex> import Ecto.Query
-      iex> SimpleSearch.run(Parent, %{"search" => []})
+      iex> Paginate.run(Parent, %{"paginate" => []})
       Parent
 
   When rummage struct passed has the key "paginate", with "per_page" and "page" keys
@@ -111,7 +111,7 @@ defmodule Rummage.Ecto.Hooks.Paginate do
     paginate_params = Map.get(rummage, "paginate")
 
     case paginate_params do
-      a when a in [nil, [], "", %{}] -> queryable
+      a when a in [nil, [], {}, [""], "", %{}] -> queryable
       _ -> handle_paginate(queryable, paginate_params)
     end
   end

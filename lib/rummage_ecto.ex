@@ -11,6 +11,8 @@ defmodule Rummage.Ecto do
 
   If you want to check a sample application that uses Rummage, please check
   [this link](https://github.com/Excipients/rummage_phoenix_example).
+
+
   """
 
   alias Rummage.Ecto.Config
@@ -23,13 +25,10 @@ defmodule Rummage.Ecto do
       def rummage(queryable, rummage) when is_nil(rummage) or rummage == %{} do
         params = %{"search" => %{},
           "sort"=> [],
-          "paginate" => %{"per_page" => per_page(), "page" => "1"},
+          "paginate" => %{"per_page" => default_per_page(), "page" => "1"},
         }
 
-        rummage = case unquote(opts[:paginate_hook]) do
-          nil -> before_paginate(queryable, params)
-          _ -> params
-        end
+        rummage = before_paginate(queryable, params)
 
         queryable = queryable
           |> paginate_hook_call(rummage)
@@ -41,20 +40,17 @@ defmodule Rummage.Ecto do
         searched_queryable = queryable
           |> search_hook_call(rummage)
 
-        rummage = case unquote(opts[:paginate_hook]) do
-          nil -> before_paginate(queryable, rummage)
-          _ -> rummage
-        end
+        rummage = before_paginate(searched_queryable, rummage)
 
         rummaged_queryable = searched_queryable
           |> sort_hook_call(rummage)
           |> paginate_hook_call(rummage)
 
-        {queryable, rummaged_queryable}
+        {rummaged_queryable, rummage}
       end
 
       def default_per_page do
-        unquote(Integer.to_string(opts[:per_page]) || Config.default_per_page)
+        unquote(Integer.to_string(opts[:per_page] || Config.default_per_page))
       end
 
       defp search_hook_call(queryable, rummage) do
@@ -103,13 +99,26 @@ defmodule Rummage.Ecto do
       end
 
       defp get_total_count(queryable) do
-        case unquote(opts[:repo]) do
-          nil -> raise "No Repo provided for Rummage struct"
-          _ ->
-            queryable
-            |> select([b], count(b.id))
-            |> unquote(opts[:repo]).one
-        end
+        repo = get_repo()
+
+        queryable = queryable
+          |> select([b], count(b.id))
+
+        apply(repo, :one, [queryable])
+      end
+
+      defp get_repo do
+        unquote(opts[:repo]) ||
+          Config.default_repo ||
+          make_repo_name_from_topmost_namespace
+      end
+
+      defp make_repo_name_from_topmost_namespace do
+        "#{__MODULE__}"
+        |> String.split(".")
+        |> Enum.at(1)
+        |> (& "Elixir." <> &1 <> ".Repo").()
+        |> String.to_atom
       end
 
       defp parse_page_and_per_page(paginate_params) do
