@@ -50,7 +50,7 @@ defmodule Rummage.Ecto.Config do
   end
 
   @doc """
-  `:default_per_page` hook can also be set at run time
+  `:default_per_page` can also be set at run time
   in the `config.exs` file
 
   ## Examples
@@ -65,7 +65,7 @@ defmodule Rummage.Ecto.Config do
   end
 
   @doc """
-  `:default_repo` hook can also be set at run time
+  `:default_repo` can also be set at run time
   in the config.exs file
 
   ## Examples
