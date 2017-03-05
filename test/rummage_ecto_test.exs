@@ -91,7 +91,7 @@ defmodule Rummage.EctoTest do
     create_categories_and_products
 
     rummage = %{
-      "sort" => ["name.asc"]
+      "sort" => %{"field" => "name.asc"}
     }
 
     {queryable, rummage} = Product.rummage(Product, rummage)
@@ -109,7 +109,7 @@ defmodule Rummage.EctoTest do
 
     # Test rummage params
     assert rummage == %{
-      "sort" => ["name.asc"]
+      "sort" => %{"field" => "name.asc"}
     }
   end
 
@@ -117,7 +117,7 @@ defmodule Rummage.EctoTest do
     create_categories_and_products
 
     rummage = %{
-      "sort" => [["category"], "category_name.asc"]
+      "sort" => %{"assoc" => ["category"], "field" => "category_name.asc"}
     }
 
     {queryable, rummage} = Product.rummage(Product, rummage)
@@ -137,7 +137,7 @@ defmodule Rummage.EctoTest do
 
     # Test rummage params
     assert rummage == %{
-      "sort" => [["category"], "category_name.asc"]
+      "sort" => %{"assoc" => ["category"], "field" => "category_name.asc"}
     }
   end
 
@@ -241,7 +241,7 @@ defmodule Rummage.EctoTest do
         "page" => "2",
       },
       "search" => %{"price" => %{"search_type" => "lteq", "search_term" => 10}},
-      "sort" => ["name.asc"],
+      "sort" => %{"field" => "name.asc"},
     }
 
     {queryable, rummage} = Product.rummage(Product, rummage)
@@ -257,7 +257,7 @@ defmodule Rummage.EctoTest do
     # Test rummage params
     assert rummage == %{
       "search" => %{"price" => %{"search_type" => "lteq", "search_term" => 10}},
-      "sort" => ["name.asc"],
+      "sort" => %{"field" => "name.asc"},
       "paginate" => %{
         "per_page" => "2",
         "page" => "2",

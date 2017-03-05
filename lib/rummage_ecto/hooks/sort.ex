@@ -12,7 +12,7 @@ defmodule Rummage.Ecto.Hooks.Sort do
   ```elixir
   alias Rummage.Ecto.Hooks.Sort
 
-  sorted_queryable = Sort.run(Parent, %{"sort" => [[], "field_1.asc"}])
+  sorted_queryable = Sort.run(Parent, %{"sort" => %{"assoc" => [], "field" => "field_1.asc"}])
   ```
 
   For a case-insensitive sort:
@@ -25,7 +25,7 @@ defmodule Rummage.Ecto.Hooks.Sort do
   ```elixir
   alias Rummage.Ecto.Hooks.Sort
 
-  sorted_queryable = Sort.run(Parent, %{"sort" => [[], "field_1.asc.ci"}])
+  sorted_queryable = Sort.run(Parent, %{"sort" => %{"assoc" => [], "field" => "field_1.asc.ci"}])
   ```
 
 
@@ -97,7 +97,7 @@ defmodule Rummage.Ecto.Hooks.Sort do
 
       iex> alias Rummage.Ecto.Hooks.Sort
       iex> import Ecto.Query
-      iex> Sort.run(Parent, %{"sort" => []})
+      iex> Sort.run(Parent, %{"sort" => %{}})
       Parent
 
   When rummage `struct` passed has the key `"sort"`, but empty associations array
@@ -105,9 +105,9 @@ defmodule Rummage.Ecto.Hooks.Sort do
 
       iex> alias Rummage.Ecto.Hooks.Sort
       iex> import Ecto.Query
-      iex> rummage = %{"sort" => [[], "field_1.asc"]}
-      %{"sort" => [[],
-        "field_1.asc"]}
+      iex> rummage = %{"sort" => %{"assoc" => [], "field" => "field_1.asc"}}
+      %{"sort" => %{"assoc" => [],
+        "field" => "field_1.asc"}}
       iex> queryable = from u in "parents"
       #Ecto.Query<from p in "parents">
       iex> Sort.run(queryable, rummage)
@@ -115,9 +115,9 @@ defmodule Rummage.Ecto.Hooks.Sort do
 
       iex> alias Rummage.Ecto.Hooks.Sort
       iex> import Ecto.Query
-      iex> rummage = %{"sort" => [[], "field_1.desc"]}
-      %{"sort" => [[],
-        "field_1.desc"]}
+      iex> rummage = %{"sort" => %{"assoc" => [], "field" => "field_1.desc"}}
+      %{"sort" => %{"assoc" => [],
+        "field" => "field_1.desc"}}
       iex> queryable = from u in "parents"
       #Ecto.Query<from p in "parents">
       iex> Sort.run(queryable, rummage)
@@ -127,9 +127,9 @@ defmodule Rummage.Ecto.Hooks.Sort do
 
       iex> alias Rummage.Ecto.Hooks.Sort
       iex> import Ecto.Query
-      iex> rummage = %{"sort" => [[], "field_1"]}
-      %{"sort" => [[],
-        "field_1"]}
+      iex> rummage = %{"sort" => %{"assoc" => [], "field" => "field_1"}}
+      %{"sort" => %{"assoc" => [],
+        "field" => "field_1"}}
       iex> queryable = from u in "parents"
       #Ecto.Query<from p in "parents">
       iex> Sort.run(queryable, rummage)
@@ -141,8 +141,8 @@ defmodule Rummage.Ecto.Hooks.Sort do
 
       iex> alias Rummage.Ecto.Hooks.Sort
       iex> import Ecto.Query
-      iex> rummage = %{"sort" => [["parent", "parent"], "field_1.asc"]}
-      %{"sort" => [["parent", "parent"], "field_1.asc"]}
+      iex> rummage = %{"sort" => %{"assoc" => ["parent", "parent"], "field" => "field_1.asc"}}
+      %{"sort" => %{"assoc" => ["parent", "parent"], "field" => "field_1.asc"}}
       iex> queryable = from u in "parents"
       #Ecto.Query<from p in "parents">
       iex> Sort.run(queryable, rummage)
@@ -151,8 +151,8 @@ defmodule Rummage.Ecto.Hooks.Sort do
 
       iex> alias Rummage.Ecto.Hooks.Sort
       iex> import Ecto.Query
-      iex> rummage = %{"sort" => [["parent", "parent"], "field_1.desc"]}
-      %{"sort" => [["parent", "parent"], "field_1.desc"]}
+      iex> rummage = %{"sort" => %{"assoc" => ["parent", "parent"], "field" => "field_1.desc"}}
+      %{"sort" => %{"assoc" => ["parent", "parent"], "field" => "field_1.desc"}}
       iex> queryable = from u in "parents"
       #Ecto.Query<from p in "parents">
       iex> Sort.run(queryable, rummage)
@@ -162,9 +162,9 @@ defmodule Rummage.Ecto.Hooks.Sort do
 
       iex> alias Rummage.Ecto.Hooks.Sort
       iex> import Ecto.Query
-      iex> rummage = %{"sort" => [["parent", "parent"], "field_1"]}
-      %{"sort" => [["parent", "parent"],
-        "field_1"]}
+      iex> rummage = %{"sort" => %{"assoc" => ["parent", "parent"], "field" => "field_1"}}
+      %{"sort" => %{"assoc" => ["parent", "parent"],
+        "field" => "field_1"}}
       iex> queryable = from u in "parents"
       #Ecto.Query<from p in "parents">
       iex> Sort.run(queryable, rummage)
@@ -175,8 +175,8 @@ defmodule Rummage.Ecto.Hooks.Sort do
 
       iex> alias Rummage.Ecto.Hooks.Sort
       iex> import Ecto.Query
-      iex> rummage = %{"sort" => [["parent", "parent"], "field_1.asc.ci"]}
-      %{"sort" => [["parent", "parent"], "field_1.asc.ci"]}
+      iex> rummage = %{"sort" => %{"assoc" => ["parent", "parent"], "field" => "field_1.asc.ci"}}
+      %{"sort" => %{"assoc" => ["parent", "parent"], "field" => "field_1.asc.ci"}}
       iex> queryable = from u in "parents"
       #Ecto.Query<from p in "parents">
       iex> Sort.run(queryable, rummage)
@@ -187,23 +187,22 @@ defmodule Rummage.Ecto.Hooks.Sort do
     case Map.get(rummage, "sort") do
       a when a in [nil, [], {}, [""], "", %{}] -> queryable
       sort_params ->
-        sort_params = if length(sort_params) == 1 do
-          [[]] ++ sort_params
-        else
-          sort_params
+        sort_params = case sort_params["assoc"] do
+          s when s in [nil, ""] -> Map.put(sort_params, "assoc", [])
+          _ -> sort_params
         end
 
-        case Regex.match?(~r/\w.ci+$/, Enum.at(sort_params, 1)) do
+        case Regex.match?(~r/\w.ci+$/, sort_params["field"]) do
           true ->
-            order_param = Enum.at(sort_params, 1)
+            order_param = sort_params["field"]
               |> String.split(".")
               |> Enum.drop(-1)
               |> Enum.join(".")
 
-            sort_params = {Enum.at(sort_params, 0), order_param}
+            sort_params = {sort_params["assoc"], order_param}
 
             handle_sort(queryable, sort_params, true)
-          _ -> handle_sort(queryable, List.to_tuple(sort_params))
+          _ -> handle_sort(queryable, {sort_params["assoc"], sort_params["field"]})
         end
     end
   end
