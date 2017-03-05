@@ -80,8 +80,8 @@ defmodule Rummage.Ecto.Config do
   end
 
   @doc """
-  `:default_repo` hook can also be set at run time
-  in the config.exs file
+  `resolve_system_config` returns a system variable set up or returns the
+  specified default value
 
   ## Examples
   Returns value corresponding to a system variable config or returns the default value:
@@ -89,6 +89,7 @@ defmodule Rummage.Ecto.Config do
     iex> Config.resolve_system_config({:system, "some random config"}, "default")
     "default"
   """
+  @spec resolve_system_config(Tuple.t, term) :: {term}
   def resolve_system_config({:system, var_name}, default) do
     System.get_env(var_name) || default
   end
