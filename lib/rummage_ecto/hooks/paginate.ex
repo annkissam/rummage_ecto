@@ -23,11 +23,8 @@ defmodule Rummage.Ecto.Hooks.Paginate do
     default_paginate: CustomHook
   ```
 
-  The `CustomHook` must implement `@behaviour Rummage.Ecto.Hook`. For examples of `CustomHook`, check out some
-    `custom_hooks` that are shipped with elixir:
-
-      * `Rummage.Ecto.CustomHooks.SimpleSearch`
-      * `Rummage.Ecto.CustomHooks.SimpleSort`
+  The `CustomHook` must implement behaviour `Rummage.Ecto.Hook`. For examples of `CustomHook`, check out some
+    `custom_hooks` that are shipped with elixir: `Rummage.Ecto.CustomHooks.SimpleSearch`, `Rummage.Ecto.CustomHooks.SimpleSort`
   """
 
   import Ecto.Query

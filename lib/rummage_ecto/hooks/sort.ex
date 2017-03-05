@@ -12,7 +12,7 @@ defmodule Rummage.Ecto.Hooks.Sort do
   ```elixir
   alias Rummage.Ecto.Hooks.Sort
 
-  sorted_queryable = Sort.run(Parent, %{"sort" => %{"assoc" => [], "field" => "field_1.asc"}])
+  sorted_queryable = Sort.run(Parent, %{"sort" => %{"assoc" => [], "field" => "field_1.asc"}})
   ```
 
   For a case-insensitive sort:
@@ -25,7 +25,7 @@ defmodule Rummage.Ecto.Hooks.Sort do
   ```elixir
   alias Rummage.Ecto.Hooks.Sort
 
-  sorted_queryable = Sort.run(Parent, %{"sort" => %{"assoc" => [], "field" => "field_1.asc.ci"}])
+  sorted_queryable = Sort.run(Parent, %{"sort" => %{"assoc" => [], "field" => "field_1.asc.ci"}})
   ```
 
 
@@ -49,11 +49,8 @@ defmodule Rummage.Ecto.Hooks.Sort do
     default_sort: CustomHook
   ```
 
-  The `CustomHook` must implement `@behaviour Rummage.Ecto.Hook`. For examples of `CustomHook`, check out some
-    `custom_hooks` that are shipped with elixir:
-
-      * `Rummage.Ecto.CustomHooks.SimpleSearch`
-      * `Rummage.Ecto.CustomHooks.SimpleSort`
+  The `CustomHook` must implement behaviour `Rummage.Ecto.Hook`. For examples of `CustomHook`, check out some
+  `custom_hooks` that are shipped with elixir: `Rummage.Ecto.CustomHooks.SimpleSearch`, `Rummage.Ecto.CustomHooks.SimpleSort`
   """
 
   import Ecto.Query

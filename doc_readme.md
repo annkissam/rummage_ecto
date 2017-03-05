@@ -5,7 +5,7 @@ to it. You can check `Rummage.Phoenix` out by clicking [here](https://github.com
 
 **Please refer for `CHANGELOG` for version specific changes**
 
-`Rummage.Ecto` is a framework that can be used to alter `Ecto` queries with Search, Sort and Paginate operations.
+`Rummage.Ecto` is a light weight, but powerful framework that can be used to alter `Ecto` queries with Search, Sort and Paginate operations.
 
 It accomplishes the above operations by using `Hooks`, which are modules that implement `Rumamge.Ecto.Hook` behavior.
 Each operation: `Search`, `Sort` and `Paginate` have their hooks defined in `Rummage`. By doing this, `Rummage` is completely

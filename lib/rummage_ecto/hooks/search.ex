@@ -16,6 +16,7 @@ defmodule Rummage.Ecto.Hooks.Search do
   alias Rummage.Ecto.Hooks.Search
 
   searched_queryable = Search.run(Parent, %{"search" => %{"field_1" => %{"assoc" => [], "search_type" => "like", "search_term" => "field_!"}}}
+
   ```
 
   For a case-insensitive search:
@@ -29,6 +30,7 @@ defmodule Rummage.Ecto.Hooks.Search do
   alias Rummage.Ecto.Hooks.Search
 
   searched_queryable = Search.run(Parent, %{"search" => %{"field_1" => %{"assoc" => [], "search_type" => "ilike", "search_term" => "field_!"}}}
+
   ```
 
   There are many other `search_types`. Check out `Rummage.Ecto.Services.BuildSearchQuery`'s docs
@@ -54,11 +56,8 @@ defmodule Rummage.Ecto.Hooks.Search do
     default_search: CustomHook
   ```
 
-  The `CustomHook` must implement `@behaviour Rummage.Ecto.Hook`. For examples of `CustomHook`, check out some
-    `custom_hooks` that are shipped with elixir:
-
-      * `Rummage.Ecto.CustomHooks.SimpleSearch`
-      * `Rummage.Ecto.CustomHooks.SimpleSort`
+  The `CustomHook` must implement `behaviour `Rummage.Ecto.Hook`. For examples of `CustomHook`, check out some
+    `custom_hooks` that are shipped with elixir: `Rummage.Ecto.CustomHooks.SimpleSearch`, `Rummage.Ecto.CustomHooks.SimpleSort`
   """
 
   import Ecto.Query

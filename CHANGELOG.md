@@ -1,4 +1,4 @@
-# Rummage.Ecto Versions CHANGELOG
+# Versions CHANGELOG
 
 ## Version: 1.0.0
 
@@ -17,12 +17,26 @@
 
 ### Change in `rummage` struct syntaxes:
   - `search` key:
-    - Earlier: rummage = %{"search" => %{"field_1" => "field_!"}}
-    - Now: rummage = %{"search" => %{"field_1" => {["association_name"], "like", "field_!"}}}
+    - Earlier:
+      ```elixir
+      rummage = %{"search" => %{"field_1" => "field_!"}}
+      ```
+
+    - Now:
+      ```elixir
+      rummage = %{"search" => %{"field_1" => %{"assoc" => ["assoc_1", "assoc_2"], "search_type" => "like", "search_term" => "field_!"}}
+      ```
 
   - `sort` key:
-    - Earlier: %{"sort" => "field_1.asc"}
-    - Now: %{"sort" => {["association_name", "association_name"], "field_1.asc.ci"}}
+    - Earlier:
+      ```elixir
+     rummage = %{"sort" => "field_1.asc"}
+      ```
+
+    - Now:
+      ```elixir
+      rummage = %{"sort" => %{"assoc" => ["assoc_1", "assoc_2"], "field" => "field_1.asc"}}
+      ```
 
   - `paginate` key: NO CHANGES
 
