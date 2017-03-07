@@ -129,6 +129,8 @@ Below are the ways `Rummage.Ecto` can be used:
 
 ### Coming up next:
 
+  - Using the Rummage Search hook
+  - Using the Rummage Sort hook
   - Using Rummage.Phoenix
   - Writing a Custom Rummage.Ecto Hook
   - Writing a Custom Rummage.Phoenix HTML helper
@@ -170,4 +172,17 @@ Below are the ways `Rummage.Ecto` can be used:
   - Rummage Search example:
   ![rummage search](src/rummage_search.png)
 
+  - Rummage Search with Association example:
+  ![rummage search assoc](src/rummage_search_assoc.png)
 
+  - Rummage Sort example:
+  ![rummage sort](src/rummage_sort.png)
+
+  - Rummage Sort with Association example:
+  ![rummage sort assoc](src/rummage_sort_assoc.png)
+
+  - Rummage Search with Sort example:
+  ![rummage search sort](src/rummage_search_and_sort.png)
+
+  - Rummage Search, Sort and Paginate example:
+  ![rummage search sort paginate](src/rummage_search_sort_and_paginate.png)
