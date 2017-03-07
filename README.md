@@ -141,7 +141,7 @@ Below are the ways `Rummage.Ecto` can be used:
 
   ```elixir
   rummage = %{
-    "search" => %{"field_1" => %{"assoc" => [], "search_type" => "like", "search_term" => "field_!"}
+    "search" => %{"field_1" => %{"assoc" => [], "search_type" => "like", "search_term" => "field_!"},
     "sort" => %{"assoc" => [], "field" => "field_1.asc"},
     "paginate" => %{"per_page" => "5", "page" => "1"}
   }
@@ -150,8 +150,8 @@ Below are the ways `Rummage.Ecto` can be used:
     |> Product.rummage(rummage)
 
   products = queryable
-  |> Product.another_operation # <-- Since `Rummage` is Ecto, we can pipe the result queryable into another queryable operation.
-  |> Repo.all
+    |> Product.another_operation # <-- Since `Rummage` is Ecto, we can pipe the result queryable into another queryable operation.
+    |> Repo.all
   ```
 
   - Rummage responds to `params` with keys: `search`, `sort` and/or `paginate`. It doesn't need to have all the keys, or any keys for that matter.
@@ -159,10 +159,15 @@ Below are the ways `Rummage.Ecto` can be used:
 
   ```elixir
   %{
-    "search" => %{"field_1" => %{"assoc" => [], "search_type" => "like", "search_term" => "field_!"}
+    "search" => %{"field_1" => %{"assoc" => [], "search_type" => "like", "search_term" => "field_!"},
     "sort" => %{"assoc" => [], "field" => "field_1.asc"},
     "paginate" => %{"per_page" => "5", "page" => "1"}
   }
   ```
+
+## Example with Screenshots
+
+  - Rummage Search example:
+  ![rummage search](src/rummage_search.png)
 
 
