@@ -80,11 +80,11 @@ defmodule Rummage.Ecto.Config do
   end
 
   @doc """
-  `resolve_system_config` returns a system variable set up or returns the
-  specified default value
+  `resolve_system_config` returns a `system` variable set up with `var_name` key
+   or returns the specified `default` value
 
   ## Examples
-  Returns value corresponding to a system variable config or returns the default value:
+  Returns value corresponding to a system variable config or returns the `default` value:
       iex> alias Rummage.Ecto.Config
       iex> Config.resolve_system_config({:system, "some random config"}, "default")
       "default"
