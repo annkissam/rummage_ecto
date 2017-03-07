@@ -19,10 +19,11 @@ It accomplishes the above operations by using `Hooks`, which are modules that im
 Each operation: `Search`, `Sort` and `Paginate` have their hooks defined in `Rummage`. By doing this, `Rummage` is completely
 configurable.
 
-For example, if you don't like one of the implementations of `Rummage`, but like the other two, you can configure `Rummage` to not use it.
+For example, if you don't like one of the hooks of `Rummage`, but you do like the other two, you can configure `Rummage` to not use it and write your own custom
+hook.
 
-**NOTE: `Rummage` is not like `Ransack`, and doesn't intend to be. It doesn't define functions based on search params.
-If you'd like to have that for a model, you can always configure `Rummage` to use your `Search` module for that model. This
+**NOTE: `Rummage` is not like `Ransack`, and it doesn't intend to be like `Ransack`. It doesn't define functions based on search parameters.
+If you'd like to have something like that, you can always configure `Rummage` to use your `Search` module for that model. This
 is why Rummage has been made configurable.**
 
 ## Installation
@@ -38,8 +39,9 @@ This package is [available in Hex](https://hexdocs.pm/rummage_ecto/), and can be
     ```
 
 
-## Configuration (Optional, If no configuration is provided `Rummage` will use default hooks)
+## Configuration
 
+  - **NOTE: This is Optional. If no configuration is provided, `Rummage` will use default hooks and `AppName.Repo` as the repo**
   - If you want to override any of the `Rummage` default hooks,
     add `rummage_ecto` config to your list of configs in `dev.exs`:
 
@@ -49,17 +51,24 @@ This package is [available in Hex](https://hexdocs.pm/rummage_ecto/), and can be
       default_search: MyApp.SearchModule
     ```
 
+  - For configuring a repo:
+
+    ```elixir
+    config :rummage_ecto,
+      Rummage.Ecto,
+      default_repo: MyApp.Repo # This can be overridden per model basis, if need be.
+    ```
+
   - Other config options are: `default_repo`, `default_sort`, `default_paginate`, `default_per_page`
 
   - `Rumamge.Ecto` can be configured globally with a `default_per_page` value (which can be overridden for a model).
-    This is **NOT** the preferred way to set `per_page` as it might lead to conflicts. It is recommended to
-    do it per model as show below in the [Initial Setup](#initial-setup) section, as it gives the developer more
-    flexibility. If you want to set per_page for all the models, add it to `model` function in `web.ex`.
+    If you want to set different `per_page` for different the models, add it to `model.exs` file while using `Rummage.Ecto`
+    as shown in the [Advanced Usage Section](#advanced-usage).
 
 
 ## Usage
 
-`Rummage.Ecto` comes with a lot of powerful features which are available right away, without writing a bunch of code.
+`Rummage.Ecto` comes with a lot of powerful features which are available right away, without writing a whole lot of code.
 Below are the ways `Rummage.Ecto` can be used:
 
 ### Basic Usage:
@@ -87,10 +96,40 @@ Below are the ways `Rummage.Ecto` can be used:
 
 ### Advanced Usage:
 
-  - Coming soon...
+  - If you'd like to override any of `Rummage`'s default hooks with your custom hook, add the `CustomHook` of your app with the desired operation to the
+  `rummage_ecto` configuration in `config.exs`:
 
+  ```elixir
+  config :rummage_ecto, Rummage.Ecto,
+    default_repo: MyApp.Repo,
+    default_search: MyApp.SearchModule,
+    default_paginate: MyApp.PaginateModule
+  ```
 
-### Usage ( not after 0.6.0 )
+  - When using `Rummage.Ecto` with an app that has multiple `Repo`s, or when there's a need to configure `Repo` per model basis, it can be passed along with
+  the use statement of `Rummage.Ecto` in the models or ecto_structs:
+
+  ```elixir
+  defmodule MyApp.Product do
+    use MyApp.Web, :model
+    use Rummage.Ecto, repo: MyApp.SecondRepo, per_page: 10
+
+    # More code below....
+  end
+  ```
+
+  - And you should be able to use `Rummage.Ecto` with `Product` model.
+
+## Blogs
+
+  - [Rummage Demo & Basics](https://medium.com/@aditya7iyengar/searching-sorting-and-pagination-in-elixir-phoenix-with-rummage-part-1-933106ec50ca#.der0yrnvq)
+  - [Using `Rummage.Ecto`](https://medium.com/@aditya7iyengar/searching-sorting-and-pagination-in-elixir-phoenix-with-rummage-part-2-8e36558984c2#.vviioi5ia)
+
+  ### Coming Soon:
+
+  - Using `Rummage.Phoenix`
+
+## Examples ( not after 0.6.0 )
 
   - Setting up the application above will allow us to do the following:
 
