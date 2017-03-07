@@ -122,21 +122,27 @@ Below are the ways `Rummage.Ecto` can be used:
 
 ## Blogs
 
+### Current Blogs:
+
   - [Rummage Demo & Basics](https://medium.com/@aditya7iyengar/searching-sorting-and-pagination-in-elixir-phoenix-with-rummage-part-1-933106ec50ca#.der0yrnvq)
-  - [Using `Rummage.Ecto`](https://medium.com/@aditya7iyengar/searching-sorting-and-pagination-in-elixir-phoenix-with-rummage-part-2-8e36558984c2#.vviioi5ia)
+  - [Using Rummage.Ecto](https://medium.com/@aditya7iyengar/searching-sorting-and-pagination-in-elixir-phoenix-with-rummage-part-2-8e36558984c2#.vviioi5ia)
 
-  ### Coming Soon:
+### Coming up next:
 
-  - Using `Rummage.Phoenix`
+  - Using Rummage.Phoenix
+  - Writing a Custom Rummage.Ecto Hook
+  - Writing a Custom Rummage.Phoenix HTML helper
+  - Using Rummage with other Libraries: Kerosene
+  - Using Rummage with other Libraries: Scrivener
 
-## Examples ( not after 0.6.0 )
+## Examples
 
   - Setting up the application above will allow us to do the following:
 
   ```elixir
   rummage = %{
-    "search" => %{"name" => "value1", "category" => "value2"},
-    "sort" => "name.desc",
+    "search" => %{"field_1" => %{"assoc" => [], "search_type" => "like", "search_term" => "field_!"}
+    "sort" => %{"assoc" => [], "field" => "field_1.asc"},
     "paginate" => %{"per_page" => "5", "page" => "1"}
   }
 
@@ -153,10 +159,10 @@ Below are the ways `Rummage.Ecto` can be used:
 
   ```elixir
   %{
-      "search" => %{"name" => "value1", "category" => "value2"},
-      "sort" => "name.desc",
-      "paginate" => %{"per_page" => "5", "page" => "1"}
-    }
+    "search" => %{"field_1" => %{"assoc" => [], "search_type" => "like", "search_term" => "field_!"}
+    "sort" => %{"assoc" => [], "field" => "field_1.asc"},
+    "paginate" => %{"per_page" => "5", "page" => "1"}
+  }
   ```
 
 
