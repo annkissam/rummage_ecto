@@ -15,7 +15,7 @@ defmodule Rummage.Ecto.Hooks.Search do
   ```elixir
   alias Rummage.Ecto.Hooks.Search
 
-  searched_queryable = Search.run(Parent, %{"search" => %{"field_1" => %{"assoc" => [], "search_type" => "like", "search_term" => "field_!"}}}
+  searched_queryable = Search.run(Parent, %{"search" => %{"field_1" => %{"assoc" => [], "search_type" => "like", "search_term" => "field_!"}}})
 
   ```
 
@@ -29,7 +29,7 @@ defmodule Rummage.Ecto.Hooks.Search do
   ```elixir
   alias Rummage.Ecto.Hooks.Search
 
-  searched_queryable = Search.run(Parent, %{"search" => %{"field_1" => %{"assoc" => [], "search_type" => "ilike", "search_term" => "field_!"}}}
+  searched_queryable = Search.run(Parent, %{"search" => %{"field_1" => %{"assoc" => [], "search_type" => "ilike", "search_term" => "field_!"}}})
 
   ```
 

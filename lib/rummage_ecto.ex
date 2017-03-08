@@ -12,6 +12,23 @@ defmodule Rummage.Ecto do
   If you want to check a sample application that uses Rummage, please check
   [this link](https://github.com/Excipients/rummage_phoenix_example).
 
+  Usage:
+
+  ```elixir
+  defmodule Rummage.Ecto.Product do
+    use Ecto.Schema
+    use Rummage.Ecto # Can pass options if need be
+  end
+  ```
+
+  This allows you to do:
+
+      iex> rummage = %{"search" => %{"name" => %{"assoc" => [], "search_type" => "ilike", "search_term" => "field_!"}}}
+      iex> {queryable, rummage} = Rummage.Ecto.Product.rummage(Rummage.Ecto.Product, rummage)
+      iex> queryable
+      #Ecto.Query<from p in Rummage.Ecto.Product, where: ilike(p.name, ^"%field_!%")>
+      iex> rummage
+      %{"search" => %{"name" => %{"assoc" => [], "search_term" => "field_!", "search_type" => "ilike"}}}
 
   """
 
