@@ -4,7 +4,7 @@
     "minimum_coverage": 100
   },
   "skip_files": [
-    "lib/rummage_ecto/rummage_ecto.ex",
+    "lib/rummage_ecto.ex",
     "test",
   ]
 }
