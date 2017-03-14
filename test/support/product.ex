@@ -1,6 +1,5 @@
 defmodule Rummage.Ecto.Product do
   use Ecto.Schema
-  use Rummage.Ecto, repo: Rummage.Ecto.Repo
 
   schema "products" do
     field :name, :string

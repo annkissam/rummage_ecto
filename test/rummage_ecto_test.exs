@@ -7,7 +7,7 @@ defmodule Rummage.EctoTest do
   alias Rummage.Ecto.Category
 
   setup do
-    :ok = Ecto.Adapters.SQL.Sandbox.checkout(Rummage.Ecto.Repo)
+    :ok = Ecto.Adapters.SQL.Sandbox.checkout(Repo)
   end
 
   defp create_categories_and_products do
@@ -25,14 +25,6 @@ defmodule Rummage.EctoTest do
     end
   end
 
-  test "default_per_page for Product returns the default_per_page setup in the config (2)" do
-    assert Product.default_per_page == "2"
-  end
-
-  test "default_per_page for Category returns the per_page in the use call (10)" do
-    assert Category.default_per_page == "3"
-  end
-
   test "rummage call with paginate returns the correct results for Product" do
     create_categories_and_products
 
@@ -42,7 +34,7 @@ defmodule Rummage.EctoTest do
       },
     }
 
-    {queryable, rummage} = Product.rummage(Product, rummage)
+    {queryable, rummage} = Rummage.Ecto.rummage(Product, rummage)
 
     products = Repo.all(queryable)
 
@@ -69,7 +61,7 @@ defmodule Rummage.EctoTest do
       },
     }
 
-    {queryable, rummage} = Category.rummage(Category, rummage)
+    {queryable, rummage} = Rummage.Ecto.rummage(Category, rummage, per_page: 3)
 
     categories = Repo.all(queryable)
 
@@ -94,7 +86,7 @@ defmodule Rummage.EctoTest do
       "sort" => %{"field" => "name.asc"}
     }
 
-    {queryable, rummage} = Product.rummage(Product, rummage)
+    {queryable, rummage} = Rummage.Ecto.rummage(Product, rummage)
 
     products = Repo.all(queryable)
 
@@ -120,7 +112,7 @@ defmodule Rummage.EctoTest do
       "sort" => %{"assoc" => ["category"], "field" => "category_name.asc"}
     }
 
-    {queryable, rummage} = Product.rummage(Product, rummage)
+    {queryable, rummage} = Rummage.Ecto.rummage(Product, rummage)
 
     products = Repo.all(queryable)
 
@@ -148,7 +140,7 @@ defmodule Rummage.EctoTest do
       "search" => %{"price" => %{"search_type" => "lteq", "search_term" => 10}}
     }
 
-    {queryable, rummage} = Product.rummage(Product, rummage)
+    {queryable, rummage} = Rummage.Ecto.rummage(Product, rummage)
 
     products = Repo.all(queryable)
 
@@ -171,7 +163,7 @@ defmodule Rummage.EctoTest do
       "search" => %{"price" => %{"search_type" => "eq", "search_term" => 10}}
     }
 
-    {queryable, rummage} = Product.rummage(Product, rummage)
+    {queryable, rummage} = Rummage.Ecto.rummage(Product, rummage)
 
     products = Repo.all(queryable)
 
@@ -194,7 +186,7 @@ defmodule Rummage.EctoTest do
       "search" => %{"price" => %{"search_type" => "gteq", "search_term" => 10}}
     }
 
-    {queryable, rummage} = Product.rummage(Product, rummage)
+    {queryable, rummage} = Rummage.Ecto.rummage(Product, rummage)
 
     products = Repo.all(queryable)
 
@@ -217,7 +209,7 @@ defmodule Rummage.EctoTest do
       "search" => %{"category_name" => %{"assoc" => ["category"], "search_type" => "like", "search_term" => "1"}}
     }
 
-    {queryable, rummage} = Product.rummage(Product, rummage)
+    {queryable, rummage} = Rummage.Ecto.rummage(Product, rummage)
 
     products = Repo.all(queryable)
 
@@ -244,7 +236,7 @@ defmodule Rummage.EctoTest do
       "sort" => %{"field" => "name.asc"},
     }
 
-    {queryable, rummage} = Product.rummage(Product, rummage)
+    {queryable, rummage} = Rummage.Ecto.rummage(Product, rummage)
 
     products = Repo.all(queryable)
 
