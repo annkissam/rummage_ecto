@@ -204,6 +204,16 @@ defmodule Rummage.Ecto.Hooks.Sort do
     end
   end
 
+  @doc """
+  Implementation of `before_hook` for `Rummage.Ecto.Hooks.Sort`. This just returns back `rummage` at this point.
+
+  ## Examples
+      iex> alias Rummage.Ecto.Hooks.Sort
+      iex> Sort.before_hook(Parent, %{}, %{})
+      %{}
+  """
+  def before_hook(_queryable, rummage, _opts), do: rummage
+
   defp handle_sort(queryable, sort_params, ci \\ false) do
     order_param = sort_params
       |> elem(1)
