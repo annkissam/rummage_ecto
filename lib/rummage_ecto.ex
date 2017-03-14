@@ -35,23 +35,70 @@ defmodule Rummage.Ecto do
   alias Rummage.Ecto.Config
   import Ecto.Query
 
-  # @spec rummage(Ecto.Query.t, map, map) :: {Ecto.Query.t, map}
-  # def rummage(queryable, rummage, opts \\ %{}) when is_nil(rummage) or rummage == %{} do
-  #   params = %{"search" => %{},
-  #     "sort"=> [],
-  #     "paginate" => %{"per_page" => default_per_page(), "page" => "1"},
-  #   }
 
-  #   hooks = opts[:hooks] || [:search, :sort, :paginate]
+  @doc """
+  This is the function which calls to the `Rummage` `hooks`. It is the entry-point to `Rummage.Ecto`.
+  This function takes in a `queryable`, a `rummage` struct and an `opts` map. Possible `opts` values are:
 
-  #   rummage = before_paginate(queryable, params)
+  - `repo`: If you haven't set up a `default_repo`, or are using an app that uses multiple repos, this might come handy.
+            This overrides the `default_repo` in the configuration.
 
-  #   queryable = queryable
-  #     |> paginate_hook_call(rummage)
+  - `hooks`: This allows us to specify what `Rummage` hooks to use in this `rummage` lifecycle. It defaults to
+            `[:search, :sort, :paginate]`. This also allows us to specify the order of `hooks` operation, if in case they
+            need to be changed.
 
-  #   {queryable, rummage}
-  # end
+  - `search`: This allows us to override a `Rummage.Ecto.Hook` with a `CustomHook`. This `CustomHook` must implement
+              the behavior `Rummage.Ecto.Hook`.
 
+  ## Examples
+    When no `repo` or `per_page` key is given in the `opts` map, it uses
+    the default values for repo and per_page:
+
+      iex> rummage = %{"search" => %{}, "sort" => %{}, "paginate" => %{}}
+      iex> {queryable, rummage} = Rummage.Ecto.rummage(Rummage.Ecto.Product, rummage) # We have set a default_repo in the configuration to Rummage.Ecto.Repo
+      iex> rummage
+      %{"paginate" => %{"max_page" => "0", "page" => "1",
+               "per_page" => "2", "total_count" => "0"}, "search" => %{},
+             "sort" => %{}}
+      iex> queryable
+      #Ecto.Query<from p in Rummage.Ecto.Product, limit: ^2, offset: ^0>
+
+    When a `repo` key is given in the `opts` map:
+
+      iex> rummage = %{"search" => %{}, "sort" => %{}, "paginate" => %{}}
+      iex> {queryable, rummage} = Rummage.Ecto.rummage(Rummage.Ecto.Product, rummage, repo: Rummage.Ecto.Repo)
+      iex> rummage
+      %{"paginate" => %{"max_page" => "0", "page" => "1",
+               "per_page" => "2", "total_count" => "0"}, "search" => %{},
+             "sort" => %{}}
+      iex> queryable
+      #Ecto.Query<from p in Rummage.Ecto.Product, limit: ^2, offset: ^0>
+
+
+    When a `per_page` key is given in the `opts` map:
+
+      iex> rummage = %{"search" => %{}, "sort" => %{}, "paginate" => %{}}
+      iex> {queryable, rummage} = Rummage.Ecto.rummage(Rummage.Ecto.Product, rummage, per_page: 5)
+      iex> rummage
+      %{"paginate" => %{"max_page" => "0", "page" => "1",
+               "per_page" => "5", "total_count" => "0"}, "search" => %{},
+             "sort" => %{}}
+      iex> queryable
+      #Ecto.Query<from p in Rummage.Ecto.Product, limit: ^5, offset: ^0>
+
+    When a `CustomHook` is given:
+
+      iex> rummage = %{"search" => %{"name" => "x"}, "sort" => %{}, "paginate" => %{}}
+      iex> {queryable, rummage} = Rummage.Ecto.rummage(Rummage.Ecto.Product, rummage, search: Rummage.Ecto.CustomHooks.SimpleSearch)
+      iex> rummage
+      %{"paginate" => %{"max_page" => "0", "page" => "1",
+               "per_page" => "2", "total_count" => "0"},
+             "search" => %{"name" => "x"}, "sort" => %{}}
+      iex> queryable
+      #Ecto.Query<from p in Rummage.Ecto.Product, where: like(p.name, ^\"%x%\"), limit: ^2, offset: ^0>
+
+
+  """
   @spec rummage(Ecto.Query.t, map, map) :: {Ecto.Query.t, map}
   def rummage(queryable, rummage, opts \\ %{}) do
     hooks = opts[:hooks] || [:search, :sort, :paginate]
