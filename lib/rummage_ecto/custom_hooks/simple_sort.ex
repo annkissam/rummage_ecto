@@ -165,6 +165,16 @@ defmodule Rummage.Ecto.CustomHooks.SimpleSort do
     end
   end
 
+  @doc """
+  Implementation of `before_hook` for `Rummage.Ecto.CustomHooks.SimpleSort`. This just returns back `rummage` at this point.
+
+  ## Examples
+      iex> alias Rummage.Ecto.CustomHooks.SimpleSort
+      iex> SimpleSort.before_hook(Parent, %{}, %{})
+      %{}
+  """
+  def before_hook(_queryable, rummage, _opts), do: rummage
+
   defmacrop case_insensitive(field) do
     quote do
       fragment("lower(?)", unquote(field))
