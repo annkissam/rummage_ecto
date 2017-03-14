@@ -213,6 +213,22 @@ defmodule Rummage.Ecto.Hooks.Sort do
       %{}
   """
   def before_hook(_queryable, rummage, _opts), do: rummage
+  # def before_hook(queryable, rummage, _opts) do
+  #   case Map.get(rummage, "applied_assoc") do
+  #     nil ->
+  #       case Map.get(rummage, "sort") do
+  #         a when a in [nil, [], {}, [""], "", %{}] -> rummage
+  #         sort_params ->
+  #           case sort_params["assoc"] do
+  #             s when s in [nil, "", []] -> rummage
+  #             assoc ->
+  #               Map.put_new(rummage, "applied_assoc", assoc)
+  #           end
+  #       end
+  #     applied_assoc ->
+
+  #   end
+  # end
 
   defp handle_sort(queryable, sort_params, ci \\ false) do
     order_param = sort_params
