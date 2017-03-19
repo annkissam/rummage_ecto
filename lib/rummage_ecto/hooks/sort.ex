@@ -213,22 +213,6 @@ defmodule Rummage.Ecto.Hooks.Sort do
       %{}
   """
   def before_hook(_queryable, rummage, _opts), do: rummage
-  # def before_hook(queryable, rummage, _opts) do
-  #   case Map.get(rummage, "applied_assoc") do
-  #     nil ->
-  #       case Map.get(rummage, "sort") do
-  #         a when a in [nil, [], {}, [""], "", %{}] -> rummage
-  #         sort_params ->
-  #           case sort_params["assoc"] do
-  #             s when s in [nil, "", []] -> rummage
-  #             assoc ->
-  #               Map.put_new(rummage, "applied_assoc", assoc)
-  #           end
-  #       end
-  #     applied_assoc ->
-
-  #   end
-  # end
 
   defp handle_sort(queryable, sort_params, ci \\ false) do
     order_param = sort_params
@@ -236,6 +220,10 @@ defmodule Rummage.Ecto.Hooks.Sort do
 
     association_names = sort_params
       |> elem(0)
+
+    applied_assoc = applied_associations(queryable)
+
+    association_names = Enum.filter(association_names, &!Enum.member?(applied_assoc, &1))
 
     association_names
     |> Enum.reduce(queryable, &join_by_association(&1, &2))
@@ -247,6 +235,9 @@ defmodule Rummage.Ecto.Hooks.Sort do
       fragment("lower(?)", unquote(field))
     end
   end
+
+  defp applied_associations(queryable) when is_atom(queryable), do: []
+  defp applied_associations(queryable), do: Enum.map(queryable.joins, & Atom.to_string(elem(&1.assoc, 1)))
 
   defp handle_ordering(queryable, order_param, ci) do
     case Regex.match?(~r/\w.asc+$/, order_param)
