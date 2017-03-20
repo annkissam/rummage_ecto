@@ -165,8 +165,8 @@ defmodule Rummage.Ecto.Hooks.Sort do
       iex> Sort.run(queryable, rummage)
       #Ecto.Query<from p0 in subquery(from p in "parents"), join: p1 in assoc(p0, :parent), join: p2 in assoc(p1, :parent)>
 
-  # When rummage `struct` passed has `case-insensitive` sort, it returns
-  # a sorted version of the `queryable` with `case_insensitive` arguments:
+  When rummage `struct` passed has `case-insensitive` sort, it returns
+  a sorted version of the `queryable` with `case_insensitive` arguments:
 
       iex> alias Rummage.Ecto.Hooks.Sort
       iex> import Ecto.Query
