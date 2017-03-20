@@ -1,14 +1,14 @@
-defmodule Rummage.Ecto.Hooks.Paginate do
+defmodule Rummage.Ecto.CustomHooks.KeysetPaginate do
   @moduledoc """
-  `Rummage.Ecto.Hooks.Paginate` is the default pagination hook that comes shipped
+  `Rummage.Ecto.CustomHooks.KeysetPaginate` is a custom paginate hook that comes shipped
   with `Rummage.Ecto`.
 
-  This module can be overridden with a custom module while using `Rummage.Ecto`
-  in `Ecto` struct module.
+  This module can be used by overriding the default paginate module. This can be done
+  in the following ways:
 
-  In the `Ecto` module:
+  In the `Rummage.Ecto` call:
   ```elixir
-  Rummage.Ecto.rummage(queryable, rummage, paginate: CustomHook)
+  Rummage.Ecto.rummage(queryable, rummage, paginate: Rummage.Ecto.CustomHooks.KeysetPaginate)
   ```
 
   OR
@@ -17,12 +17,8 @@ defmodule Rummage.Ecto.Hooks.Paginate do
   ```elixir
   config :rummage_ecto,
     Rummage.Ecto,
-    default_paginate: CustomHook
+    default_paginate: Rummage.Ecto.CustomHooks.KeysetPaginate
   ```
-
-  The `CustomHook` must implement behaviour `Rummage.Ecto.Hook`. For examples of `CustomHook`, check out some
-    `custom_hooks` that are shipped with elixir: `Rummage.Ecto.CustomHooks.SimpleSearch`, `Rummage.Ecto.CustomHooks.SimpleSort`,
-    Rummage.Ecto.CustomHooks.SimplePaginate
   """
 
   import Ecto.Query
@@ -37,68 +33,68 @@ defmodule Rummage.Ecto.Hooks.Paginate do
   When rummage struct passed doesn't have the key "paginate", it simply returns the
   queryable itself:
 
-      iex> alias Rummage.Ecto.Hooks.Paginate
+      iex> alias Rummage.Ecto.CustomHooks.KeysetPaginate
       iex> import Ecto.Query
-      iex> Paginate.run(Parent, %{})
+      iex> KeysetPaginate.run(Parent, %{})
       Parent
 
   When the queryable passed is not just a struct:
 
-      iex> alias Rummage.Ecto.Hooks.Paginate
+      iex> alias Rummage.Ecto.CustomHooks.KeysetPaginate
       iex> import Ecto.Query
       iex> queryable = from u in "parents"
       #Ecto.Query<from p in "parents">
-      iex> Paginate.run(queryable, %{})
+      iex> KeysetPaginate.run(queryable, %{})
       #Ecto.Query<from p in "parents">
 
   When rummage `struct` passed has the key `"paginate"`, but with a value of `%{}`, `""`
   or `[]` it simply returns the `queryable` itself:
 
-      iex> alias Rummage.Ecto.Hooks.Paginate
+      iex> alias Rummage.Ecto.CustomHooks.KeysetPaginate
       iex> import Ecto.Query
-      iex> Paginate.run(Parent, %{"paginate" => %{}})
+      iex> KeysetPaginate.run(Parent, %{"paginate" => %{}})
       Parent
 
-      iex> alias Rummage.Ecto.Hooks.Paginate
+      iex> alias Rummage.Ecto.CustomHooks.KeysetPaginate
       iex> import Ecto.Query
-      iex> Paginate.run(Parent, %{"paginate" => ""})
+      iex> KeysetPaginate.run(Parent, %{"paginate" => ""})
       Parent
 
-      iex> alias Rummage.Ecto.Hooks.Paginate
+      iex> alias Rummage.Ecto.CustomHooks.KeysetPaginate
       iex> import Ecto.Query
-      iex> Paginate.run(Parent, %{"paginate" => []})
+      iex> KeysetPaginate.run(Parent, %{"paginate" => []})
       Parent
 
   When rummage struct passed has the key "paginate", with "per_page" and "page" keys
   it returns a paginated version of the queryable passed in as the argument:
 
-      iex> alias Rummage.Ecto.Hooks.Paginate
+      iex> alias Rummage.Ecto.CustomHooks.KeysetPaginate
       iex> import Ecto.Query
       iex> rummage = %{"paginate" => %{"per_page" => "1", "page" => "1"}}
       %{"paginate" => %{"page" => "1", "per_page" => "1"}}
       iex> queryable = from u in "parents"
       #Ecto.Query<from p in "parents">
-      iex> Paginate.run(queryable, rummage)
+      iex> KeysetPaginate.run(queryable, rummage)
       #Ecto.Query<from p in "parents", limit: ^1, offset: ^0>
 
-      iex> alias Rummage.Ecto.Hooks.Paginate
+      iex> alias Rummage.Ecto.CustomHooks.KeysetPaginate
       iex> import Ecto.Query
       iex> rummage = %{"paginate" => %{"per_page" => "5", "page" => "2"}}
       %{"paginate" => %{"page" => "2", "per_page" => "5"}}
       iex> queryable = from u in "parents"
       #Ecto.Query<from p in "parents">
-      iex> Paginate.run(queryable, rummage)
+      iex> KeysetPaginate.run(queryable, rummage)
       #Ecto.Query<from p in "parents", limit: ^5, offset: ^5>
 
   When no `"page"` key is passed, it defaults to `1`:
 
-      iex> alias Rummage.Ecto.Hooks.Paginate
+      iex> alias Rummage.Ecto.CustomHooks.KeysetPaginate
       iex> import Ecto.Query
       iex> rummage = %{"paginate" => %{"per_page" => "10"}}
       %{"paginate" => %{"per_page" => "10"}}
       iex> queryable = from u in "parents"
       #Ecto.Query<from p in "parents">
-      iex> Paginate.run(queryable, rummage)
+      iex> KeysetPaginate.run(queryable, rummage)
       #Ecto.Query<from p in "parents", limit: ^10, offset: ^0>
   """
   @spec run(Ecto.Query.t, map) :: {Ecto.Query.t, map}
@@ -112,24 +108,24 @@ defmodule Rummage.Ecto.Hooks.Paginate do
   end
 
   @doc """
-  Implementation of `before_hook` for `Rummage.Ecto.Hooks.Paginate`. This function
+  Implementation of `before_hook` for `Rummage.Ecto.CustomHooks.KeysetPaginate`. This function
   takes a `queryable`, `rummage` struct and an `opts` map. Using those it calculates
   the `total_count` and `max_page` for the paginate hook.
 
   ## Examples
-      iex> alias Rummage.Ecto.Hooks.Paginate
+      iex> alias Rummage.Ecto.CustomHooks.KeysetPaginate
       iex> alias Rummage.Ecto.Category
-      iex> Paginate.before_hook(Category, %{}, %{})
+      iex> KeysetPaginate.before_hook(Category, %{}, %{})
       %{}
 
-      iex> alias Rummage.Ecto.Hooks.Paginate
+      iex> alias Rummage.Ecto.CustomHooks.KeysetPaginate
       iex> alias Rummage.Ecto.Category
       iex> Ecto.Adapters.SQL.Sandbox.checkout(Rummage.Ecto.Repo)
       iex> Rummage.Ecto.Repo.insert(%Category{category_name: "Category 1"})
       iex> Rummage.Ecto.Repo.insert(%Category{category_name: "Category 2"})
       iex> Rummage.Ecto.Repo.insert(%Category{category_name: "Category 3"})
       iex> rummage = %{"paginate" => %{"per_page" => "1", "page" => "1"}}
-      iex> Paginate.before_hook(Category, rummage, %{})
+      iex> KeysetPaginate.before_hook(Category, rummage, %{})
       %{"paginate" => %{"max_page" => "3", "page" => "1", "per_page" => "1", "total_count" => "3"}}
   """
   @spec before_hook(Ecto.Query.t, map, map) :: map
