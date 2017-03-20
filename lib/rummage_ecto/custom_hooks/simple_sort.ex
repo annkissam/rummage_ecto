@@ -25,15 +25,12 @@ defmodule Rummage.Ecto.CustomHooks.SimpleSort do
   sorted_queryable = SimpleSort.run(Parent, %{"sort" => "field_1.asc.ci"})
   ```
 
-  This module can be used by overriding the default search module. This can be done
+  This module can be used by overriding the default sort module. This can be done
   in the following ways:
 
   In the `Ecto` module:
   ```elixir
-  defmodule SomeModule do
-    use Ecto.Schema
-    use Rummage.Ecto, sort_hook: Rummage.Ecto.CustomHooks.SimpleSort
-  end
+  Rummage.Ecto.rummage(queryable, rummage, sort: Rummage.Ecto.CustomHooks.SimpleSort)
   ```
 
   OR
@@ -42,7 +39,7 @@ defmodule Rummage.Ecto.CustomHooks.SimpleSort do
   ```elixir
   config :rummage_ecto,
     Rummage.Ecto,
-    default_search: Rummage.Ecto.CustomHooks.SimpleSort
+    default_sort: Rummage.Ecto.CustomHooks.SimpleSort
   ```
   """
 
