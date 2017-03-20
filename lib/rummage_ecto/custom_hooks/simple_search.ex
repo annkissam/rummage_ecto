@@ -129,6 +129,7 @@ defmodule Rummage.Ecto.CustomHooks.SimpleSearch do
 
   @doc """
   Implementation of `before_hook` for `Rummage.Ecto.CustomHooks.SimpleSearch`. This just returns back `rummage` at this point.
+  It doesn't matter what `queryable` or `opts` are, it just returns back `rummage`.
 
   ## Examples
       iex> alias Rummage.Ecto.CustomHooks.SimpleSearch

@@ -81,7 +81,8 @@ defmodule Rummage.Ecto.Config do
 
   @doc """
   `resolve_system_config` returns a `system` variable set up with `var_name` key
-   or returns the specified `default` value
+   or returns the specified `default` value. Takes in `arg` whose first element is
+   an atom `:system`.
 
   ## Examples
   Returns value corresponding to a system variable config or returns the `default` value:

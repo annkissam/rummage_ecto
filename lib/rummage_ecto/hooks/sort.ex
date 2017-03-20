@@ -206,6 +206,7 @@ defmodule Rummage.Ecto.Hooks.Sort do
 
   @doc """
   Implementation of `before_hook` for `Rummage.Ecto.Hooks.Sort`. This just returns back `rummage` at this point.
+  It doesn't matter what `queryable` or `opts` are, it just returns back `rummage`.
 
   ## Examples
       iex> alias Rummage.Ecto.Hooks.Sort
