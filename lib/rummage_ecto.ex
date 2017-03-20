@@ -26,7 +26,7 @@ defmodule Rummage.Ecto do
       iex> rummage = %{"search" => %{"name" => %{"assoc" => [], "search_type" => "ilike", "search_term" => "field_!"}}}
       iex> {queryable, rummage} = Rummage.Ecto.rummage(Rummage.Ecto.Product, rummage)
       iex> queryable
-      #Ecto.Query<from p in Rummage.Ecto.Product, where: ilike(p.name, ^"%field_!%")>
+      #Ecto.Query<from p in subquery(from p in Rummage.Ecto.Product), where: ilike(p.name, ^"%field_!%")>
       iex> rummage
       %{"search" => %{"name" => %{"assoc" => [], "search_term" => "field_!", "search_type" => "ilike"}}}
 
@@ -95,7 +95,7 @@ defmodule Rummage.Ecto do
                "per_page" => "2", "total_count" => "0"},
              "search" => %{"name" => "x"}, "sort" => %{}}
       iex> queryable
-      #Ecto.Query<from p in Rummage.Ecto.Product, where: like(p.name, ^\"%x%\"), limit: ^2, offset: ^0>
+      #Ecto.Query<from p in Rummage.Ecto.Product, where: like(p.name, ^"%x%"), limit: ^2, offset: ^0>
 
 
   """
