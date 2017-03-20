@@ -8,8 +8,8 @@ env:
   - MIX_ENV=test
 script:
   - mix test
-  - mix coveralls.travis
 after_script:
+  - mix coveralls.travis
   - mix credo
   - mix deps.get --only docs
   - MIX_ENV=docs mix inch.report
