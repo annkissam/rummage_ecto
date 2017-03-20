@@ -271,6 +271,7 @@ defmodule Rummage.Ecto.Hooks.Search do
       iex> Search.before_hook(Parent, %{}, %{})
       %{}
   """
+  @spec before_hook(Ecto.Query.t, map, map) :: map
   def before_hook(_queryable, rummage, _opts), do: rummage
 
   defp handle_search(queryable, search_params) do

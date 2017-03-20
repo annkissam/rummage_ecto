@@ -134,6 +134,7 @@ defmodule Rummage.Ecto.Hooks.Paginate do
       iex> Paginate.before_hook(Category, rummage, %{})
       %{"paginate" => %{"max_page" => "3", "page" => "1", "per_page" => "1", "total_count" => "3"}}
   """
+  @spec before_hook(Ecto.Query.t, map, map) :: map
   def before_hook(queryable, rummage, opts) do
     paginate_params = Map.get(rummage, "paginate")
 

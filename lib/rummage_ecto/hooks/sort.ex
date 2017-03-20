@@ -212,6 +212,7 @@ defmodule Rummage.Ecto.Hooks.Sort do
       iex> Sort.before_hook(Parent, %{}, %{})
       %{}
   """
+  @spec before_hook(Ecto.Query.t, map, map) :: map
   def before_hook(_queryable, rummage, _opts), do: rummage
 
   defp handle_sort(queryable, sort_params, ci \\ false) do

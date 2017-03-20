@@ -33,8 +33,6 @@ defmodule Rummage.Ecto do
   """
 
   alias Rummage.Ecto.Config
-  import Ecto.Query
-
 
   @doc """
   This is the function which calls to the `Rummage` `hooks`. It is the entry-point to `Rummage.Ecto`.

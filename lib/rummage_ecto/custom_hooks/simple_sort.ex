@@ -173,6 +173,7 @@ defmodule Rummage.Ecto.CustomHooks.SimpleSort do
       iex> SimpleSort.before_hook(Parent, %{}, %{})
       %{}
   """
+  @spec before_hook(Ecto.Query.t, map, map) :: map
   def before_hook(_queryable, rummage, _opts), do: rummage
 
   defmacrop case_insensitive(field) do
