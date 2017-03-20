@@ -3,6 +3,7 @@ defmodule Rummage.Ecto.Category do
 
   schema "categories" do
     field :category_name, :string
+    belongs_to :category, Rummage.Ecto.Category
 
     timestamps
   end

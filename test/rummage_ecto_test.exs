@@ -12,14 +12,17 @@ defmodule Rummage.EctoTest do
 
   defp create_categories_and_products do
     for x <- 1..4 do
-      category = %Category{category_name: "Category #{x}"}
-      |> Repo.insert!
+      parent_category = %Category{category_name: "Parent Category #{10 - x}"}
+        |> Repo.insert!
+
+      category = %Category{category_name: "Category #{x}", category: parent_category}
+        |> Repo.insert!
 
       for x <- 1..2 do
         %Product{
           name: "Product #{x}",
           price: 10.0 * x,
-          category_id: category.id
+          category: category
         } |> Repo.insert!
       end
     end
@@ -73,8 +76,8 @@ defmodule Rummage.EctoTest do
       "paginate" => %{
         "per_page" => "3",
         "page" => "1",
-        "max_page" => "2",
-        "total_count" => "4",
+        "max_page" => "3",
+        "total_count" => "8",
       },
     }
   end
@@ -243,6 +246,8 @@ defmodule Rummage.EctoTest do
     # Test length
     assert length(products) == 2
 
+    assert Enum.all?(products, & &1.price <= 10)
+
     # Test prices of products
     # assert Enum.all?(Repo.preload(products, :category), & &1.category.category_name == "Category 1")
 
@@ -277,8 +282,8 @@ defmodule Rummage.EctoTest do
     # Test length
     assert length(products) == 2
 
-    # Test prices of products
-    # assert Enum.all?(Repo.preload(products, :category), & &1.category.category_name == "Category 1")
+    # Test search
+    assert Enum.all?(Repo.preload(products, :category), & &1.category.category_name == "Category 1")
 
     # Test rummage params
     assert rummage == %{
@@ -289,6 +294,120 @@ defmodule Rummage.EctoTest do
         "page" => "1",
         "max_page" => "1",
         "total_count" => "2",
+      },
+    }
+  end
+
+  test "rummage call with multiple associations in assocs search" do
+    create_categories_and_products
+
+    rummage = %{
+      "paginate" => %{
+        "page" => "1",
+      },
+      "search" => %{"category_name" => %{"assoc" => ["category", "category"], "search_type" => "like", "search_term" => "Parent"}},
+      "sort" => %{"assoc" => ["category"], "field" => "category_name.asc"}
+    }
+
+    {queryable, rummage} = Rummage.Ecto.rummage(Product, rummage)
+
+    products = Repo.all(queryable)
+
+    # Test length
+    assert length(products) == 2
+
+    # Test search
+    assert Enum.all?(Repo.preload(products, :category), & Repo.preload(&1.category, :category).category.category_name =~ "Parent Category")
+
+    # Test sort
+    assert Enum.all?(Repo.preload(products, :category), & &1.category.category_name == "Category 1")
+    assert Enum.all?(Repo.preload(products, :category), & Repo.preload(&1.category, :category).category.category_name == "Parent Category 9")
+
+    # Test rummage params
+    assert rummage == %{
+      "search" => %{"category_name" => %{"assoc" => ["category", "category"], "search_term" => "Parent", "search_type" => "like"}},
+      "sort" => %{"field" => "category_name.asc", "assoc" => ["category"]},
+      "paginate" => %{
+        "per_page" => "2",
+        "page" => "1",
+        "max_page" => "4",
+        "total_count" => "8",
+      },
+    }
+  end
+
+  test "rummage call with multiple associations in assocs search and assoc sort" do
+    create_categories_and_products
+
+    rummage = %{
+      "paginate" => %{
+        "page" => "1",
+      },
+      "search" => %{"category_name" => %{"assoc" => ["category", "category"], "search_type" => "like", "search_term" => "Parent"}},
+      "sort" => %{"assoc" => ["category", "category"], "field" => "category_name.asc"}
+    }
+
+    {queryable, rummage} = Rummage.Ecto.rummage(Product, rummage)
+
+    products = Repo.all(queryable)
+
+    # Test length
+    assert length(products) == 2
+
+    # Test search
+    assert Enum.all?(Repo.preload(products, :category), & Repo.preload(&1.category, :category).category.category_name =~ "Parent Category")
+
+    # Test sort
+    assert Enum.all?(Repo.preload(products, :category), & &1.category.category_name == "Category 4")
+    assert Enum.all?(Repo.preload(products, :category), & Repo.preload(&1.category, :category).category.category_name == "Parent Category 6")
+
+    # Test rummage params
+    assert rummage == %{
+      "search" => %{"category_name" => %{"assoc" => ["category", "category"], "search_term" => "Parent", "search_type" => "like"}},
+      "sort" => %{"field" => "category_name.asc", "assoc" => ["category", "category"]},
+      "paginate" => %{
+        "per_page" => "2",
+        "page" => "1",
+        "max_page" => "4",
+        "total_count" => "8",
+      },
+    }
+  end
+
+  test "rummage call with multiple associations in assocs sort" do
+    create_categories_and_products
+
+    rummage = %{
+      "paginate" => %{
+        "page" => "1",
+      },
+      "search" => %{"category_name" => %{"assoc" => ["category"], "search_type" => "like", "search_term" => "Category"}},
+      "sort" => %{"assoc" => ["category", "category"], "field" => "category_name.asc"}
+    }
+
+    {queryable, rummage} = Rummage.Ecto.rummage(Product, rummage)
+
+    products = Repo.all(queryable)
+
+    # Test length
+    assert length(products) == 2
+
+    # Test search
+    assert Enum.all?(Repo.preload(products, :category), & &1.category.category_name =~ "Category")
+
+    # Test sort
+    assert Enum.all?(Repo.preload(products, :category), & &1.category.category_name =~ "Category 4")
+    assert Enum.all?(Repo.preload(products, :category), & Repo.preload(&1.category, :category).category.category_name == "Parent Category 6")
+
+    # Test rummage params
+    assert rummage == %{
+      "search" => %{"category_name" => %{"assoc" => ["category"], "search_term" => "Category", "search_type" => "like"}},
+      "sort" => %{"field" => "category_name.asc", "assoc" => ["category", "category"]},
+      "paginate" => %{
+        "per_page" => "2",
+        "page" => "1",
+        "max_page" => "4",
+        "total_count" => "8",
       },
     }
   end
