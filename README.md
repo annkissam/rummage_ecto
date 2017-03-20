@@ -98,18 +98,7 @@ Below are the ways `Rummage.Ecto` can be used:
     default_per_page: 10
   ```
 
-  - Use `Rummage.Ecto` in the models or ecto_structs:
-
-  ```elixir
-  defmodule MyApp.Product do
-    use MyApp.Web, :model
-    use Rummage.Ecto
-
-    # More code below....
-  end
-  ```
-
-  - And you should be able to use `Rummage.Ecto` with `Product` model.
+  - And you should be able to use `Rummage.Ecto` with any `Ecto` model.
 
 ### Advanced Usage:
 
@@ -124,18 +113,14 @@ Below are the ways `Rummage.Ecto` can be used:
   ```
 
   - When using `Rummage.Ecto` with an app that has multiple `Repo`s, or when there's a need to configure `Repo` per model basis, it can be passed along with
-  the use statement of `Rummage.Ecto` in the models or ecto_structs:
+  with the call to `Rummage.Ecto`. This overrides the default repo set in the configuration:
 
   ```elixir
-  defmodule MyApp.Product do
-    use MyApp.Web, :model
-    use Rummage.Ecto, repo: MyApp.SecondRepo, per_page: 10
-
-    # More code below....
-  end
+  {queryable, rummage} = Product
+    |> Rummage.Ecto.rummage(rummage, repo: MyApp.Repo2)
   ```
 
-  - And you should be able to use `Rummage.Ecto` with `Product` model.
+  - And you should be able to use `Rummage.Ecto` with `Product` model which is in a different `Repo` than the default one.
 
 
 ## Examples
@@ -149,8 +134,8 @@ Below are the ways `Rummage.Ecto` can be used:
     "paginate" => %{"per_page" => "5", "page" => "1"}
   }
 
-  {queryable, rummage} = queryable
-    |> Product.rummage(rummage)
+  {queryable, rummage} = Product
+    |> Rummage.Ecto.rummage(rummage)
 
   products = queryable
     |> Product.another_operation # <-- Since `Rummage` is Ecto, we can pipe the result queryable into another queryable operation.
