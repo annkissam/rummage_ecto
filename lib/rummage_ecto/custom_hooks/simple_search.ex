@@ -127,6 +127,17 @@ defmodule Rummage.Ecto.CustomHooks.SimpleSearch do
     end
   end
 
+  @doc """
+  Implementation of `before_hook` for `Rummage.Ecto.CustomHooks.SimpleSearch`. This just returns back `rummage` at this point.
+
+  ## Examples
+      iex> alias Rummage.Ecto.CustomHooks.SimpleSearch
+      iex> SimpleSearch.before_hook(Parent, %{}, %{})
+      %{}
+  """
+  @spec before_hook(Ecto.Query.t, map, map) :: map
+  def before_hook(_queryable, rummage, _opts), do: rummage
+
   defp handle_search(queryable, search_params) do
     search_params
     |> Map.to_list

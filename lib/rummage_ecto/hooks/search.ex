@@ -121,7 +121,7 @@ defmodule Rummage.Ecto.Hooks.Search do
         iex> queryable = from u in "parents"
         #Ecto.Query<from p in "parents">
         iex> Search.run(queryable, rummage)
-        #Ecto.Query<from p in "parents", where: like(p.field_1, ^"%field_!%")>
+        #Ecto.Query<from p in subquery(from p in "parents"), where: like(p.field_1, ^"%field_!%")>
 
     When rummage `struct` passed has `search_type` of `ilike` (case insensitive), it returns
     a searched version of the `queryable` with `ilike` search query:
@@ -133,7 +133,7 @@ defmodule Rummage.Ecto.Hooks.Search do
         iex> queryable = from u in "parents"
         #Ecto.Query<from p in "parents">
         iex> Search.run(queryable, rummage)
-        #Ecto.Query<from p in "parents", where: ilike(p.field_1, ^"%field_!%")>
+        #Ecto.Query<from p in subquery(from p in "parents"), where: ilike(p.field_1, ^"%field_!%")>
 
     When rummage `struct` passed has `search_type` of `eq`, it returns
     a searched version of the `queryable` with `==` search query:
@@ -145,7 +145,7 @@ defmodule Rummage.Ecto.Hooks.Search do
         iex> queryable = from u in "parents"
         #Ecto.Query<from p in "parents">
         iex> Search.run(queryable, rummage)
-        #Ecto.Query<from p in "parents", where: p.field_1 == ^"field_!">
+        #Ecto.Query<from p in subquery(from p in "parents"), where: p.field_1 == ^"field_!">
 
     When rummage `struct` passed has `search_type` of `gt`, it returns
     a searched version of the `queryable` with `>` search query:
@@ -157,7 +157,7 @@ defmodule Rummage.Ecto.Hooks.Search do
         iex> queryable = from u in "parents"
         #Ecto.Query<from p in "parents">
         iex> Search.run(queryable, rummage)
-        #Ecto.Query<from p in "parents", where: p.field_1 > ^"field_!">
+        #Ecto.Query<from p in subquery(from p in "parents"), where: p.field_1 > ^"field_!">
 
     When rummage `struct` passed has `search_type` of `lt`, it returns
     a searched version of the `queryable` with `<` search query:
@@ -169,7 +169,7 @@ defmodule Rummage.Ecto.Hooks.Search do
         iex> queryable = from u in "parents"
         #Ecto.Query<from p in "parents">
         iex> Search.run(queryable, rummage)
-        #Ecto.Query<from p in "parents", where: p.field_1 < ^"field_!">
+        #Ecto.Query<from p in subquery(from p in "parents"), where: p.field_1 < ^"field_!">
 
     When rummage `struct` passed has `search_type` of `gteq`, it returns
     a searched version of the `queryable` with `>=` search query:
@@ -181,7 +181,7 @@ defmodule Rummage.Ecto.Hooks.Search do
         iex> queryable = from u in "parents"
         #Ecto.Query<from p in "parents">
         iex> Search.run(queryable, rummage)
-        #Ecto.Query<from p in "parents", where: p.field_1 >= ^"field_!">
+        #Ecto.Query<from p in subquery(from p in "parents"), where: p.field_1 >= ^"field_!">
 
     When rummage `struct` passed has `search_type` of `lteq`, it returns
     a searched version of the `queryable` with `<=` search query:
@@ -193,7 +193,7 @@ defmodule Rummage.Ecto.Hooks.Search do
         iex> queryable = from u in "parents"
         #Ecto.Query<from p in "parents">
         iex> Search.run(queryable, rummage)
-        #Ecto.Query<from p in "parents", where: p.field_1 <= ^"field_!">
+        #Ecto.Query<from p in subquery(from p in "parents"), where: p.field_1 <= ^"field_!">
 
   When `associations` is not an empty `list`:
     When rummage `struct` passed has `search_type` of `like`, it returns
@@ -206,7 +206,7 @@ defmodule Rummage.Ecto.Hooks.Search do
         iex> queryable = from u in "parents"
         #Ecto.Query<from p in "parents">
         iex> Search.run(queryable, rummage)
-        #Ecto.Query<from p0 in "parents", join: p1 in assoc(p0, :parent), join: p2 in assoc(p1, :parent), where: like(p2.field_1, ^"%field_!%")>
+        #Ecto.Query<from p0 in subquery(from p in "parents"), join: p1 in assoc(p0, :parent), join: p2 in assoc(p1, :parent), where: like(p2.field_1, ^"%field_!%")>
 
     When rummage `struct` passed has `search_type` of `lteq`, it returns
     a searched version of the `queryable` with `<=` search query:
@@ -218,7 +218,7 @@ defmodule Rummage.Ecto.Hooks.Search do
         iex> queryable = from u in "parents"
         #Ecto.Query<from p in "parents">
         iex> Search.run(queryable, rummage)
-        #Ecto.Query<from p0 in "parents", join: p1 in assoc(p0, :parent), join: p2 in assoc(p1, :parent), where: p2.field_1 <= ^"field_!">
+        #Ecto.Query<from p0 in subquery(from p in "parents"), join: p1 in assoc(p0, :parent), join: p2 in assoc(p1, :parent), where: p2.field_1 <= ^"field_!">
 
     When rummage `struct` passed has an empty string as `search_term`, it returns the `queryable` itself:
 
@@ -263,6 +263,17 @@ defmodule Rummage.Ecto.Hooks.Search do
     end
   end
 
+  @doc """
+  Implementation of `before_hook` for `Rummage.Ecto.Hooks.Search`. This just returns back `rummage` at this point.
+
+  ## Examples
+      iex> alias Rummage.Ecto.Hooks.Search
+      iex> Search.before_hook(Parent, %{}, %{})
+      %{}
+  """
+  @spec before_hook(Ecto.Query.t, map, map) :: map
+  def before_hook(_queryable, rummage, _opts), do: rummage
+
   defp handle_search(queryable, search_params) do
     search_params
     |> Map.to_list
@@ -284,11 +295,16 @@ defmodule Rummage.Ecto.Hooks.Search do
     case search_term do
       s when s in [nil, "", []] -> queryable
       _ ->
+        queryable = from(e in subquery(queryable))
+
         association_names
         |> Enum.reduce(queryable, &join_by_association(&1, &2))
         |> BuildSearchQuery.run(field, search_type, search_term)
     end
   end
+
+  # defp applied_associations(queryable) when is_atom(queryable), do: []
+  # defp applied_associations(queryable), do: Enum.map(queryable.joins, & Atom.to_string(elem(&1.assoc, 1)))
 
   defp join_by_association(association, queryable) do
     join(queryable, :inner, [..., p1], p2 in assoc(p1, ^String.to_atom(association)))

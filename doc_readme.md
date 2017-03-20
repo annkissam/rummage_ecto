@@ -1,7 +1,7 @@
 # Rummage.Ecto
 
 **If you're looking for full `Phoenix` support, `Rummage.Phoenix` uses `Rumamge.Ecto` and adds `HTML` and `Controller` support
-to it. You can check `Rummage.Phoenix` out by clicking [here](https://github.com/Excipients/rummage_phoenix)**
+to it. You can check `Rummage.Phoenix` out by clicking [here](https://github.com/aditya7iyengar/rummage_phoenix)**
 
 **Please refer for `CHANGELOG` for version specific changes**
 

@@ -108,7 +108,7 @@ defmodule Rummage.Ecto.Hooks.Sort do
       iex> queryable = from u in "parents"
       #Ecto.Query<from p in "parents">
       iex> Sort.run(queryable, rummage)
-      #Ecto.Query<from p in "parents", order_by: [asc: p.field_1]>
+      #Ecto.Query<from p in subquery(from p in "parents"), order_by: [asc: p.field_1]>
 
       iex> alias Rummage.Ecto.Hooks.Sort
       iex> import Ecto.Query
@@ -118,7 +118,7 @@ defmodule Rummage.Ecto.Hooks.Sort do
       iex> queryable = from u in "parents"
       #Ecto.Query<from p in "parents">
       iex> Sort.run(queryable, rummage)
-      #Ecto.Query<from p in "parents", order_by: [desc: p.field_1]>
+      #Ecto.Query<from p in subquery(from p in "parents"), order_by: [desc: p.field_1]>
 
   When no `order` is specified, it returns the `queryable` itself:
 
@@ -130,7 +130,7 @@ defmodule Rummage.Ecto.Hooks.Sort do
       iex> queryable = from u in "parents"
       #Ecto.Query<from p in "parents">
       iex> Sort.run(queryable, rummage)
-      #Ecto.Query<from p in "parents">
+      #Ecto.Query<from p in subquery(from p in "parents")>
 
 
   When rummage `struct` passed has the key `"sort"`, with `field` and `order`
@@ -143,7 +143,7 @@ defmodule Rummage.Ecto.Hooks.Sort do
       iex> queryable = from u in "parents"
       #Ecto.Query<from p in "parents">
       iex> Sort.run(queryable, rummage)
-      #Ecto.Query<from p0 in "parents", join: p1 in assoc(p0, :parent), join: p2 in assoc(p1, :parent), order_by: [asc: p2.field_1]>
+      #Ecto.Query<from p0 in subquery(from p in "parents"), join: p1 in assoc(p0, :parent), join: p2 in assoc(p1, :parent), order_by: [asc: p2.field_1]>
 
 
       iex> alias Rummage.Ecto.Hooks.Sort
@@ -153,7 +153,7 @@ defmodule Rummage.Ecto.Hooks.Sort do
       iex> queryable = from u in "parents"
       #Ecto.Query<from p in "parents">
       iex> Sort.run(queryable, rummage)
-      #Ecto.Query<from p0 in "parents", join: p1 in assoc(p0, :parent), join: p2 in assoc(p1, :parent), order_by: [desc: p2.field_1]>
+      #Ecto.Query<from p0 in subquery(from p in "parents"), join: p1 in assoc(p0, :parent), join: p2 in assoc(p1, :parent), order_by: [desc: p2.field_1]>
 
   When no `order` is specified even with the associations, it returns the `queryable` itself:
 
@@ -165,7 +165,7 @@ defmodule Rummage.Ecto.Hooks.Sort do
       iex> queryable = from u in "parents"
       #Ecto.Query<from p in "parents">
       iex> Sort.run(queryable, rummage)
-      #Ecto.Query<from p0 in "parents", join: p1 in assoc(p0, :parent), join: p2 in assoc(p1, :parent)>
+      #Ecto.Query<from p0 in subquery(from p in "parents"), join: p1 in assoc(p0, :parent), join: p2 in assoc(p1, :parent)>
 
   # When rummage `struct` passed has `case-insensitive` sort, it returns
   # a sorted version of the `queryable` with `case_insensitive` arguments:
@@ -177,7 +177,7 @@ defmodule Rummage.Ecto.Hooks.Sort do
       iex> queryable = from u in "parents"
       #Ecto.Query<from p in "parents">
       iex> Sort.run(queryable, rummage)
-      #Ecto.Query<from p0 in "parents", join: p1 in assoc(p0, :parent), join: p2 in assoc(p1, :parent), order_by: [asc: fragment("lower(?)", p2.field_1)]>
+      #Ecto.Query<from p0 in subquery(from p in "parents"), join: p1 in assoc(p0, :parent), join: p2 in assoc(p1, :parent), order_by: [asc: fragment("lower(?)", p2.field_1)]>
   """
   @spec run(Ecto.Query.t, map) :: {Ecto.Query.t, map}
   def run(queryable, rummage) do
@@ -204,12 +204,25 @@ defmodule Rummage.Ecto.Hooks.Sort do
     end
   end
 
+  @doc """
+  Implementation of `before_hook` for `Rummage.Ecto.Hooks.Sort`. This just returns back `rummage` at this point.
+
+  ## Examples
+      iex> alias Rummage.Ecto.Hooks.Sort
+      iex> Sort.before_hook(Parent, %{}, %{})
+      %{}
+  """
+  @spec before_hook(Ecto.Query.t, map, map) :: map
+  def before_hook(_queryable, rummage, _opts), do: rummage
+
   defp handle_sort(queryable, sort_params, ci \\ false) do
     order_param = sort_params
       |> elem(1)
 
     association_names = sort_params
       |> elem(0)
+
+    queryable = from(e in subquery(queryable))
 
     association_names
     |> Enum.reduce(queryable, &join_by_association(&1, &2))
@@ -221,6 +234,9 @@ defmodule Rummage.Ecto.Hooks.Sort do
       fragment("lower(?)", unquote(field))
     end
   end
+
+  # defp applied_associations(queryable) when is_atom(queryable), do: []
+  # defp applied_associations(queryable), do: Enum.map(queryable.joins, & Atom.to_string(elem(&1.assoc, 1)))
 
   defp handle_ordering(queryable, order_param, ci) do
     case Regex.match?(~r/\w.asc+$/, order_param)

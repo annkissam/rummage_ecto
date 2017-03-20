@@ -1,15 +1,15 @@
 # Rummage.Ecto
 
-[![Build Status](https://travis-ci.org/Excipients/rummage_ecto.svg?branch=master)](https://travis-ci.org/Excipients/rummage_ecto)
-[![Coverage Status](https://coveralls.io/repos/github/Excipients/rummage_ecto/badge.svg?branch=master)](https://coveralls.io/github/Excipients/rummage_ecto?branch=master)
+[![Build Status](https://travis-ci.org/aditya7iyengar/rummage_ecto.svg?branch=master)](https://travis-ci.org/aditya7iyengar/rummage_ecto)
+[![Coverage Status](https://coveralls.io/repos/github/aditya7iyengar/rummage_ecto/badge.svg?branch=master)](https://coveralls.io/github/aditya7iyengar/rummage_ecto?branch=master)
 [![Hex Version](http://img.shields.io/hexpm/v/rummage_ecto.svg?style=flat)](https://hex.pm/packages/rummage_ecto)
 [![hex.pm downloads](https://img.shields.io/hexpm/dt/rummage_ecto.svg)](https://hex.pm/packages/rummage_ecto)
 [![Hex docs](http://img.shields.io/badge/hex.pm-docs-green.svg?style=flat)](https://hexdocs.pm/rummage_ecto)
-[![docs](https://inch-ci.org/github/Excipients/rummage_ecto.svg)](http://inch-ci.org/github/Excipients/rummage_ecto)
-[![MIT licensed](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/Excipients/rummage_ecto/master/LICENSE)
+[![docs](https://inch-ci.org/github/aditya7iyengar/rummage_ecto.svg)](http://inch-ci.org/github/aditya7iyengar/rummage_ecto)
+[![MIT licensed](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/aditya7iyengar/rummage_ecto/master/LICENSE)
 
 **If you're looking for full `Phoenix` support, `Rummage.Phoenix` uses `Rumamge.Ecto` and adds `HTML` and `Controller` support
-to it. You can check `Rummage.Phoenix` out by clicking [here](https://github.com/Excipients/rummage_phoenix)**
+to it. You can check `Rummage.Phoenix` out by clicking [here](https://github.com/aditya7iyengar/rummage_phoenix)**
 
 **Please refer for [CHANGELOG](CHANGELOG.md) for version specific changes**
 
@@ -98,18 +98,7 @@ Below are the ways `Rummage.Ecto` can be used:
     default_per_page: 10
   ```
 
-  - Use `Rummage.Ecto` in the models or ecto_structs:
-
-  ```elixir
-  defmodule MyApp.Product do
-    use MyApp.Web, :model
-    use Rummage.Ecto
-
-    # More code below....
-  end
-  ```
-
-  - And you should be able to use `Rummage.Ecto` with `Product` model.
+  - And you should be able to use `Rummage.Ecto` with any `Ecto` model.
 
 ### Advanced Usage:
 
@@ -124,18 +113,14 @@ Below are the ways `Rummage.Ecto` can be used:
   ```
 
   - When using `Rummage.Ecto` with an app that has multiple `Repo`s, or when there's a need to configure `Repo` per model basis, it can be passed along with
-  the use statement of `Rummage.Ecto` in the models or ecto_structs:
+  with the call to `Rummage.Ecto`. This overrides the default repo set in the configuration:
 
   ```elixir
-  defmodule MyApp.Product do
-    use MyApp.Web, :model
-    use Rummage.Ecto, repo: MyApp.SecondRepo, per_page: 10
-
-    # More code below....
-  end
+  {queryable, rummage} = Product
+    |> Rummage.Ecto.rummage(rummage, repo: MyApp.Repo2)
   ```
 
-  - And you should be able to use `Rummage.Ecto` with `Product` model.
+  - And you should be able to use `Rummage.Ecto` with `Product` model which is in a different `Repo` than the default one.
 
 
 ## Examples
@@ -149,8 +134,8 @@ Below are the ways `Rummage.Ecto` can be used:
     "paginate" => %{"per_page" => "5", "page" => "1"}
   }
 
-  {queryable, rummage} = queryable
-    |> Product.rummage(rummage)
+  {queryable, rummage} = Product
+    |> Rummage.Ecto.rummage(rummage)
 
   products = queryable
     |> Product.another_operation # <-- Since `Rummage` is Ecto, we can pipe the result queryable into another queryable operation.
