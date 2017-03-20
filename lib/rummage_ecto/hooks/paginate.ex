@@ -10,7 +10,6 @@ defmodule Rummage.Ecto.Hooks.Paginate do
   ```elixir
   defmodule SomeModule do
     use Ecto.Schema
-    use Rummage.Ecto, paginate_hook: CustomHook
   end
   ```
 

@@ -34,7 +34,7 @@ This package is [available in Hex](https://hexdocs.pm/rummage_ecto/), and can be
 
     ```elixir
     def deps do
-      [{:rummage_ecto, "~> 1.0.0"}]
+      [{:rummage_ecto, "~> 1.1.0"}]
     end
     ```
 
