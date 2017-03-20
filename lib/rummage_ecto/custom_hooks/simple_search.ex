@@ -31,17 +31,14 @@ defmodule Rummage.Ecto.CustomHooks.SimpleSearch do
   This module can be used by overriding the default search module. This can be done
   in the following ways:
 
-  In the `Ecto` module:
+  In the `Rummage.Ecto` call:
   ```elixir
-  defmodule SomeModule do
-    use Ecto.Schema
-    use Rummage.Ecto, search_hook: Rummage.Ecto.CustomHooks.SimpleSearch
-  end
+  Rummage.Ecto.rummage(queryable, rummage, search: Rummage.Ecto.CustomHooks.SimpleSearch)
   ```
 
   OR
 
-  Globally for all models in `config.exs` (NOT Recommended):
+  Globally for all models in `config.exs`:
   ```elixir
   config :rummage_ecto,
     Rummage.Ecto,
