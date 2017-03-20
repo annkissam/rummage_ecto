@@ -129,7 +129,7 @@ Below are the ways `Rummage.Ecto` can be used:
 
   ```elixir
   rummage = %{
-    "search" => %{"field_1" => %{"assoc" => [], "search_type" => "like", "search_term" => "field_!"},
+    "search" => %{"field_1" => %{"assoc" => [], "search_type" => "like", "search_term" => "field_!"}},
     "sort" => %{"assoc" => [], "field" => "field_1.asc"},
     "paginate" => %{"per_page" => "5", "page" => "1"}
   }
