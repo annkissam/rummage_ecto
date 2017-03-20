@@ -8,15 +8,12 @@ defmodule Rummage.Ecto.Hooks.Paginate do
 
   In the `Ecto` module:
   ```elixir
-  defmodule SomeModule do
-    use Ecto.Schema
-    use Rummage.Ecto, paginate_hook: CustomHook
-  end
+  Rummage.Ecto.rummage(queryable, rummage, paginate: CustomHook)
   ```
 
   OR
 
-  Globally for all models in `config.exs` (NOT Recommended):
+  Globally for all models in `config.exs`:
   ```elixir
   config :rummage_ecto,
     Rummage.Ecto,
@@ -24,7 +21,8 @@ defmodule Rummage.Ecto.Hooks.Paginate do
   ```
 
   The `CustomHook` must implement behaviour `Rummage.Ecto.Hook`. For examples of `CustomHook`, check out some
-    `custom_hooks` that are shipped with elixir: `Rummage.Ecto.CustomHooks.SimpleSearch`, `Rummage.Ecto.CustomHooks.SimpleSort`
+    `custom_hooks` that are shipped with elixir: `Rummage.Ecto.CustomHooks.SimpleSearch`, `Rummage.Ecto.CustomHooks.SimpleSort`,
+    Rummage.Ecto.CustomHooks.SimplePaginate
   """
 
   import Ecto.Query
