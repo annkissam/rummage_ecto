@@ -1,5 +1,21 @@
 # Versions CHANGELOG
 
+## Version: 1.1.0
+
+### Changes to Rummage as whole:
+- More functional way of calling `Rummage`:
+  - Instead of `EctoSchema.rummage(query, rummage)`, call `Rummage.Ecto.rummage(query, rummage)`
+
+- Default `Hooks` can handle any number of associations.
+
+### Changes to complexity:
+- `Hooks` are more independent of each other due to a newly introduced `before_hook` feature. This
+allows us to format `rummage_params` based on what a hook is expecting and keep the code clean.
+
+### In Progress:
+- A `CustomHook` with `key-set` pagination based on [this](http://use-the-index-luke.com/no-offset) link.
+
+
 ## Version: 1.0.0
 
 ### Major changes to default hooks:
