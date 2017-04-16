@@ -98,7 +98,9 @@ defmodule Rummage.Ecto do
 
   """
   @spec rummage(Ecto.Query.t, map, map) :: {Ecto.Query.t, map}
-  def rummage(queryable, rummage, opts \\ %{}) do
+  def rummage(queryable, rummage, opts \\ %{})
+  def rummage(queryable, rummage, opts) when rummage == nil, do: {queryable, %{}}
+  def rummage(queryable, rummage, opts) do
     hooks = opts[:hooks] || [:search, :sort, :paginate]
 
     Enum.reduce(hooks, {queryable, rummage}, fn(hook, {q, r}) ->
