@@ -143,7 +143,7 @@ defmodule Rummage.Ecto.Hooks.Paginate do
 
         {page, per_page} = parse_page_and_per_page(paginate_params, opts)
 
-        per_page = if per_page < 1, do: 1, else: per_page
+        per_page = (per_page < 1) && 1 || per_page
 
         max_page_fl = total_count / per_page
         max_page = max_page_fl
