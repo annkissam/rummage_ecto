@@ -10,7 +10,7 @@ defmodule Rummage.Ecto do
   but like the other two, you can configure Rummage to not use it.
 
   If you want to check a sample application that uses Rummage, please check
-  [this link](https://github.com/Excipients/rummage_phoenix_example).
+  [this link](https://github.com/aditya7iyengar/rummage_ecto_example).
 
   Usage:
 
