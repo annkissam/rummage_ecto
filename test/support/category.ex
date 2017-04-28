@@ -5,6 +5,6 @@ defmodule Rummage.Ecto.Category do
     field :category_name, :string
     belongs_to :category, Rummage.Ecto.Category
 
-    timestamps
+    timestamps()
   end
 end

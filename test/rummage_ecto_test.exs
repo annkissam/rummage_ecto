@@ -10,7 +10,7 @@ defmodule Rummage.EctoTest do
     :ok = Ecto.Adapters.SQL.Sandbox.checkout(Repo)
   end
 
-  defp create_categories_and_products do
+  defp create_categories_and_products() do
     for x <- 1..4 do
       parent_category = %Category{category_name: "Parent Category #{10 - x}"}
         |> Repo.insert!
@@ -29,7 +29,7 @@ defmodule Rummage.EctoTest do
   end
 
   test "rummage call with paginate returns the correct results for Product" do
-    create_categories_and_products
+    create_categories_and_products()
 
     rummage = %{
       "paginate" => %{
@@ -56,7 +56,7 @@ defmodule Rummage.EctoTest do
   end
 
   test "rummage call with paginate returns the correct results for Category" do
-    create_categories_and_products
+    create_categories_and_products()
 
     rummage = %{
       "paginate" => %{
@@ -83,7 +83,7 @@ defmodule Rummage.EctoTest do
   end
 
   test "rummage call with sort without assoc params returns the correct results" do
-    create_categories_and_products
+    create_categories_and_products()
 
     rummage = %{
       "sort" => %{"field" => "name.asc"}
@@ -109,7 +109,7 @@ defmodule Rummage.EctoTest do
   end
 
   test "rummage call with sort and assoc params returns the correct results" do
-    create_categories_and_products
+    create_categories_and_products()
 
     rummage = %{
       "sort" => %{"assoc" => ["category"], "field" => "category_name.asc"}
@@ -137,7 +137,7 @@ defmodule Rummage.EctoTest do
   end
 
   test "rummage call with search and search_type lteq returns the correct results" do
-    create_categories_and_products
+    create_categories_and_products()
 
     rummage = %{
       "search" => %{"price" => %{"search_type" => "lteq", "search_term" => 10}}
@@ -160,7 +160,7 @@ defmodule Rummage.EctoTest do
   end
 
   test "rummage call with search and search_type eq returns the correct results" do
-    create_categories_and_products
+    create_categories_and_products()
 
     rummage = %{
       "search" => %{"price" => %{"search_type" => "eq", "search_term" => 10}}
@@ -183,7 +183,7 @@ defmodule Rummage.EctoTest do
   end
 
   test "rummage call with search and search_type gteq returns the correct results" do
-    create_categories_and_products
+    create_categories_and_products()
 
     rummage = %{
       "search" => %{"price" => %{"search_type" => "gteq", "search_term" => 10}}
@@ -206,7 +206,7 @@ defmodule Rummage.EctoTest do
   end
 
   test "rummage call with search and assoc params returns the correct results" do
-    create_categories_and_products
+    create_categories_and_products()
 
     rummage = %{
       "search" => %{"category_name" => %{"assoc" => ["category"], "search_type" => "like", "search_term" => "1"}}
@@ -229,7 +229,7 @@ defmodule Rummage.EctoTest do
   end
 
   test "rummage call with search, sort and paginate" do
-    create_categories_and_products
+    create_categories_and_products()
 
     rummage = %{
       "paginate" => %{
@@ -265,7 +265,7 @@ defmodule Rummage.EctoTest do
   end
 
   test "rummage call with assocs search, assoc sort and paginate" do
-    create_categories_and_products
+    create_categories_and_products()
 
     rummage = %{
       "paginate" => %{
@@ -299,7 +299,7 @@ defmodule Rummage.EctoTest do
   end
 
   test "rummage call with multiple associations in assocs search" do
-    create_categories_and_products
+    create_categories_and_products()
 
     rummage = %{
       "paginate" => %{
@@ -337,7 +337,7 @@ defmodule Rummage.EctoTest do
   end
 
   test "rummage call with multiple associations in assocs search and assoc sort" do
-    create_categories_and_products
+    create_categories_and_products()
 
     rummage = %{
       "paginate" => %{
@@ -375,7 +375,7 @@ defmodule Rummage.EctoTest do
   end
 
   test "rummage call with multiple associations in assocs sort" do
-    create_categories_and_products
+    create_categories_and_products()
 
     rummage = %{
       "paginate" => %{
