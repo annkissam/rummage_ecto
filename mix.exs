@@ -1,14 +1,14 @@
 defmodule Rummage.Ecto.Mixfile do
   use Mix.Project
 
-  @version "2.0.0"
+  @version "1.2.0"
   @url "https://github.com/Excipients/rummage_ecto"
 
   def project do
     [
       app: :rummage_ecto,
       version: @version,
-      elixir: "~> 1.4.2",
+      elixir: "~> 1.3.4",
       deps: deps(),
       build_embedded: Mix.env == :prod,
       start_permanent: Mix.env == :prod,
