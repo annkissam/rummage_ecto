@@ -26,6 +26,7 @@ defmodule Rummage.Ecto.Hooks.Paginate do
   """
 
   import Ecto.Query
+  alias Rummage.Ecto.Config
 
   @behaviour Rummage.Ecto.Hook
 
@@ -143,7 +144,7 @@ defmodule Rummage.Ecto.Hooks.Paginate do
 
         {page, per_page} = parse_page_and_per_page(paginate_params, opts)
 
-        per_page = if per_page < 1, do: 1, else: per_page
+        per_page = (per_page < 1) && 1 || per_page
 
         max_page_fl = total_count / per_page
         max_page = max_page_fl
@@ -166,16 +167,18 @@ defmodule Rummage.Ecto.Hooks.Paginate do
     end
   end
 
-  defp get_total_count(queryable, opts), do: length(apply(get_repo(opts), :all, [queryable]))
+  defp get_total_count(queryable, opts) do
+    subquery = from s in subquery(queryable), select: count(s.id)
+    hd(apply(get_repo(opts), :all, [subquery]))
+  end
 
   defp get_repo(opts) do
-    opts[:repo] ||
-      Rummage.Ecto.Config.default_repo
+    opts[:repo] || Config.default_repo
   end
 
   defp parse_page_and_per_page(paginate_params, opts) do
     per_page = paginate_params
-      |> Map.get("per_page", Integer.to_string(opts[:per_page] || Rummage.Ecto.Config.default_per_page))
+      |> Map.get("per_page", Integer.to_string(opts[:per_page] || Config.default_per_page))
       |> String.to_integer
 
     page = paginate_params

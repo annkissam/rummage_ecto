@@ -1,14 +1,14 @@
 defmodule Rummage.Ecto.Mixfile do
   use Mix.Project
 
-  @version "1.1.0"
-  @url "https://github.com/Excipients/rummage_ecto"
+  @version "1.2.0"
+  @url "https://github.com/aditya7iyengar/rummage_ecto"
 
   def project do
     [
       app: :rummage_ecto,
       version: @version,
-      elixir: "~> 1.3",
+      elixir: "~> 1.3.4",
       deps: deps(),
       build_embedded: Mix.env == :prod,
       start_permanent: Mix.env == :prod,
@@ -40,13 +40,13 @@ defmodule Rummage.Ecto.Mixfile do
   end
 
   def package do
-  [
-    files: ["lib", "mix.exs", "README.md"],
-    maintainers: ["Adi Iyengar"],
-    licenses: ["MIT"],
-    links: %{"Github" => @url},
-  ]
-end
+    [
+      files: ["lib", "mix.exs", "README.md"],
+      maintainers: ["Adi Iyengar"],
+      licenses: ["MIT"],
+      links: %{"Github" => @url},
+    ]
+  end
 
   defp deps do
     [
@@ -68,7 +68,7 @@ end
   def docs do
     [
       main: "Rummage.Ecto",
-      source_url: "https://github.com/Excipients/rummage_ecto",
+      source_url: @url,
       extras: ["doc_readme.md", "CHANGELOG.md"],
       source_ref: "v#{@version}"
     ]

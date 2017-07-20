@@ -250,6 +250,19 @@ defmodule Rummage.Ecto.Hooks.Search do
         #Ecto.Query<from p in "parents">
         iex> Search.run(queryable, rummage)
         #Ecto.Query<from p in "parents">
+
+  When `associations` is an empty `string`:
+    When rummage `struct` passed has `search_type` of `like`, it returns
+    a searched version of the `queryable` with `like` search query:
+
+        iex> alias Rummage.Ecto.Hooks.Search
+        iex> import Ecto.Query
+        iex> rummage = %{"search" => %{"field_1" => %{"assoc" => "", "search_type" => "like", "search_term" => "field_!"}}}
+        %{"search" => %{"field_1" => %{"assoc" => "", "search_type" => "like", "search_term" => "field_!"}}}
+        iex> queryable = from u in "parents"
+        #Ecto.Query<from p in "parents">
+        iex> Search.run(queryable, rummage)
+        #Ecto.Query<from p in subquery(from p in "parents"), where: like(p.field_1, ^"%field_!%")>
   """
   @spec run(Ecto.Query.t, map) :: {Ecto.Query.t, map}
   def run(queryable, rummage) do
@@ -287,7 +300,11 @@ defmodule Rummage.Ecto.Hooks.Search do
     field_params = param
       |> elem(1)
 
-    association_names = if is_nil(field_params["assoc"]) or field_params["assoc"] == "", do: [], else: field_params["assoc"]
+    association_names = case field_params["assoc"] do
+      a when a in [nil, "", []] -> []
+      assoc -> assoc
+    end
+
     search_type = field_params["search_type"]
     search_term = field_params["search_term"]
 
@@ -301,9 +318,6 @@ defmodule Rummage.Ecto.Hooks.Search do
         |> BuildSearchQuery.run(field, search_type, search_term)
     end
   end
-
-  # defp applied_associations(queryable) when is_atom(queryable), do: []
-  # defp applied_associations(queryable), do: Enum.map(queryable.joins, & Atom.to_string(elem(&1.assoc, 1)))
 
   defp join_by_association(association, queryable) do
     join(queryable, :inner, [..., p1], p2 in assoc(p1, ^String.to_atom(association)))

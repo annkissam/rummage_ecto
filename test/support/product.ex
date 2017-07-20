@@ -6,6 +6,6 @@ defmodule Rummage.Ecto.Product do
     field :price, :float
     belongs_to :category, Rummage.Ecto.Category
 
-    timestamps
+    timestamps()
   end
 end
