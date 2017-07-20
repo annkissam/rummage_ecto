@@ -34,7 +34,7 @@ This package is [available in Hex](https://hexdocs.pm/rummage_ecto/), and can be
 
     ```elixir
     def deps do
-      [{:rummage_ecto, "~> 1.1.0"}]
+      [{:rummage_ecto, "~> 1.2.0"}]
     end
     ```
 
@@ -44,17 +44,22 @@ This package is [available in Hex](https://hexdocs.pm/rummage_ecto/), and can be
 
   - [Rummage Demo & Basics](https://medium.com/@aditya7iyengar/searching-sorting-and-pagination-in-elixir-phoenix-with-rummage-part-1-933106ec50ca#.der0yrnvq)
   - [Using Rummage.Ecto](https://medium.com/@aditya7iyengar/searching-sorting-and-pagination-in-elixir-phoenix-with-rummage-part-2-8e36558984c2#.vviioi5ia)
-  - [Using Rummage.Phoenix](https://medium.com/@aditya7iyengar/searching-sorting-and-pagination-in-elixir-phoenix-with-rummage-part-3-7cf5023bc226#.q08478ud2)
+  - [Using Rummage.Phoenix: Part 1](https://medium.com/@aditya7iyengar/searching-sorting-and-pagination-in-elixir-phoenix-with-rummage-part-3-7cf5023bc226#.q08478ud2)
 
 ### Coming up next:
 
-  - Using Rummage.Phoenix 2
+  - Using Rummage.Phoenix: Part 2
   - Using the Rummage Search hook
   - Using the Rummage Sort hook
   - Writing a Custom Rummage.Ecto Hook
   - Writing a Custom Rummage.Phoenix HTML helper
   - Using Rummage with other Libraries: Kerosene
   - Using Rummage with other Libraries: Scrivener
+
+## Hooks
+
+
+
 
 ## Configuration
 
