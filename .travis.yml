@@ -1,5 +1,5 @@
 env:
-  -ECTO_PGSQL_USER =postgres
+  -ECTO_PGSQL_USER=postgres
   -ECTO_PGSQL_PASSWORD=postgres
 language: elixir
 elixir:
