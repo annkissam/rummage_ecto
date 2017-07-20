@@ -22,6 +22,7 @@ defmodule Rummage.Ecto.CustomHooks.KeysetPaginate do
   """
 
   import Ecto.Query
+  alias Rummage.Ecto.Config
 
   @behaviour Rummage.Ecto.Hook
 
@@ -165,13 +166,12 @@ defmodule Rummage.Ecto.CustomHooks.KeysetPaginate do
   defp get_total_count(queryable, opts), do: length(apply(get_repo(opts), :all, [queryable]))
 
   defp get_repo(opts) do
-    opts[:repo] ||
-      Rummage.Ecto.Config.default_repo
+    opts[:repo] || Config.default_repo
   end
 
   defp parse_page_and_per_page(paginate_params, opts) do
     per_page = paginate_params
-      |> Map.get("per_page", Integer.to_string(opts[:per_page] || Rummage.Ecto.Config.default_per_page))
+      |> Map.get("per_page", Integer.to_string(opts[:per_page] || Config.default_per_page))
       |> String.to_integer
 
     page = paginate_params
