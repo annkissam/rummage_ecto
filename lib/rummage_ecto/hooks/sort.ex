@@ -196,11 +196,9 @@ defmodule Rummage.Ecto.Hooks.Sort do
 
             sort_params = {sort_params["assoc"], order_param}
 
-            queryable
-            |> strip_assoc(handle_sort(queryable,sort_params, true))
+            handle_sort(queryable,sort_params, true)
           _ ->
-            queryable
-            |> strip_assoc(handle_sort(queryable, {sort_params["assoc"], sort_params["field"]}))
+            handle_sort(queryable, {sort_params["assoc"], sort_params["field"]})
         end
     end
   end
@@ -268,9 +266,5 @@ defmodule Rummage.Ecto.Hooks.Sort do
 
   defp order_by_assoc(queryable, order_type, parsed_field, true) do
     order_by(queryable, [p0, ..., p2], [{^String.to_atom(order_type), case_insensitive(field(p2, ^String.to_atom(parsed_field)))}])
-  end
-
-  defp strip_assoc(original_queryable, queryable) do
-    from(s in subquery(queryable), select: s)
   end
 end
