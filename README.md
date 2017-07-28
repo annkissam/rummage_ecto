@@ -8,14 +8,14 @@
 [![docs](https://inch-ci.org/github/aditya7iyengar/rummage_ecto.svg)](http://inch-ci.org/github/aditya7iyengar/rummage_ecto)
 [![MIT licensed](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/aditya7iyengar/rummage_ecto/master/LICENSE)
 
-**If you're looking for full `Phoenix` support, `Rummage.Phoenix` uses `Rumamge.Ecto` and adds `HTML` and `Controller` support
+**If you're looking for full `Phoenix` support, `Rummage.Phoenix` uses `Rummage.Ecto` and adds `HTML` and `Controller` support
 to it. You can check `Rummage.Phoenix` out by clicking [here](https://github.com/aditya7iyengar/rummage_phoenix)**
 
 **Please refer for [CHANGELOG](CHANGELOG.md) for version specific changes**
 
 `Rummage.Ecto` is a light weight, but powerful framework that can be used to alter `Ecto` queries with Search, Sort and Paginate operations.
 
-It accomplishes the above operations by using `Hooks`, which are modules that implement `Rumamge.Ecto.Hook` behavior.
+It accomplishes the above operations by using `Hooks`, which are modules that implement `Rummage.Ecto.Hook` behavior.
 Each operation: `Search`, `Sort` and `Paginate` have their hooks defined in `Rummage`. By doing this, `Rummage` is completely
 configurable.
 
@@ -83,7 +83,7 @@ This package is [available in Hex](https://hexdocs.pm/rummage_ecto/), and can be
 
   - Other config options are: `default_repo`, `default_sort`, `default_paginate`, `default_per_page`
 
-  - `Rumamge.Ecto` can be configured globally with a `default_per_page` value (which can be overridden for a model).
+  - `Rummage.Ecto` can be configured globally with a `default_per_page` value (which can be overridden for a model).
     If you want to set different `per_page` for different the models, add it to `model.exs` file while using `Rummage.Ecto`
     as shown in the [Advanced Usage Section](#advanced-usage).
 
@@ -95,7 +95,7 @@ Below are the ways `Rummage.Ecto` can be used:
 
 ### Basic Usage:
 
-  - Add the `Repo` of your app and the desired `per_page` (if using Rumamge's Pagination) to the `rummage_ecto` configuration in `config.exs`:
+  - Add the `Repo` of your app and the desired `per_page` (if using Rummage's Pagination) to the `rummage_ecto` configuration in `config.exs`:
 
   ```elixir
   config :rummage_ecto, Rummage.Ecto,
