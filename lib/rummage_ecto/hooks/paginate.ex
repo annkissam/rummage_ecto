@@ -168,6 +168,7 @@ defmodule Rummage.Ecto.Hooks.Paginate do
   end
 
   defp get_total_count(queryable, opts) do
+    IO.inspect queryable
     subquery = from s in subquery(queryable), select: count(s.id)
     hd(apply(get_repo(opts), :all, [subquery]))
   end
