@@ -100,7 +100,7 @@ defmodule Rummage.Ecto.CustomHooks.SimpleSearch do
       iex> queryable = from u in "parents"
       #Ecto.Query<from p in "parents">
       iex> SimpleSearch.run(queryable, rummage)
-      #Ecto.Query<from p in "parents", where: like(p.field_1, ^"%field_!%")>
+      #Ecto.Query<from p in "parents", where: like(p.field_1, ^"field_!")>
 
   When rummage struct passed has case-insensitive search, it returns
   a searched version of the queryable with case_insensitive arguments:
@@ -112,7 +112,7 @@ defmodule Rummage.Ecto.CustomHooks.SimpleSearch do
       iex> queryable = from u in "parents"
       #Ecto.Query<from p in "parents">
       iex> SimpleSearch.run(queryable, rummage)
-      #Ecto.Query<from p in "parents", where: ilike(p.field_1, ^"%field_!%")>
+      #Ecto.Query<from p in "parents", where: ilike(p.field_1, ^"field_!")>
   """
   @spec run(Ecto.Query.t, map) :: {Ecto.Query.t, map}
   def run(queryable, rummage) do
@@ -158,7 +158,7 @@ defmodule Rummage.Ecto.CustomHooks.SimpleSearch do
 
           queryable
           |> where([b],
-            ilike(field(b, ^field), ^"%#{String.replace(term, "%", "\\%")}%"))
+            ilike(field(b, ^field), ^term))
       _ ->
         field = String.to_atom(field)
 
@@ -166,7 +166,7 @@ defmodule Rummage.Ecto.CustomHooks.SimpleSearch do
 
         queryable
         |> where([b],
-          like(field(b, ^field), ^"%#{String.replace(term, "%", "\\%")}%"))
+          like(field(b, ^field), ^term))
     end
   end
 end

@@ -39,7 +39,7 @@ defmodule Rummage.Ecto.Services.BuildSearchQuery do
       iex> queryable = from u in "parents"
       #Ecto.Query<from p in "parents">
       iex> BuildSearchQuery.run(queryable, :field_1, "like", "field_!")
-      #Ecto.Query<from p in "parents", where: like(p.field_1, ^"%field_!%")>
+      #Ecto.Query<from p in "parents", where: like(p.field_1, ^"field_!")>
 
   When `field`, `search_type` and `queryable` are passed with `search_type` of `ilike`:
 
@@ -48,7 +48,7 @@ defmodule Rummage.Ecto.Services.BuildSearchQuery do
         iex> queryable = from u in "parents"
         #Ecto.Query<from p in "parents">
         iex> BuildSearchQuery.run(queryable, :field_1, "ilike", "field_!")
-        #Ecto.Query<from p in "parents", where: ilike(p.field_1, ^"%field_!%")>
+        #Ecto.Query<from p in "parents", where: ilike(p.field_1, ^"field_!")>
 
   When `field`, `search_type` and `queryable` are passed with `search_type` of `eq`:
 
@@ -123,13 +123,13 @@ When `field`, `search_type` and `queryable` are passed with an invalid `search_t
       iex> queryable = from u in "parents"
       #Ecto.Query<from p in "parents">
       iex> BuildSearchQuery.handle_like(queryable, :field_1, "field_!")
-      #Ecto.Query<from p in "parents", where: like(p.field_1, ^"%field_!%")>
+      #Ecto.Query<from p in "parents", where: like(p.field_1, ^"field_!")>
   """
   @spec handle_like(Ecto.Query.t, atom, term) :: {Ecto.Query.t}
   def handle_like(queryable, field, search_term) do
     queryable
     |> where([..., b],
-      like(field(b, ^field), ^"%#{String.replace(search_term, "%", "\\%")}%"))
+      like(field(b, ^field), ^search_term))
   end
 
 
@@ -144,13 +144,13 @@ When `field`, `search_type` and `queryable` are passed with an invalid `search_t
       iex> queryable = from u in "parents"
       #Ecto.Query<from p in "parents">
       iex> BuildSearchQuery.handle_ilike(queryable, :field_1, "field_!")
-      #Ecto.Query<from p in "parents", where: ilike(p.field_1, ^"%field_!%")>
+      #Ecto.Query<from p in "parents", where: ilike(p.field_1, ^"field_!")>
   """
   @spec handle_ilike(Ecto.Query.t, atom, term) :: {Ecto.Query.t}
   def handle_ilike(queryable, field, search_term) do
     queryable
     |> where([..., b],
-      ilike(field(b, ^field), ^"%#{String.replace(search_term, "%", "\\%")}%"))
+      ilike(field(b, ^field), ^search_term))
   end
 
 

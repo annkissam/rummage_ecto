@@ -209,7 +209,7 @@ defmodule Rummage.EctoTest do
     create_categories_and_products()
 
     rummage = %{
-      "search" => %{"category_name" => %{"assoc" => ["category"], "search_type" => "like", "search_term" => "1"}}
+      "search" => %{"category_name" => %{"assoc" => ["category"], "search_type" => "like", "search_term" => "%1%"}}
     }
 
     {queryable, rummage} = Rummage.Ecto.rummage(Product, rummage)
@@ -224,7 +224,7 @@ defmodule Rummage.EctoTest do
 
     # Test rummage params
     assert rummage == %{
-      "search" => %{"category_name" => %{"assoc" => ["category"], "search_type" => "like", "search_term" => "1"}}
+      "search" => %{"category_name" => %{"assoc" => ["category"], "search_type" => "like", "search_term" => "%1%"}}
     }
   end
 
@@ -271,7 +271,7 @@ defmodule Rummage.EctoTest do
       "paginate" => %{
         "page" => "2",
       },
-      "search" => %{"category_name" => %{"assoc" => ["category"], "search_type" => "like", "search_term" => "1"}},
+      "search" => %{"category_name" => %{"assoc" => ["category"], "search_type" => "like", "search_term" => "%1%"}},
       "sort" => %{"assoc" => ["category"], "field" => "category_name.asc"}
     }
 
@@ -287,7 +287,7 @@ defmodule Rummage.EctoTest do
 
     # Test rummage params
     assert rummage == %{
-      "search" => %{"category_name" => %{"assoc" => ["category"], "search_term" => "1", "search_type" => "like"}},
+      "search" => %{"category_name" => %{"assoc" => ["category"], "search_term" => "%1%", "search_type" => "like"}},
       "sort" => %{"field" => "category_name.asc", "assoc" => ["category"]},
       "paginate" => %{
         "per_page" => "2",
@@ -305,7 +305,7 @@ defmodule Rummage.EctoTest do
       "paginate" => %{
         "page" => "1",
       },
-      "search" => %{"category_name" => %{"assoc" => ["category", "category"], "search_type" => "like", "search_term" => "Parent"}},
+      "search" => %{"category_name" => %{"assoc" => ["category", "category"], "search_type" => "like", "search_term" => "%Parent%"}},
       "sort" => %{"assoc" => ["category"], "field" => "category_name.asc"}
     }
 
@@ -325,7 +325,7 @@ defmodule Rummage.EctoTest do
 
     # Test rummage params
     assert rummage == %{
-      "search" => %{"category_name" => %{"assoc" => ["category", "category"], "search_term" => "Parent", "search_type" => "like"}},
+      "search" => %{"category_name" => %{"assoc" => ["category", "category"], "search_term" => "%Parent%", "search_type" => "like"}},
       "sort" => %{"field" => "category_name.asc", "assoc" => ["category"]},
       "paginate" => %{
         "per_page" => "2",
@@ -343,7 +343,7 @@ defmodule Rummage.EctoTest do
       "paginate" => %{
         "page" => "1",
       },
-      "search" => %{"category_name" => %{"assoc" => ["category", "category"], "search_type" => "like", "search_term" => "Parent"}},
+      "search" => %{"category_name" => %{"assoc" => ["category", "category"], "search_type" => "like", "search_term" => "%Parent%"}},
       "sort" => %{"assoc" => ["category", "category"], "field" => "category_name.asc"}
     }
 
@@ -363,7 +363,7 @@ defmodule Rummage.EctoTest do
 
     # Test rummage params
     assert rummage == %{
-      "search" => %{"category_name" => %{"assoc" => ["category", "category"], "search_term" => "Parent", "search_type" => "like"}},
+      "search" => %{"category_name" => %{"assoc" => ["category", "category"], "search_term" => "%Parent%", "search_type" => "like"}},
       "sort" => %{"field" => "category_name.asc", "assoc" => ["category", "category"]},
       "paginate" => %{
         "per_page" => "2",
@@ -381,7 +381,7 @@ defmodule Rummage.EctoTest do
       "paginate" => %{
         "page" => "1",
       },
-      "search" => %{"category_name" => %{"assoc" => ["category"], "search_type" => "like", "search_term" => "Category"}},
+      "search" => %{"category_name" => %{"assoc" => ["category"], "search_type" => "like", "search_term" => "%Category%"}},
       "sort" => %{"assoc" => ["category", "category"], "field" => "category_name.asc"}
     }
 
@@ -401,7 +401,7 @@ defmodule Rummage.EctoTest do
 
     # Test rummage params
     assert rummage == %{
-      "search" => %{"category_name" => %{"assoc" => ["category"], "search_term" => "Category", "search_type" => "like"}},
+      "search" => %{"category_name" => %{"assoc" => ["category"], "search_term" => "%Category%", "search_type" => "like"}},
       "sort" => %{"field" => "category_name.asc", "assoc" => ["category", "category"]},
       "paginate" => %{
         "per_page" => "2",

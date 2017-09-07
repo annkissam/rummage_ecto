@@ -1,7 +1,7 @@
 # Rummage.Ecto
 
-[![Build Status](https://travis-ci.org/aditya7iyengar/rummage_ecto.svg?branch=master)](https://travis-ci.org/aditya7iyengar/rummage_ecto)
-[![Coverage Status](https://coveralls.io/repos/github/aditya7iyengar/rummage_ecto/badge.svg?branch=master)](https://coveralls.io/github/aditya7iyengar/rummage_ecto?branch=master)
+[![Build Status](https://travis-ci.org/dwarvesf/rummage_ecto.svg?branch=master)](https://travis-ci.org/aditya7iyengar/rummage_ecto)
+[![Coverage Status](https://coveralls.io/repos/github/dwarvesf/rummage_ecto/badge.svg?branch=master)](https://coveralls.io/github/aditya7iyengar/rummage_ecto?branch=master)
 [![Hex Version](http://img.shields.io/hexpm/v/rummage_ecto.svg?style=flat)](https://hex.pm/packages/rummage_ecto)
 [![hex.pm downloads](https://img.shields.io/hexpm/dt/rummage_ecto.svg)](https://hex.pm/packages/rummage_ecto)
 [![Hex docs](http://img.shields.io/badge/hex.pm-docs-green.svg?style=flat)](https://hexdocs.pm/rummage_ecto)
@@ -34,7 +34,7 @@ This package is [available in Hex](https://hexdocs.pm/rummage_ecto/), and can be
 
     ```elixir
     def deps do
-      [{:rummage_ecto, "~> 1.2.0"}]
+      [{:rummage_ecto, "github: "dwarvesf/rummage_ecto""}]
     end
     ```
 
