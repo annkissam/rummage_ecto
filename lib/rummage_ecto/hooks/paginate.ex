@@ -75,8 +75,8 @@ defmodule Rummage.Ecto.Hooks.Paginate do
 
       iex> alias Rummage.Ecto.Hooks.Paginate
       iex> import Ecto.Query
-      iex> rummage = %{"paginate" => %{"per_page" => "1", "page" => "1"}}
-      %{"paginate" => %{"page" => "1", "per_page" => "1"}}
+      iex> rummage = %{"paginate" => %{"per_page" => 1, "page" => 1}}
+      %{"paginate" => %{"page" => 1, "per_page" => 1}}
       iex> queryable = from u in "parents"
       #Ecto.Query<from p in "parents">
       iex> Paginate.run(queryable, rummage)
@@ -84,8 +84,8 @@ defmodule Rummage.Ecto.Hooks.Paginate do
 
       iex> alias Rummage.Ecto.Hooks.Paginate
       iex> import Ecto.Query
-      iex> rummage = %{"paginate" => %{"per_page" => "5", "page" => "2"}}
-      %{"paginate" => %{"page" => "2", "per_page" => "5"}}
+      iex> rummage = %{"paginate" => %{"per_page" => 5, "page" => 2}}
+      %{"paginate" => %{"page" => 2, "per_page" => 5}}
       iex> queryable = from u in "parents"
       #Ecto.Query<from p in "parents">
       iex> Paginate.run(queryable, rummage)
@@ -95,8 +95,8 @@ defmodule Rummage.Ecto.Hooks.Paginate do
 
       iex> alias Rummage.Ecto.Hooks.Paginate
       iex> import Ecto.Query
-      iex> rummage = %{"paginate" => %{"per_page" => "10"}}
-      %{"paginate" => %{"per_page" => "10"}}
+      iex> rummage = %{"paginate" => %{"per_page" => 10}}
+      %{"paginate" => %{"per_page" => 10}}
       iex> queryable = from u in "parents"
       #Ecto.Query<from p in "parents">
       iex> Paginate.run(queryable, rummage)
@@ -129,9 +129,9 @@ defmodule Rummage.Ecto.Hooks.Paginate do
       iex> Rummage.Ecto.Repo.insert(%Category{category_name: "Category 1"})
       iex> Rummage.Ecto.Repo.insert(%Category{category_name: "Category 2"})
       iex> Rummage.Ecto.Repo.insert(%Category{category_name: "Category 3"})
-      iex> rummage = %{"paginate" => %{"per_page" => "1", "page" => "1"}}
+      iex> rummage = %{"paginate" => %{"per_page" => 1, "page" => 1}}
       iex> Paginate.before_hook(Category, rummage, %{})
-      %{"paginate" => %{"max_page" => "3", "page" => "1", "per_page" => "1", "total_count" => "3"}}
+      %{"paginate" => %{"max_page" => 3, "page" => 1, "per_page" => 1, "total_count" => 3}}
   """
   @spec before_hook(Ecto.Query.t, map, map) :: map
   def before_hook(queryable, rummage, opts) do
@@ -157,11 +157,15 @@ defmodule Rummage.Ecto.Hooks.Paginate do
           true -> page
         end
 
-        paginate_params = paginate_params
+        paginate_params =
+          paginate_params
           |> Map.put("page", Integer.to_string(page))
           |> Map.put("per_page", Integer.to_string(per_page))
           |> Map.put("total_count", Integer.to_string(total_count))
           |> Map.put("max_page", Integer.to_string(max_page))
+          |> Enum.reduce(%{}, fn({key, val}, acc) ->
+            Map.put(acc, key, String.to_integer(val))
+          end)
 
         Map.put(rummage, "paginate", paginate_params)
     end
@@ -178,12 +182,10 @@ defmodule Rummage.Ecto.Hooks.Paginate do
 
   defp parse_page_and_per_page(paginate_params, opts) do
     per_page = paginate_params
-      |> Map.get("per_page", Integer.to_string(opts[:per_page] || Config.default_per_page))
-      |> String.to_integer
+      |> Map.get("per_page", opts[:per_page] || Config.default_per_page)
 
     page = paginate_params
-      |> Map.get("page", "1")
-      |> String.to_integer
+      |> Map.get("page", 1)
 
     {page, per_page}
   end
@@ -191,11 +193,9 @@ defmodule Rummage.Ecto.Hooks.Paginate do
   defp handle_paginate(queryable, paginate_params) do
     per_page = paginate_params
       |> Map.get("per_page")
-      |> String.to_integer
 
     page = paginate_params
-      |> Map.get("page", "1")
-      |> String.to_integer
+      |> Map.get("page", 1)
 
     offset = per_page * (page - 1)
 

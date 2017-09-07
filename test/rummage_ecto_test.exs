@@ -33,7 +33,7 @@ defmodule Rummage.EctoTest do
 
     rummage = %{
       "paginate" => %{
-        "page" => "2",
+        "page" => 2,
       },
     }
 
@@ -47,10 +47,10 @@ defmodule Rummage.EctoTest do
     # Test rummage params
     assert rummage == %{
       "paginate" => %{
-        "per_page" => "2",
-        "page" => "2",
-        "max_page" => "4",
-        "total_count" => "8",
+        "per_page" => 2,
+        "page" => 2,
+        "max_page" => 4,
+        "total_count" => 8,
       },
     }
   end
@@ -60,7 +60,7 @@ defmodule Rummage.EctoTest do
 
     rummage = %{
       "paginate" => %{
-        "page" => "1",
+        "page" => 1,
       },
     }
 
@@ -74,10 +74,10 @@ defmodule Rummage.EctoTest do
     # Test rummage params
     assert rummage == %{
       "paginate" => %{
-        "per_page" => "3",
-        "page" => "1",
-        "max_page" => "3",
-        "total_count" => "8",
+        "per_page" => 3,
+        "page" => 1,
+        "max_page" => 3,
+        "total_count" => 8,
       },
     }
   end
@@ -233,7 +233,7 @@ defmodule Rummage.EctoTest do
 
     rummage = %{
       "paginate" => %{
-        "page" => "2",
+        "page" => 2,
       },
       "search" => %{"price" => %{"search_type" => "lteq", "search_term" => 10}},
       "sort" => %{"field" => "name.asc"},
@@ -256,10 +256,10 @@ defmodule Rummage.EctoTest do
       "search" => %{"price" => %{"search_type" => "lteq", "search_term" => 10}},
       "sort" => %{"field" => "name.asc"},
       "paginate" => %{
-        "per_page" => "2",
-        "page" => "2",
-        "max_page" => "2",
-        "total_count" => "4",
+        "per_page" => 2,
+        "page" => 2,
+        "max_page" => 2,
+        "total_count" => 4,
       },
     }
   end
@@ -269,7 +269,7 @@ defmodule Rummage.EctoTest do
 
     rummage = %{
       "paginate" => %{
-        "page" => "2",
+        "page" => 2,
       },
       "search" => %{"category_name" => %{"assoc" => ["category"], "search_type" => "like", "search_term" => "%1%"}},
       "sort" => %{"assoc" => ["category"], "field" => "category_name.asc"}
@@ -290,10 +290,10 @@ defmodule Rummage.EctoTest do
       "search" => %{"category_name" => %{"assoc" => ["category"], "search_term" => "%1%", "search_type" => "like"}},
       "sort" => %{"field" => "category_name.asc", "assoc" => ["category"]},
       "paginate" => %{
-        "per_page" => "2",
-        "page" => "1",
-        "max_page" => "1",
-        "total_count" => "2",
+        "per_page" => 2,
+        "page" => 1,
+        "max_page" => 1,
+        "total_count" => 2,
       },
     }
   end
@@ -303,7 +303,7 @@ defmodule Rummage.EctoTest do
 
     rummage = %{
       "paginate" => %{
-        "page" => "1",
+        "page" => 1,
       },
       "search" => %{"category_name" => %{"assoc" => ["category", "category"], "search_type" => "like", "search_term" => "%Parent%"}},
       "sort" => %{"assoc" => ["category"], "field" => "category_name.asc"}
@@ -328,10 +328,10 @@ defmodule Rummage.EctoTest do
       "search" => %{"category_name" => %{"assoc" => ["category", "category"], "search_term" => "%Parent%", "search_type" => "like"}},
       "sort" => %{"field" => "category_name.asc", "assoc" => ["category"]},
       "paginate" => %{
-        "per_page" => "2",
-        "page" => "1",
-        "max_page" => "4",
-        "total_count" => "8",
+        "per_page" => 2,
+        "page" => 1,
+        "max_page" => 4,
+        "total_count" => 8,
       },
     }
   end
@@ -341,7 +341,7 @@ defmodule Rummage.EctoTest do
 
     rummage = %{
       "paginate" => %{
-        "page" => "1",
+        "page" => 1,
       },
       "search" => %{"category_name" => %{"assoc" => ["category", "category"], "search_type" => "like", "search_term" => "%Parent%"}},
       "sort" => %{"assoc" => ["category", "category"], "field" => "category_name.asc"}
@@ -366,10 +366,10 @@ defmodule Rummage.EctoTest do
       "search" => %{"category_name" => %{"assoc" => ["category", "category"], "search_term" => "%Parent%", "search_type" => "like"}},
       "sort" => %{"field" => "category_name.asc", "assoc" => ["category", "category"]},
       "paginate" => %{
-        "per_page" => "2",
-        "page" => "1",
-        "max_page" => "4",
-        "total_count" => "8",
+        "per_page" => 2,
+        "page" => 1,
+        "max_page" => 4,
+        "total_count" => 8,
       },
     }
   end
@@ -379,7 +379,7 @@ defmodule Rummage.EctoTest do
 
     rummage = %{
       "paginate" => %{
-        "page" => "1",
+        "page" => 1,
       },
       "search" => %{"category_name" => %{"assoc" => ["category"], "search_type" => "like", "search_term" => "%Category%"}},
       "sort" => %{"assoc" => ["category", "category"], "field" => "category_name.asc"}
@@ -404,10 +404,10 @@ defmodule Rummage.EctoTest do
       "search" => %{"category_name" => %{"assoc" => ["category"], "search_term" => "%Category%", "search_type" => "like"}},
       "sort" => %{"field" => "category_name.asc", "assoc" => ["category", "category"]},
       "paginate" => %{
-        "per_page" => "2",
-        "page" => "1",
-        "max_page" => "4",
-        "total_count" => "8",
+        "per_page" => 2,
+        "page" => 1,
+        "max_page" => 4,
+        "total_count" => 8,
       },
     }
   end

@@ -55,8 +55,8 @@ defmodule Rummage.Ecto do
       iex> rummage = %{"search" => %{}, "sort" => %{}, "paginate" => %{}}
       iex> {queryable, rummage} = Rummage.Ecto.rummage(Rummage.Ecto.Product, rummage) # We have set a default_repo in the configuration to Rummage.Ecto.Repo
       iex> rummage
-      %{"paginate" => %{"max_page" => "0", "page" => "1",
-               "per_page" => "2", "total_count" => "0"}, "search" => %{},
+      %{"paginate" => %{"max_page" => 0, "page" => 1,
+               "per_page" => 2, "total_count" => 0}, "search" => %{},
              "sort" => %{}}
       iex> queryable
       #Ecto.Query<from p in Rummage.Ecto.Product, limit: ^2, offset: ^0>
@@ -66,8 +66,8 @@ defmodule Rummage.Ecto do
       iex> rummage = %{"search" => %{}, "sort" => %{}, "paginate" => %{}}
       iex> {queryable, rummage} = Rummage.Ecto.rummage(Rummage.Ecto.Product, rummage, repo: Rummage.Ecto.Repo)
       iex> rummage
-      %{"paginate" => %{"max_page" => "0", "page" => "1",
-               "per_page" => "2", "total_count" => "0"}, "search" => %{},
+      %{"paginate" => %{"max_page" => 0, "page" => 1,
+               "per_page" => 2, "total_count" => 0}, "search" => %{},
              "sort" => %{}}
       iex> queryable
       #Ecto.Query<from p in Rummage.Ecto.Product, limit: ^2, offset: ^0>
@@ -78,8 +78,8 @@ defmodule Rummage.Ecto do
       iex> rummage = %{"search" => %{}, "sort" => %{}, "paginate" => %{}}
       iex> {queryable, rummage} = Rummage.Ecto.rummage(Rummage.Ecto.Product, rummage, per_page: 5)
       iex> rummage
-      %{"paginate" => %{"max_page" => "0", "page" => "1",
-               "per_page" => "5", "total_count" => "0"}, "search" => %{},
+      %{"paginate" => %{"max_page" => 0, "page" => 1,
+               "per_page" => 5, "total_count" => 0}, "search" => %{},
              "sort" => %{}}
       iex> queryable
       #Ecto.Query<from p in Rummage.Ecto.Product, limit: ^5, offset: ^0>
@@ -89,8 +89,8 @@ defmodule Rummage.Ecto do
       iex> rummage = %{"search" => %{"name" => "x"}, "sort" => %{}, "paginate" => %{}}
       iex> {queryable, rummage} = Rummage.Ecto.rummage(Rummage.Ecto.Product, rummage, search: Rummage.Ecto.CustomHooks.SimpleSearch)
       iex> rummage
-      %{"paginate" => %{"max_page" => "0", "page" => "1",
-               "per_page" => "2", "total_count" => "0"},
+      %{"paginate" => %{"max_page" => 0, "page" => 1,
+               "per_page" => 2, "total_count" => 0},
              "search" => %{"name" => "x"}, "sort" => %{}}
       iex> queryable
       #Ecto.Query<from p in Rummage.Ecto.Product, where: like(p.name, ^"x"), limit: ^2, offset: ^0>
