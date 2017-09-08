@@ -187,6 +187,9 @@ defmodule Rummage.Ecto.Hooks.Paginate do
     page = paginate_params
       |> Map.get("page", 1)
 
+    per_page = if is_integer(per_page), do: per_page, else: String.to_integer(per_page)
+    page = if is_integer(page), do: page, else: String.to_integer(page)
+
     {page, per_page}
   end
 
