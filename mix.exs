@@ -34,7 +34,7 @@ defmodule Rummage.Ecto.Mixfile do
       applications: [
         :logger,
         :ecto,
-        :postgrex,
+        :mariaex,
       ],
     ]
   end
@@ -55,7 +55,7 @@ end
       {:excoveralls, "~> 0.3", only: :test},
       {:ex_doc, "~> 0.14", only: :dev, runtime: false},
       {:inch_ex, "~> 0.5", only: [:dev, :test, :docs]},
-      {:postgrex, ">= 0.0.0", only: [:test]},
+      {:mariaex, ">= 0.0.0", only: [:test]},
     ]
   end
 
@@ -64,7 +64,7 @@ end
     A library that allows us to search, sort and paginate ecto queries
     """
   end
-
+2
   def docs do
     [
       main: "Rummage.Ecto",
