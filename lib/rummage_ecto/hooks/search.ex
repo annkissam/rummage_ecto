@@ -263,6 +263,19 @@ defmodule Rummage.Ecto.Hooks.Search do
         #Ecto.Query<from p in "parents">
         iex> Search.run(queryable, rummage)
         #Ecto.Query<from p in subquery(from p in "parents"), where: like(p.field_1, ^"field_!")>
+
+
+    When rummage `struct` passed has `search_type` of `is_nil`, it returns
+    a searched version of the `queryable` with `IS NULL` search query:
+
+        iex> alias Rummage.Ecto.Hooks.Search
+        iex> import Ecto.Query
+        iex> rummage = %{"search" => %{"field_1" => %{"assoc" => [], "search_type" => "is_nil", "search_term" => "true"}}}
+        %{"search" => %{"field_1" => %{"assoc" => [], "search_type" => "is_nil", "search_term" => "true"}}}
+        iex> queryable = from u in "parents"
+        #Ecto.Query<from p in "parents">
+        iex> Search.run(queryable, rummage)
+        #Ecto.Query<from p in subquery(from p in "parents"), where: is_nil(p.field_1)>
   """
   @spec run(Ecto.Query.t, map) :: {Ecto.Query.t, map}
   def run(queryable, rummage) do
