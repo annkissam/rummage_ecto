@@ -6,7 +6,7 @@ defmodule Rummage.Ecto.Services.BuildSearchQuery do
   Has a `Module Attribute` called `search_types`:
 
   ```elixir
-  @search_types ~w(like ilike eq gt lt gteq lteq)
+  @search_types ~w(like ilike eq gt lt gteq lteq is_nil)
   ```
 
   `@search_types` is a collection of all the 8 valid `search_types` that come shipped with
@@ -102,7 +102,7 @@ defmodule Rummage.Ecto.Services.BuildSearchQuery do
       iex> import Ecto.Query
       iex> queryable = from u in "parents"
       #Ecto.Query<from p in "parents">
-      iex> BuildSearchQuery.run(queryable, :field_1, "is_nil", "true")
+      iex> BuildSearchQuery.run(queryable, :field_1, "is_nil", "false")
       #Ecto.Query<from p in "parents", where: is_nil(p.field_1)>
 
   When `field`, `search_type` and `queryable` are passed with an invalid `search_type`:
@@ -280,18 +280,18 @@ defmodule Rummage.Ecto.Services.BuildSearchQuery do
       iex> import Ecto.Query
       iex> queryable = from u in "parents"
       #Ecto.Query<from p in "parents">
-      iex> BuildSearchQuery.handle_is_nil(queryable, :field_1, true)
-      #Ecto.Query<from p in "parents", where: is_nil(p.field_1)>
+      iex> BuildSearchQuery.handle_is_nil(queryable, :field_1, "false")
+      #Ecto.Query<from p in "parents", where: not is_nil(p.field_1)>
   """
   @spec handle_is_nil(Ecto.Query.t, atom, term) :: {Ecto.Query.t}
-  def handle_is_nil(queryable, field, true) do
-    queryable
-    |> where([..., b],
-      is_nil(field(b, ^field)))
-  end
-  def handle_is_nil(queryable, field, false) do
+  def handle_is_nil(queryable, field, "false") do
     queryable
     |> where([..., b],
       not is_nil(field(b, ^field)))
+  end
+  def handle_is_nil(queryable, field, _) do
+    queryable
+    |> where([..., b],
+      is_nil(field(b, ^field)))
   end
 end
