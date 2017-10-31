@@ -103,7 +103,7 @@ defmodule Rummage.Ecto.Services.BuildSearchQuery do
       iex> queryable = from u in "parents"
       #Ecto.Query<from p in "parents">
       iex> BuildSearchQuery.run(queryable, :field_1, "is_nil", "false")
-      #Ecto.Query<from p in "parents", where: is_nil(p.field_1)>
+      #Ecto.Query<from p in "parents", where: not is_nil(p.field_1)>
 
   When `field`, `search_type` and `queryable` are passed with an invalid `search_type`:
 
