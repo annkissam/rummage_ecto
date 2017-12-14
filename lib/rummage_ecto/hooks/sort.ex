@@ -256,6 +256,11 @@ defmodule Rummage.Ecto.Hooks.Sort do
     end
   end
 
+  defp join_by_association({join_qualifier, association}, queryable) do
+    #TODO: Have rummage_phoenix convert to atom
+    join(queryable, String.to_atom(join_qualifier), [..., p1], p2 in assoc(p1, ^String.to_atom(association)))
+  end
+
   defp join_by_association(association, queryable) do
     join(queryable, :inner, [..., p1], p2 in assoc(p1, ^String.to_atom(association)))
   end
