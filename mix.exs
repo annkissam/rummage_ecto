@@ -8,7 +8,7 @@ defmodule Rummage.Ecto.Mixfile do
     [
       app: :rummage_ecto,
       version: @version,
-      elixir: "~> 1.3.4",
+      elixir: "~> 1.3",
       deps: deps(),
       build_embedded: Mix.env == :prod,
       start_permanent: Mix.env == :prod,

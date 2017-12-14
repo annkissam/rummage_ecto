@@ -6,7 +6,7 @@ defmodule Rummage.Ecto.Repo.Migrations.CreateCategories do
       add :category_name, :string
       add :category_id, references(:categories)
 
-      timestamps
+      timestamps()
     end
   end
 end
