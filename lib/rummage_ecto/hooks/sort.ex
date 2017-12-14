@@ -176,6 +176,31 @@ defmodule Rummage.Ecto.Hooks.Sort do
       #Ecto.Query<from p in "parents">
       iex> Sort.run(queryable, rummage)
       #Ecto.Query<from p0 in subquery(from p in "parents"), join: p1 in assoc(p0, :parent), join: p2 in assoc(p1, :parent), order_by: [asc: fragment("lower(?)", p2.field_1)]>
+
+  When rummage `struct` passed has a field with `->>` in it, it returns
+  a sorted version of the `queryable` with map field-compatible arguments:
+
+      iex> alias Rummage.Ecto.Hooks.Sort
+      iex> import Ecto.Query
+      iex> rummage = %{"sort" => %{"assoc" => ["parent", "parent"], "field" => "map_field_1->>key_1.asc"}}
+      %{"sort" => %{"assoc" => ["parent", "parent"], "field" => "map_field_1->>key_1.asc"}}
+      iex> queryable = from u in "parents"
+      #Ecto.Query<from p in "parents">
+      iex> Sort.run(queryable, rummage)
+      #Ecto.Query<from p0 in subquery(from p in "parents"), join: p1 in assoc(p0, :parent), join: p2 in assoc(p1, :parent), order_by: [asc: fragment("?->>?", p2.map_field_1, ^"key_1")]>
+
+  When rummage `struct` passed has a field with `->>` in it and a
+  `case-insensitive` flag, it returns a sorted version of the `queryable` with
+  case insensitive map field-compatible arguments:
+
+      iex> alias Rummage.Ecto.Hooks.Sort
+      iex> import Ecto.Query
+      iex> rummage = %{"sort" => %{"assoc" => ["parent", "parent"], "field" => "map_field_1->>key_1.asc.ci"}}
+      %{"sort" => %{"assoc" => ["parent", "parent"], "field" => "map_field_1->>key_1.asc.ci"}}
+      iex> queryable = from u in "parents"
+      #Ecto.Query<from p in "parents">
+      iex> Sort.run(queryable, rummage)
+      #Ecto.Query<from p0 in subquery(from p in "parents"), join: p1 in assoc(p0, :parent), join: p2 in assoc(p1, :parent), order_by: [asc: fragment("lower(?->>?)", p2.map_field_1, ^"key_1")]>
   """
   @spec run(Ecto.Query.t, map) :: {Ecto.Query.t, map}
   def run(queryable, rummage) do
@@ -261,10 +286,16 @@ defmodule Rummage.Ecto.Hooks.Sort do
   end
 
   defp order_by_assoc(queryable, order_type, parsed_field, false) do
-    order_by(queryable, [p0, ..., p2], [{^String.to_atom(order_type), field(p2, ^String.to_atom(parsed_field))}])
+    case String.split(parsed_field, "->>") do
+      [base_field, key] -> order_by(queryable, [p0, ..., p2], [{^String.to_atom(order_type), fragment("?->>?", field(p2, ^String.to_atom(base_field)), ^key)}])
+      _ -> order_by(queryable, [p0, ..., p2], [{^String.to_atom(order_type), field(p2, ^String.to_atom(parsed_field))}])
+    end
   end
 
   defp order_by_assoc(queryable, order_type, parsed_field, true) do
-    order_by(queryable, [p0, ..., p2], [{^String.to_atom(order_type), case_insensitive(field(p2, ^String.to_atom(parsed_field)))}])
+    case String.split(parsed_field, "->>") do
+      [base_field, key] -> order_by(queryable, [p0, ..., p2], [{^String.to_atom(order_type), fragment("lower(?->>?)", field(p2, ^String.to_atom(base_field)), ^key)}])
+      _ -> order_by(queryable, [p0, ..., p2], [{^String.to_atom(order_type), case_insensitive(field(p2, ^String.to_atom(parsed_field)))}])
+    end
   end
 end
