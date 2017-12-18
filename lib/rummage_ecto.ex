@@ -98,7 +98,7 @@ defmodule Rummage.Ecto do
 
   """
   @spec rummage(Ecto.Query.t, map, map) :: {Ecto.Query.t, map}
-  def rummage(queryable, rummage, opts \\ %{})
+  def rummage(queryable, rummage, opts \\ [])
   def rummage(queryable, rummage, _opts) when rummage == nil, do: {queryable, %{}}
   def rummage(queryable, rummage, opts) do
     hooks = opts[:hooks] || [:search, :sort, :paginate]
@@ -110,5 +110,13 @@ defmodule Rummage.Ecto do
 
       {q |> hook_module.run(rummage), rummage}
     end)
+  end
+
+  defmacro __using__(_opts) do
+    quote do
+      require Rummage.Ecto
+
+      defdelegate rummage(queryable, rummage, opts \\ []), to: Rummage.Ecto
+    end
   end
 end
