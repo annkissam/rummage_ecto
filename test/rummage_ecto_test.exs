@@ -64,7 +64,7 @@ defmodule Rummage.EctoTest do
       },
     }
 
-    {queryable, rummage} = Rummage.Ecto.rummage(Category, rummage, per_page: 3)
+    {queryable, rummage} = Category.rummage(Category, rummage, per_page: 3)
 
     categories = Repo.all(queryable)
 
