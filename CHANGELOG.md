@@ -1,5 +1,22 @@
 # Versions CHANGELOG
 
+## Version: 1.3.0
+
+### TODO:
+
+- Bring back `__using__`
+- Make default hooks more generalized
+- Add NoPrimaryKey pagination hook or add a generalized version of current hook
+- Change the way configurations are done
+- Update Documentation
+
+### DONE:
+
+
+## Version: 1.2.0
+
+- Faster Pagination Hooks
+
 ## Version: 1.1.0
 
 ### Changes to Rummage as whole:
