@@ -2,7 +2,7 @@ language: elixir
 elixir:
   - 1.4.5
 otp_release:
-  - 20.2
+  - 20.1
 sudo: false
 env:
   - MIX_ENV=test ECTO_PGSQL_USER=postgres ECTO_PGSQL_PASSWORD=
