@@ -26,7 +26,7 @@ defmodule Rummage.Ecto.Services.BuildSearchQuery do
 
   import Ecto.Query
 
-  @search_types ~w(like ilike eq gt lt gteq lteq)
+  @search_types ~w(like ilike eq gt lt gteq lteq is_null)
 
   @doc """
   Builds a searched `queryable` on top of the given `queryable` using `field`, `search_type`
@@ -273,14 +273,17 @@ When `field`, `search_type` and `queryable` are passed with an invalid `search_t
       iex> BuildSearchQuery.handle_is_null(queryable, :field_1, false)
       #Ecto.Query<from p in "parents", where: not is_nil(p.field_1)>
   """
+
   @spec handle_is_null(Ecto.Query.t, atom, term) :: {Ecto.Query.t}
-  def handle_is_null(queryable, field, true) do
+  def handle_is_null(queryable, field, term \\ true)
+
+  def handle_is_null(queryable, field, term) when term in ["true", true, 1] do
     queryable
     |> where([..., b],
       is_nil(field(b, ^field)))
   end
 
-  def handle_is_null(queryable, field, false) do
+  def handle_is_null(queryable, field, term) when term in ["false", false, 0] do
     queryable
     |> where([..., b],
       not is_nil(field(b, ^field)))
