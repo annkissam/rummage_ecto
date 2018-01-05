@@ -108,7 +108,7 @@ When `field`, `search_type` and `queryable` are passed with an invalid `search_t
   def run(queryable, field, search_type, search_term) do
     case Enum.member?(@search_types, search_type) do
       true -> apply(__MODULE__, String.to_atom("handle_" <> search_type), [queryable, field, search_term])
-      _ -> queryable
+      _ -> raise "Unknown search_type #{search_type}"
     end
   end
 
