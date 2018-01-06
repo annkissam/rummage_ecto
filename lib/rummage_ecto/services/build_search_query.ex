@@ -19,13 +19,14 @@ defmodule Rummage.Ecto.Services.BuildSearchQuery do
   * `lt`: Searches for a `term` to be less than to a given `field` of a `queryable`.
   * `gteq`: Searches for a `term` to be greater than or equal to to a given `field` of a `queryable`.
   * `lteq`: Searches for a `term` to be less than or equal to a given `field` of a `queryable`.
+  * `is_null`: Searches for a null value when `term` is true, or not null when `term` is false.
 
   Feel free to use this module on a custom search hook that you write.
   """
 
   import Ecto.Query
 
-  @search_types ~w(like ilike eq gt lt gteq lteq)
+  @search_types ~w(like ilike eq gt lt gteq lteq is_null)
 
   @doc """
   Builds a searched `queryable` on top of the given `queryable` using `field`, `search_type`
@@ -102,13 +103,13 @@ When `field`, `search_type` and `queryable` are passed with an invalid `search_t
       iex> queryable = from u in "parents"
       #Ecto.Query<from p in "parents">
       iex> BuildSearchQuery.run(queryable, :field_1, "pizza", "field_!")
-      #Ecto.Query<from p in "parents">
+      ** (RuntimeError) Unknown search_type pizza
   """
   @spec run(Ecto.Query.t, atom, String.t, term) :: {Ecto.Query.t}
   def run(queryable, field, search_type, search_term) do
     case Enum.member?(@search_types, search_type) do
       true -> apply(__MODULE__, String.to_atom("handle_" <> search_type), [queryable, field, search_term])
-      _ -> queryable
+      _ -> raise "Unknown search_type #{search_type}"
     end
   end
 
@@ -256,5 +257,35 @@ When `field`, `search_type` and `queryable` are passed with an invalid `search_t
     queryable
     |> where([..., b],
       field(b, ^field) <= ^search_term)
+  end
+
+  @doc """
+  Builds a searched `queryable` on `field` is_nil (when `term` is true), or not is_nil (when `term` is false).
+
+  ## Examples
+
+      iex> alias Rummage.Ecto.Services.BuildSearchQuery
+      iex> import Ecto.Query
+      iex> queryable = from u in "parents"
+      #Ecto.Query<from p in "parents">
+      iex> BuildSearchQuery.handle_is_null(queryable, :field_1, true)
+      #Ecto.Query<from p in "parents", where: is_nil(p.field_1)>
+      iex> BuildSearchQuery.handle_is_null(queryable, :field_1, false)
+      #Ecto.Query<from p in "parents", where: not is_nil(p.field_1)>
+  """
+
+  @spec handle_is_null(Ecto.Query.t, atom, term) :: {Ecto.Query.t}
+  def handle_is_null(queryable, field, term \\ true)
+
+  def handle_is_null(queryable, field, term) when term in ["true", true, 1] do
+    queryable
+    |> where([..., b],
+      is_nil(field(b, ^field)))
+  end
+
+  def handle_is_null(queryable, field, term) when term in ["false", false, 0] do
+    queryable
+    |> where([..., b],
+      not is_nil(field(b, ^field)))
   end
 end
