@@ -97,19 +97,21 @@ defmodule Rummage.Ecto do
 
 
   """
+  @default_hooks [search: :default, sort: :default, paginate: :default]
+
   @spec rummage(Ecto.Query.t, map, map) :: {Ecto.Query.t, map}
   def rummage(queryable, rummage, opts \\ [])
   def rummage(queryable, rummage, _opts) when rummage == nil, do: {queryable, %{}}
   def rummage(queryable, rummage, opts) do
-    hooks = opts[:hooks] || [:search, :sort, :paginate]
+    hooks = opts[:hooks] || @default_hooks
+    Enum.reduce(hooks, {queryable, rummage}, &apply_mod(&1, &2, opts))
+  end
 
-    Enum.reduce(hooks, {queryable, rummage}, fn(hook, {q, r}) ->
-      hook_module = opts[hook] || apply(Config, String.to_atom("default_#{hook}"), [])
+  defp apply_mod({type, mod}, {queryable, rummage}, opts) do
+    mod = mod == :default && apply(Config, type, []) || mod
 
-      rummage = hook_module.before_hook(q, r, opts)
-
-      {q |> hook_module.run(rummage), rummage}
-    end)
+    {apply(mod, :run, [queryable, rummage]),
+      apply(mod, :before_hook, [queryable, rummage, opts])}
   end
 
   defmacro __using__(_opts) do
