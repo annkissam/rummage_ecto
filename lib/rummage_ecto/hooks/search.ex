@@ -160,12 +160,17 @@ defmodule Rummage.Ecto.Hooks.Search do
   @spec run(Ecto.Query.t(), map()) :: Ecto.Query.t()
   def run(q, s), do: handle_search(q, s)
 
+  # Helper function which handles addition of search query on top of
+  # the sent queryable variable, for all search fields.
   defp handle_search(queryable, search_params) do
     search_params
     |> Map.to_list()
     |> Enum.reduce(queryable, &search_queryable(&1, &2))
   end
 
+  # Helper function which handles addition of search query on top of
+  # the sent queryable variable, for ONE search fields.
+  # This delegates the query building to `BuildSearchQuery` module
   defp search_queryable(param, queryable) do
     field = elem(param, 0)
     field_params = elem(param, 1)
@@ -181,7 +186,8 @@ defmodule Rummage.Ecto.Hooks.Search do
     |> BuildSearchQuery.run(field, search_type, search_term)
   end
 
-  # TODO: Support other join types
+  # Helper function which handles associations in a query with a join
+  # type.
   defp join_by_assoc({join, assoc}, query) do
     join(query, join, [..., p1], p2 in assoc(p1, ^String.to_atom(assoc)))
   end
