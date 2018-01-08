@@ -43,7 +43,7 @@ defmodule Rummage.Ecto.Hooks.Sort do
   ```elixir
   config :rummage_ecto,
     Rummage.Ecto,
-    default_sort: CustomHook
+   .sort: CustomHook
   ```
 
   The `CustomHook` must implement behaviour `Rummage.Ecto.Hook`. For examples of `CustomHook`, check out some
