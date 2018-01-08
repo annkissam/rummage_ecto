@@ -40,8 +40,9 @@ defmodule Rummage.Ecto.Hooks.Paginate do
    .paginate: CustomHook
   ```
 
-  The `CustomHook` must implement behaviour `Rummage.Ecto.Hook`. For examples of `CustomHook`, check out some
-    `custom_hooks` that are shipped with elixir: `Rummage.Ecto.CustomHooks.SimpleSearch`, `Rummage.Ecto.CustomHooks.SimpleSort`,
+  The `CustomHook` must use `Rummage.Ecto.Hook`. For examples of `CustomHook`,
+  check out some `custom_hooks` that are shipped with `Rummage.Ecto`:
+  `Rummage.Ecto.CustomHooks.SimpleSearch`, `Rummage.Ecto.CustomHooks.SimpleSort`,
     Rummage.Ecto.CustomHooks.SimplePaginate
   """
 
@@ -294,7 +295,8 @@ defmodule Rummage.Ecto.Hooks.Paginate do
   defp get_params(queryable, paginate_params, repo) do
     per_page = Map.get(paginate_params, :per_page)
     total_count = get_total_count(queryable, repo)
-    max_page = (total_count / per_page)
+    max_page = total_count
+      |> (& &1 / per_page).()
       |> Float.ceil()
       |> trunc()
 
