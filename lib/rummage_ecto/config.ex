@@ -2,11 +2,36 @@ defmodule Rummage.Ecto.Config do
   @moduledoc """
   This module encapsulates all the Rummage's runtime configurations
   that can be set in the config.exs file.
+
+  __This configuration is optional, as `Rummage.Ecto` can accept the same
+  arguments as optional arguments to the function `Rummage.Ecto.rummage/3`__
+
+  ## Usage:
+
+  A basic example without overriding default hooks:
+  ### config.exs:
+
+    config :app_name, Rummage.Ecto,
+      per_page: 10,
+      repo: AppName.Repo
+
+  This is a more advanced usage where you can specify the default hooks:
+  ### config.exs:
+
+    config :app_name, Rummage.Ecto,
+      per_page: 10,
+      repo: AppName.Repo,
+      search: Rummage.Ecto.Hooks.Search,
+      sort: Rummage.Ecto.Hooks.Sort,
+      paginate: Rummage.Ecto.Hooks.Paginate
+
   """
 
   @doc """
   `:search` hook can also be set at run time
-  in the `config.exs` file
+  in the `config.exs` file. This pulls the configuration
+  assocated with the application, `application`. When no
+  application is given this defaults to `rummage_ecto`.
 
   ## Examples
   When no config is set, if returns the default hook
@@ -15,8 +40,8 @@ defmodule Rummage.Ecto.Config do
       iex> Config.search
       Rummage.Ecto.Hooks.Search
   """
-  def search do
-    config(:search, Rummage.Ecto.Hooks.Search)
+  def search(application \\ :rummage_ecto) do
+    config(:search, Rummage.Ecto.Hooks.Search, application)
   end
 
   @doc """
@@ -30,8 +55,8 @@ defmodule Rummage.Ecto.Config do
       iex> Config.sort
       Rummage.Ecto.Hooks.Sort
   """
-  def sort do
-    config(:sort, Rummage.Ecto.Hooks.Sort)
+  def sort(application \\ :rummage_ecto) do
+    config(:sort, Rummage.Ecto.Hooks.Sort, application)
   end
 
   @doc """
@@ -45,8 +70,8 @@ defmodule Rummage.Ecto.Config do
       iex> Config.paginate
       Rummage.Ecto.Hooks.Paginate
   """
-  def paginate do
-    config(:paginate, Rummage.Ecto.Hooks.Paginate)
+  def paginate(application \\ :rummage_ecto) do
+    config(:paginate, Rummage.Ecto.Hooks.Paginate, application)
   end
 
   @doc """
@@ -60,8 +85,8 @@ defmodule Rummage.Ecto.Config do
       iex> Config.per_page
       2
   """
-  def per_page do
-    config(:per_page, 10)
+  def per_page(application \\ :rummage_ecto) do
+    config(:per_page, 10, application)
   end
 
   @doc """
@@ -75,16 +100,16 @@ defmodule Rummage.Ecto.Config do
       iex> Config.repo
       Rummage.Ecto.Repo
   """
-  def repo do
-    config(:repo, nil)
+  def repo(application \\ :rummage_ecto) do
+    config(:repo, nil, application)
   end
 
-  defp config do
-    Application.get_env(:rummage_ecto, Rummage.Ecto, [])
+  defp config(application) do
+    Application.get_env(application, Rummage.Ecto, [])
   end
 
-  defp config(key, default) do
-    config()
+  defp config(key, default, application) do
+    config(application)
     |> Keyword.get(key, default)
     |> resolve_config(default)
   end
