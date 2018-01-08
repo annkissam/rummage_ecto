@@ -3,10 +3,9 @@ use Mix.Config
 config :logger, :console,
   level: :error
 
-config :rummage_ecto, Rummage.Ecto,[
+config :rummage_ecto, Rummage.Ecto,
   repo: Rummage.Ecto.Repo,
-  per_page: 2,
-]
+  per_page: 2
 
 config :rummage_ecto, ecto_repos: [Rummage.Ecto.Repo]
 
