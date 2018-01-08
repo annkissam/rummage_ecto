@@ -43,12 +43,12 @@ defmodule Rummage.Ecto do
   - `repo`: If you haven't set up a .repo`, or are using an app that uses multiple repos, this might come handy.
             This overrides the .repo` in the configuration.
 
-  - `hooks`: This allows us to specify what `Rummage` hooks to use in this `rummage` lifecycle. It defaults to
-            `[:search, :sort, :paginate]`. This also allows us to specify the order of `hooks` operation, if in case they
-            need to be changed.
-
   - `search`: This allows us to override a `Rummage.Ecto.Hook` with a `CustomHook`. This `CustomHook` must implement
               the behavior `Rummage.Ecto.Hook`.
+
+  - `sort`:
+
+  - `paginate`:
 
   ## Examples
     When no `repo` or `per_page` key is given in the `opts` map, it uses
@@ -114,11 +114,32 @@ defmodule Rummage.Ecto do
       apply(mod, :before_hook, [queryable, rummage, opts])}
   end
 
+  @doc """
+  TODO: Add some crazy docs!
+  """
   defmacro __using__(opts) do
     quote do
-      require Rummage.Ecto
+      alias Rummage.Ecto.Config, as: RConfig
 
-      defdelegate rummage(queryable, rummage, opts \\ []), to: Rummage.Ecto
+      def rummage(queryable, rummage, opts \\ []) do
+        Rummage.Ecto.rummage(queryable, rummage, uniq_merge(opts, defaults()))
+      end
+
+      defp defaults() do
+        keys = ~w(repo per_page search sort paginate)a
+        Enum.map(keys, &get_defs/1)
+      end
+
+      defp get_defs(key) do
+        app = Application.get_application(__MODULE__)
+        {key, Keyword.get(unquote(opts), key, apply(RConfig, key, [app]))}
+      end
+
+      defp uniq_merge(keyword1, keyword2) do
+        keyword2
+        |> Keyword.merge(keyword1)
+        |> Keyword.new()
+      end
     end
   end
 end
