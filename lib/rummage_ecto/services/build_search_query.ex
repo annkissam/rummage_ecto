@@ -6,10 +6,10 @@ defmodule Rummage.Ecto.Services.BuildSearchQuery do
   Has a `Module Attribute` called `search_types`:
 
   ```elixir
-  @search_types ~w(like ilike eq gt lt gteq lteq)
+  @search_types ~w(like ilike eq gt lt gteq lteq is_null)
   ```
 
-  `@search_types` is a collection of all the 7 valid `search_types` that come shipped with
+  `@search_types` is a collection of all the 8 valid `search_types` that come shipped with
   `Rummage.Ecto`'s default search hook. The types are:
 
   * `like`: Searches for a `term` in a given `field` of a `queryable`.
@@ -44,12 +44,12 @@ defmodule Rummage.Ecto.Services.BuildSearchQuery do
 
   When `field`, `search_type` and `queryable` are passed with `search_type` of `ilike`:
 
-        iex> alias Rummage.Ecto.Services.BuildSearchQuery
-        iex> import Ecto.Query
-        iex> queryable = from u in "parents"
-        #Ecto.Query<from p in "parents">
-        iex> BuildSearchQuery.run(queryable, :field_1, "ilike", "field_!")
-        #Ecto.Query<from p in "parents", where: ilike(p.field_1, ^"%field_!%")>
+      iex> alias Rummage.Ecto.Services.BuildSearchQuery
+      iex> import Ecto.Query
+      iex> queryable = from u in "parents"
+      #Ecto.Query<from p in "parents">
+      iex> BuildSearchQuery.run(queryable, :field_1, "ilike", "field_!")
+      #Ecto.Query<from p in "parents", where: ilike(p.field_1, ^"%field_!%")>
 
   When `field`, `search_type` and `queryable` are passed with `search_type` of `eq`:
 
@@ -104,6 +104,7 @@ When `field`, `search_type` and `queryable` are passed with an invalid `search_t
       #Ecto.Query<from p in "parents">
       iex> BuildSearchQuery.run(queryable, :field_1, "pizza", "field_!")
       ** (RuntimeError) Unknown search_type pizza
+
   """
   @spec run(Ecto.Query.t, atom, String.t, term) :: {Ecto.Query.t}
   def run(queryable, field, search_type, search_term) do
@@ -133,7 +134,6 @@ When `field`, `search_type` and `queryable` are passed with an invalid `search_t
       like(field(b, ^field), ^"%#{String.replace(search_term, "%", "\\%")}%"))
   end
 
-
   @doc """
   Builds a searched `queryable` on top of the given `queryable` using `field` and `search_type`
   when the `search_term` is `ilike`.
@@ -153,7 +153,6 @@ When `field`, `search_type` and `queryable` are passed with an invalid `search_t
     |> where([..., b],
       ilike(field(b, ^field), ^"%#{String.replace(search_term, "%", "\\%")}%"))
   end
-
 
   @doc """
   Builds a searched `queryable` on top of the given `queryable` using `field` and `search_type`
@@ -175,7 +174,6 @@ When `field`, `search_type` and `queryable` are passed with an invalid `search_t
       field(b, ^field) == ^search_term)
   end
 
-
   @doc """
   Builds a searched `queryable` on top of the given `queryable` using `field` and `search_type`
   when the `search_term` is `gt`.
@@ -195,7 +193,6 @@ When `field`, `search_type` and `queryable` are passed with an invalid `search_t
     |> where([..., b],
       field(b, ^field) > ^search_term)
   end
-
 
   @doc """
   Builds a searched `queryable` on top of the given `queryable` using `field` and `search_type`
@@ -217,7 +214,6 @@ When `field`, `search_type` and `queryable` are passed with an invalid `search_t
       field(b, ^field) < ^search_term)
   end
 
-
   @doc """
   Builds a searched `queryable` on top of the given `queryable` using `field` and `search_type`
   when the `search_term` is `gteq`.
@@ -237,7 +233,6 @@ When `field`, `search_type` and `queryable` are passed with an invalid `search_t
     |> where([..., b],
       field(b, ^field) >= ^search_term)
   end
-
 
   @doc """
   Builds a searched `queryable` on top of the given `queryable` using `field` and `search_type`
@@ -276,13 +271,11 @@ When `field`, `search_type` and `queryable` are passed with an invalid `search_t
 
   @spec handle_is_null(Ecto.Query.t, atom, term) :: {Ecto.Query.t}
   def handle_is_null(queryable, field, term \\ true)
-
   def handle_is_null(queryable, field, term) when term in ["true", true, 1] do
     queryable
     |> where([..., b],
       is_nil(field(b, ^field)))
   end
-
   def handle_is_null(queryable, field, term) when term in ["false", false, 0] do
     queryable
     |> where([..., b],
