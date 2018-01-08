@@ -42,7 +42,7 @@ defmodule Rummage.Ecto.CustomHooks.SimpleSearch do
   ```elixir
   config :rummage_ecto,
     Rummage.Ecto,
-    default_search: Rummage.Ecto.CustomHooks.SimpleSearch
+   .search: Rummage.Ecto.CustomHooks.SimpleSearch
   ```
   """
 

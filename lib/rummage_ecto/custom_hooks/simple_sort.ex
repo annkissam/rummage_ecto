@@ -39,7 +39,7 @@ defmodule Rummage.Ecto.CustomHooks.SimpleSort do
   ```elixir
   config :rummage_ecto,
     Rummage.Ecto,
-    default_sort: Rummage.Ecto.CustomHooks.SimpleSort
+   .sort: Rummage.Ecto.CustomHooks.SimpleSort
   ```
   """
 
