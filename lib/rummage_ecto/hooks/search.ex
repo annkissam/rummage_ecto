@@ -1,14 +1,13 @@
 defmodule Rummage.Ecto.Hooks.Search do
   @moduledoc """
+  TODO: Explain how to use `assoc` better
+
   `Rummage.Ecto.Hooks.Search` is the default search hook that comes with
   `Rummage.Ecto`.
 
   This module provides a operations that can add searching functionality to
   a pipeline of `Ecto` queries. This module works by taking fields, and `search_type`,
   `search_term` and `assoc` associated with those `fields`.
-
-  TODO: Explain how to use `assoc` better
-
 
   NOTE: This module doesn't return a list of entries, but a `Ecto.Query.t`.
 
