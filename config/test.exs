@@ -4,8 +4,8 @@ config :logger, :console,
   level: :error
 
 config :rummage_ecto, Rummage.Ecto,[
-  default_repo: Rummage.Ecto.Repo,
-  default_per_page: 2,
+  repo: Rummage.Ecto.Repo,
+  per_page: 2,
 ]
 
 config :rummage_ecto, ecto_repos: [Rummage.Ecto.Repo]
