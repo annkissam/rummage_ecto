@@ -196,7 +196,7 @@ defmodule Rummage.Ecto.Hooks.Sort do
 
             sort_params = {sort_params["assoc"], order_param}
 
-            handle_sort(queryable,sort_params, true)
+            handle_sort(queryable, sort_params, true)
           _ ->
             handle_sort(queryable, {sort_params["assoc"], sort_params["field"]})
         end
