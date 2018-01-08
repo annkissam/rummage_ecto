@@ -1,5 +1,5 @@
 defmodule Rummage.Ecto do
-  @moduledoc ~S"""
+  @moduledoc """
   Rummage.Ecto is a light weight, but powerful framework that can be used to alter Ecto
   queries with Search, Sort and Paginate operations.
 
@@ -34,12 +34,14 @@ defmodule Rummage.Ecto do
 
   alias Rummage.Ecto.Config
 
+  @hooks [search: :default, sort: :default, paginate: :default]
+
   @doc """
   This is the function which calls to the `Rummage` `hooks`. It is the entry-point to `Rummage.Ecto`.
   This function takes in a `queryable`, a `rummage` struct and an `opts` map. Possible `opts` values are:
 
-  - `repo`: If you haven't set up a `default_repo`, or are using an app that uses multiple repos, this might come handy.
-            This overrides the `default_repo` in the configuration.
+  - `repo`: If you haven't set up a .repo`, or are using an app that uses multiple repos, this might come handy.
+            This overrides the .repo` in the configuration.
 
   - `hooks`: This allows us to specify what `Rummage` hooks to use in this `rummage` lifecycle. It defaults to
             `[:search, :sort, :paginate]`. This also allows us to specify the order of `hooks` operation, if in case they
@@ -53,7 +55,7 @@ defmodule Rummage.Ecto do
     the default values for repo and per_page:
 
       iex> rummage = %{"search" => %{}, "sort" => %{}, "paginate" => %{}}
-      iex> {queryable, rummage} = Rummage.Ecto.rummage(Rummage.Ecto.Product, rummage) # We have set a default_repo in the configuration to Rummage.Ecto.Repo
+      iex> {queryable, rummage} = Rummage.Ecto.rummage(Rummage.Ecto.Product, rummage) # We have set a.repo in the configuration to Rummage.Ecto.Repo
       iex> rummage
       %{"paginate" => %{"max_page" => "0", "page" => "1",
                "per_page" => "2", "total_count" => "0"}, "search" => %{},
@@ -97,24 +99,22 @@ defmodule Rummage.Ecto do
 
 
   """
-  @default_hooks [search: :default, sort: :default, paginate: :default]
-
   @spec rummage(Ecto.Query.t, map, map) :: {Ecto.Query.t, map}
   def rummage(queryable, rummage, opts \\ [])
   def rummage(queryable, rummage, _opts) when rummage == nil, do: {queryable, %{}}
   def rummage(queryable, rummage, opts) do
-    hooks = opts[:hooks] || @default_hooks
+    hooks = [opts[:search] || Rummage.Ecto.Config.search(),
+             opts[:sort] || Rummage.Ecto.Config.sort(),
+             opts[:paginate] || Rummage.Ecto.Config.paginate()]
     Enum.reduce(hooks, {queryable, rummage}, &apply_mod(&1, &2, opts))
   end
 
-  defp apply_mod({type, mod}, {queryable, rummage}, opts) do
-    mod = mod == :default && apply(Config, type, []) || mod
-
+  defp apply_mod(mod, {queryable, rummage}, opts) do
     {apply(mod, :run, [queryable, rummage]),
       apply(mod, :before_hook, [queryable, rummage, opts])}
   end
 
-  defmacro __using__(_opts) do
+  defmacro __using__(opts) do
     quote do
       require Rummage.Ecto
 
