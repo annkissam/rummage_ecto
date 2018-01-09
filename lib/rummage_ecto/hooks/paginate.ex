@@ -10,11 +10,42 @@ defmodule Rummage.Ecto.Hooks.Paginate do
 
 
   NOTE: This module doesn't return a list of entries, but a `Ecto.Query.t`.
-
-
   This module `uses` `Rummage.Ecto.Hook`.
 
-  ## Usage:
+  _____________________________________________________________________________
+
+  # ABOUT:
+
+  ## Arguments:
+
+  This Hook expects a `queryable` (an `Ecto.Queryable`) and
+  `paginate_params` (a `Map`). The map should be in the format:
+  `%{per_page: 10, page: 1}`
+
+  Details:
+
+  * `per_page`: Specifies the entries in each page.
+  * `page`: Specifies the `page` number.
+
+
+  For example, if we want to paginate products, we would
+  do the following:
+
+  ```elixir
+  Rummage.Ecto.Hooks.Paginate.run(Product, %{per_page: 10, page: 1})
+  ```
+
+  _____________________________________________________________________________
+
+  # ASSUMPTIONS/NOTES:
+
+  NONE: This Hook should work for all the `Schema` types. Whether the schema has
+  a primary_key or not, this should handle that.
+
+  _____________________________________________________________________________
+
+  ## USAGE:
+
   To add pagination to a `Ecto.Queryable`, simply do the following:
 
   ```ex
