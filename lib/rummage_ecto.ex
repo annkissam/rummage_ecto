@@ -104,6 +104,17 @@ defmodule Rummage.Ecto do
       iex> queryable
       Rummage.Ecto.Product
 
+  When `nil` hook module is given, it just returns the queryable and the params:
+
+      iex> import Rummage.Ecto
+      iex> alias Rummage.Ecto.Product
+      iex> rummage = %{paginate: %{page: 1}}
+      iex> {queryable, rummage} = rummage(Product, rummage, paginate: nil)
+      iex> rummage
+      %{paginate: %{page: 1}}
+      iex> queryable
+      Rummage.Ecto.Product
+
 
   When a hook param is given, with hook module it just returns the
   `queryable` and the `params`:
@@ -141,8 +152,7 @@ defmodule Rummage.Ecto do
 
   """
   @spec rummage(Ecto.Query.t(), map(), Keyword.t()) :: {Ecto.Query.t(), map()}
-  def rummage(queryable, rummage, opts \\ [])
-  def rummage(queryable, rummage, opts) do
+  def rummage(queryable, rummage, opts \\ []) do
     hooks = [search: Keyword.get(opts, :search, RConfig.search()),
              sort: Keyword.get(opts, :sort, RConfig.sort()),
              paginate: Keyword.get(opts, :paginate, RConfig.paginate())]
