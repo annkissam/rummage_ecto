@@ -16,7 +16,7 @@ defmodule Rummage.Ecto.Hook do
   `Rummage.Ecto.Hook.__using__/1` macro, it can be ensured that `run/2` and
   `format_params/2` functions have been implemented.
 
-  ```ex
+  ```elixir
   defmodule MyCustomHook do
     use Rummage.Ecto.Hook
 
@@ -28,7 +28,7 @@ defmodule Rummage.Ecto.Hook do
 
   - A Custom Hook can also be created by using `Rummage.Ecto.Hook` `@behviour`
 
-  ```ex
+  ```elixir
   defmodule MyCustomHook do
     @behviour Rummage.Ecto.Hook
 
