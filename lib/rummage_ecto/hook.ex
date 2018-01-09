@@ -40,11 +40,39 @@ defmodule Rummage.Ecto.Hook do
 
   """
 
+  @doc """
+  All callback invoked by `Rummage.Ecto` which applies a set of translations
+  to an ecto query, based on operations defined in the hook.
+  """
   @callback run(Ecto.Query.t(), map()) :: Ecto.Query.t()
+
+  @doc """
+  All callback invoked by `Rummage.Ecto` which applies a set of translations
+  to params passed to the hook. This is responsible for making sure that
+  the params passed to the hook's `run/2` function are santized.
+  """
   @callback format_params(Ecto.Query.t(), map(), keyword()) :: map()
 
   @doc """
-  TODO: Improve Docs
+  This macro allows us to write rummage hooks in an easier way. This includes
+  a `@behaviour` module attribute and defines `raisable` callback implementations
+  for the hook `using` this module. It also makes `run/2` and `format_params/3`
+  overridable and expects them to be defined in the hook.
+
+  ## Usage:
+
+  ```elixir
+  defmodule MyHook do
+    use Rummage.Ecto.Hook
+
+    def run(queryable, params), do: "do something"
+
+    def format_params(q, params, opts), do: "do something"
+  end
+  ```
+
+  For a better example, check out `Rummage.Ecto.Hooks.Paginate` or any other
+  hooks defined in `Rumamge.Ecto`
   """
   defmacro __using__(_opts) do
     quote do
