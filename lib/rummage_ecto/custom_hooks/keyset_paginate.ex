@@ -36,7 +36,7 @@ defmodule Rummage.Ecto.CustomHooks.KeysetPaginate do
 
   Globally for all models in `config.exs`:
   ```elixir
-  config :rummage_ecto,
+  config :my_app,
     Rummage.Ecto,
     paginate: Rummage.Ecto.CustomHooks.KeysetPaginate
   ```
