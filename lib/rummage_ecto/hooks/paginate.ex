@@ -117,7 +117,7 @@ defmodule Rummage.Ecto.Hooks.Paginate do
       #Ecto.Query<from p in "products", limit: ^5, offset: ^5>
 
   """
-  @spec run(Ecto.Query.t, map) :: Ecto.Query.t
+  @spec run(Ecto.Query.t(), map()) :: Ecto.Query.t()
   def run(queryable, paginate_params) do
     :ok = validate_params(paginate_params)
 
