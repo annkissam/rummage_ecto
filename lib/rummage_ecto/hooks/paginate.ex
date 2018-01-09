@@ -53,6 +53,8 @@ defmodule Rummage.Ecto.Hooks.Paginate do
   @expected_keys ~w(per_page page)a
   @err_msg "Error in params, No values given for keys: "
 
+  @per_page 10
+
   @doc """
   This is the callback implementation of `Rummage.Ecto.Hook.run/2`.
 
@@ -171,19 +173,20 @@ defmodule Rummage.Ecto.Hooks.Paginate do
 
   ## Examples
 
-  When a `repo` isn't passed in `opts`:
+  When a `repo` isn't passed in `opts` it gives an error:
 
       iex> alias Rummage.Ecto.Hooks.Paginate
       iex> alias Rummage.Ecto.Category
       iex> Paginate.format_params(Category, %{per_page: 1, page: 1}, [])
       ** (RuntimeError) Expected key `repo` in `opts`, got []
 
-  When `paginate_params` given aren't valid:
+  When `paginate_params` given aren't valid, it uses defaults to populate params:
 
       iex> alias Rummage.Ecto.Hooks.Paginate
       iex> alias Rummage.Ecto.Category
-      iex> Paginate.format_params(Category, %{}, [])
-      ** (RuntimeError) Error in params, No values given for keys: per_page, page
+      iex> Ecto.Adapters.SQL.Sandbox.checkout(Rummage.Ecto.Repo)
+      iex> Paginate.format_params(Category, %{}, [repo: Rummage.Ecto.Repo])
+      %{max_page: 0, page: 1, per_page: 10, total_count: 0}
 
   When `paginate_params` and `opts` given are valid:
 
@@ -282,12 +285,20 @@ defmodule Rummage.Ecto.Hooks.Paginate do
   """
   @spec format_params(Ecto.Query.t(), map(), keyword()) :: map()
   def format_params(queryable, paginate_params, opts) do
-    :ok = validate_params(paginate_params)
+    paginate_params = populate_params(paginate_params, opts)
 
     case Keyword.get(opts, :repo) do
       nil -> raise "Expected key `repo` in `opts`, got #{inspect(opts)}"
       repo -> get_params(queryable, paginate_params, repo)
     end
+  end
+
+  # Helper function that populate the list of params based on
+  # @expected_keys list
+  defp populate_params(params, opts) do
+    params
+    |> Map.put_new(:per_page, Keyword.get(opts, :per_page, @per_page))
+    |> Map.put_new(:page, 1)
   end
 
   # Helper function which gets formatted list of params including
