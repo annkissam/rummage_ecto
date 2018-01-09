@@ -5,6 +5,7 @@ defmodule Rummage.Ecto.Repo.Migrations.CreateProducts do
     create table(:products) do
       add :name, :string
       add :price, :float
+      add :available, :boolean
       add :category_id, references(:categories)
 
       timestamps()
