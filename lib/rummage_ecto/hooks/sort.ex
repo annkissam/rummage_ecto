@@ -90,21 +90,18 @@ defmodule Rummage.Ecto.Hooks.Sort do
   When an empty map is passed as `params`:
 
       iex> alias Rummage.Ecto.Hooks.Sort
-      iex> import Ecto.Query
       iex> Sort.run(Parent, %{})
       ** (RuntimeError) Error in params, No values given for keys: field, order, assoc
 
   When a non-empty map is passed as `params`, but with a missing key:
 
       iex> alias Rummage.Ecto.Hooks.Sort
-      iex> import Ecto.Query
       iex> Sort.run(Parent, %{field: :name})
       ** (RuntimeError) Error in params, No values given for keys: order, assoc
 
   When a valid map of params is passed with an `Ecto.Schema` module:
 
       iex> alias Rummage.Ecto.Hooks.Sort
-      iex> import Ecto.Query
       iex> Sort.run(Rummage.Ecto.Product, %{field: :name, assoc: [], order: :asc})
       #Ecto.Query<from p in subquery(from p in Rummage.Ecto.Product), order_by: [asc: p.name]>
 
@@ -149,7 +146,6 @@ defmodule Rummage.Ecto.Hooks.Sort do
   `desc` order and `ci` true:
 
       iex> alias Rummage.Ecto.Hooks.Sort
-      iex> import Ecto.Query
       iex> queryable = Rummage.Ecto.Product
       Rummage.Ecto.Product
       iex> Sort.run(queryable, %{field: :name, assoc: [inner: :category], order: :desc, ci: true})
