@@ -41,7 +41,7 @@ defmodule Rummage.Ecto.Hooks.Search do
 
   ```
 
-  There are many other `search_types`. Check out `Rummage.Ecto.Services.BuildSearchQuery`'s docs
+  There are many other `search_types`. Check out `Rummage.Ecto.Services.BuildSearchQuery` docs
   to explore more `search_types`
 
   This module can be overridden with a custom module while using `Rummage.Ecto`
@@ -143,7 +143,7 @@ defmodule Rummage.Ecto.Hooks.Search do
 
       iex> alias Rummage.Ecto.Hooks.Search
       iex> import Ecto.Query
-      iex> search_params = %{field1: %{assoc: [inner: "category"],
+      iex> search_params = %{field1: %{assoc: [inner: :category],
       ...> search_type: :like, search_term: "field1", search_expr: :or_where}}
       iex> query = from p in "products"
       iex> Search.run(query, search_params)
@@ -154,7 +154,7 @@ defmodule Rummage.Ecto.Hooks.Search do
 
       iex> alias Rummage.Ecto.Hooks.Search
       iex> import Ecto.Query
-      iex> search_params = %{field1: %{assoc: [inner: "category", left: "category", cross: "category"],
+      iex> search_params = %{field1: %{assoc: [inner: :category, left: :category, cross: :category],
       ...> search_type: :like, search_term: "field1", search_expr: :where}}
       iex> query = from p in "products"
       iex> Search.run(query, search_params)
@@ -228,8 +228,13 @@ defmodule Rummage.Ecto.Hooks.Search do
   # Helper function which handles associations in a query with a join
   # type.
   defp join_by_assoc({join, assoc}, query) do
-    join(query, join, [..., p1], p2 in assoc(p1, ^String.to_atom(assoc)))
+    join(query, join, [..., p1], p2 in assoc(p1, ^assoc))
   end
+
+  # NOTE: These functions can be used in future for multiple search fields that
+  # are associated.
+  # defp applied_associations(queryable) when is_atom(queryable), do: []
+  # defp applied_associations(queryable), do: Enum.map(queryable.joins, & Atom.to_string(elem(&1.assoc, 1)))
 
   # Helper function that validates the list of params based on
   # @expected_keys list
