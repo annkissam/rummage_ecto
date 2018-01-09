@@ -104,20 +104,21 @@ defmodule Rummage.Ecto do
       iex> queryable
       Rummage.Ecto.Product
 
-  When a hook param is given, it just returns the
+
+  When a hook param is given, with hook module it just returns the
   `queryable` and the `params`:
 
       iex> import Rummage.Ecto
       iex> alias Rummage.Ecto.Product
-      iex> rummage = %{}
+      iex> rummage = %{paginate: %{page: 1}}
       iex> repo = Rummage.Ecto.Repo
       iex> Ecto.Adapters.SQL.Sandbox.checkout(repo)
       iex> opts = [paginate: Rummage.Ecto.Hooks.Paginate, repo: repo]
-      iex> {queryable, rummage} = rummage(Product, rummage)
+      iex> {queryable, rummage} = rummage(Product, rummage, opts)
       iex> rummage
-      %{}
+      %{paginate: %{max_page: 0, page: 1, per_page: 10, total_count: 0}}
       iex> queryable
-      Rummage.Ecto.Product
+      #Ecto.Query<from p in Rummage.Ecto.Product, limit: ^10, offset: ^0>
 
 
   When a hook is given, with correspondng params, it updates and returns the
