@@ -89,9 +89,13 @@ defmodule Rummage.Ecto.Hooks.Search do
   value corresponding to that key is a list of params for that key, which
   should include the keys: `#{Enum.join(@expected_keys, ", ")}`.
 
-  This function expects a `search_type` and a list of `associations` (empty for none).
-  The `search_term` is what the `field` will be matched to based on the
-  `search_type`.
+  This function expects a `search_expr`, `search_type` and a list of
+  `associations` (empty for none).  The `search_term` is what the `field`
+  will be matched to based on the `search_type` and `search_expr`.
+
+  If no `search_expr` is given, it defaults to `where`.
+
+  For all `search_exprs`, refer to `Rummage.Ecto.Services.BuildSearchQuery`.
 
   For all `search_types`, refer to `Rummage.Ecto.Services.BuildSearchQuery`.
 
@@ -121,7 +125,7 @@ defmodule Rummage.Ecto.Hooks.Search do
       iex> alias Rummage.Ecto.Hooks.Search
       iex> import Ecto.Query
       iex> search_params = %{field1: %{assoc: [],
-      ...> search_type: "like", search_term: "field1"}}
+      ...> search_type: :like, search_term: "field1", search_expr: :where}}
       iex> Search.run(Rummage.Ecto.Product, search_params)
       #Ecto.Query<from p in subquery(from p in Rummage.Ecto.Product), where: like(p.field1, ^"%field1%")>
 
@@ -130,7 +134,7 @@ defmodule Rummage.Ecto.Hooks.Search do
       iex> alias Rummage.Ecto.Hooks.Search
       iex> import Ecto.Query
       iex> search_params = %{field1: %{assoc: [],
-      ...> search_type: "like", search_term: "field1"}}
+      ...> search_type: :like, search_term: "field1", search_expr: :where}}
       iex> query = from p in "products"
       iex> Search.run(query, search_params)
       #Ecto.Query<from p in subquery(from p in "products"), where: like(p.field1, ^"%field1%")>
@@ -140,10 +144,10 @@ defmodule Rummage.Ecto.Hooks.Search do
       iex> alias Rummage.Ecto.Hooks.Search
       iex> import Ecto.Query
       iex> search_params = %{field1: %{assoc: [inner: "category"],
-      ...> search_type: "like", search_term: "field1"}}
+      ...> search_type: :like, search_term: "field1", search_expr: :or_where}}
       iex> query = from p in "products"
       iex> Search.run(query, search_params)
-      #Ecto.Query<from p in subquery(from p in "products"), join: c in assoc(p, :category), where: like(c.field1, ^"%field1%")>
+      #Ecto.Query<from p in subquery(from p in "products"), join: c in assoc(p, :category), or_where: like(c.field1, ^"%field1%")>
 
   When a valid map of params is passed with an `Ecto.Query.t`, with `assoc`s, with
   different join types:
@@ -151,10 +155,44 @@ defmodule Rummage.Ecto.Hooks.Search do
       iex> alias Rummage.Ecto.Hooks.Search
       iex> import Ecto.Query
       iex> search_params = %{field1: %{assoc: [inner: "category", left: "category", cross: "category"],
-      ...> search_type: "like", search_term: "field1"}}
+      ...> search_type: :like, search_term: "field1", search_expr: :where}}
       iex> query = from p in "products"
       iex> Search.run(query, search_params)
       #Ecto.Query<from p in subquery(from p in "products"), join: c0 in assoc(p, :category), left_join: c1 in assoc(c0, :category), cross_join: c2 in assoc(c1, :category), where: like(c2.field1, ^"%field1%")>
+
+  When a valid map of params is passed with an `Ecto.Query.t`, searching on
+  a boolean param
+
+      iex> alias Rummage.Ecto.Hooks.Search
+      iex> import Ecto.Query
+      iex> search_params = %{available: %{assoc: [],
+      ...> search_type: :eq, search_term: true, search_expr: :where}}
+      iex> query = from p in "products"
+      iex> Search.run(query, search_params)
+      #Ecto.Query<from p in subquery(from p in "products"), where: p.available == ^true>
+
+  When a valid map of params is passed with an `Ecto.Query.t`, searching on
+  a float param
+
+      iex> alias Rummage.Ecto.Hooks.Search
+      iex> import Ecto.Query
+      iex> search_params = %{price: %{assoc: [],
+      ...> search_type: :gteq, search_term: 10.0, search_expr: :where}}
+      iex> query = from p in "products"
+      iex> Search.run(query, search_params)
+      #Ecto.Query<from p in subquery(from p in "products"), where: p.price >= ^10.0>
+
+  When a valid map of params is passed with an `Ecto.Query.t`, searching on
+  a boolean param, but with a wrong `search_type`.
+  NOTE: This doesn't validate the search_type of search_term
+
+      iex> alias Rummage.Ecto.Hooks.Search
+      iex> import Ecto.Query
+      iex> search_params = %{available: %{assoc: [],
+      ...> search_type: :ilike, search_term: true, search_expr: :where}}
+      iex> query = from p in "products"
+      iex> Search.run(query, search_params)
+      ** (ArgumentError) argument error
 
   """
   @spec run(Ecto.Query.t(), map()) :: Ecto.Query.t()
@@ -180,10 +218,11 @@ defmodule Rummage.Ecto.Hooks.Search do
     assocs = Map.get(field_params, :assoc)
     search_type = Map.get(field_params, :search_type)
     search_term = Map.get(field_params, :search_term)
+    search_expr = Map.get(field_params, :search_expr, :where)
 
     assocs
     |> Enum.reduce(from(e in subquery(queryable)), &join_by_assoc(&1, &2))
-    |> BuildSearchQuery.run(field, search_type, search_term)
+    |> BuildSearchQuery.run(field, {search_expr, search_type}, search_term)
   end
 
   # Helper function which handles associations in a query with a join
