@@ -37,7 +37,7 @@ defmodule Rummage.Ecto.CustomHooks.KeysetPaginate do
 
   ```elixir
   Rummage.Ecto.CustomHooks.KeysetPaginate.run(Product,
-    %{per_page: 10, page: 1, last_seen_pk: 10, pk: :id}
+    %{per_page: 10, page: 1, last_seen_pk: 10, pk: :id})
   ```
 
   ## When to Use KeysetPaginate?

@@ -42,7 +42,7 @@ defmodule Rummage.Ecto.Hooks.Search do
   ```elixir
   Rummage.Ecto.Hooks.Search.run(Product, %{available: %{assoc: [],
     search_type: :eq,
-    search_term: true}}
+    search_term: true}})
   ```
 
   This can be used for a search with multiple fields as well. Say, we want to
@@ -55,7 +55,7 @@ defmodule Rummage.Ecto.Hooks.Search do
       search_term: true},
     %{price: %{assoc: [],
       search_type: :lt,
-      search_term: 10.0}}
+      search_term: 10.0}})
   ```
 
   ## Assoications:
