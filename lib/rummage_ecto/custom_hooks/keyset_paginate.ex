@@ -10,6 +10,19 @@ defmodule Rummage.Ecto.CustomHooks.KeysetPaginate do
 
   NOTE: This module doesn't return a list of entries, but a `Ecto.Query.t`.
 
+  # ASSUMPTIONS/NOTES:
+
+  * This Hook assumes that the querried `Ecto.Schema` has a `primary_key`.
+  * This Hook also orders the query by ascending `primary_key`
+
+  # When to Use KeysetPaginate?
+
+  - Keyset Pagination is mainly here to make pagination faster for complex
+  pages. It is recommended that you use `Rummage.Ecto.Hooks.Paginate` for a
+  simple pagination operation, as this module has a lot of assumptions and
+  it's own ordering on top of the given query.
+
+  NOTE: __It is not recommended to use this with the native sort hook__
 
   This module can be used by overriding the default module. This can be done
   in the following ways:
