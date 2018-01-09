@@ -2,105 +2,114 @@ defmodule Rummage.Ecto.Config do
   @moduledoc """
   This module encapsulates all the Rummage's runtime configurations
   that can be set in the config.exs file.
+
+  __This configuration is optional, as `Rummage.Ecto` can accept the same
+  arguments as optional arguments to the function `Rummage.Ecto.rummage/3`__
+
+  ## Usage:
+
+  A basic example without overriding default hooks:
+  ### config.exs:
+
+    config :app_name, Rummage.Ecto,
+      per_page: 10,
+      repo: AppName.Repo
+
+  This is a more advanced usage where you can specify the default hooks:
+  ### config.exs:
+
+    config :app_name, Rummage.Ecto,
+      per_page: 10,
+      repo: AppName.Repo,
+      search: Rummage.Ecto.Hooks.Search,
+      sort: Rummage.Ecto.Hooks.Sort,
+      paginate: Rummage.Ecto.Hooks.Paginate
+
   """
 
   @doc """
-  `:default_search` hook can also be set at run time
-  in the `config.exs` file
+  `:search` hook can also be set at run time
+  in the `config.exs` file. This pulls the configuration
+  assocated with the application, `application`. When no
+  application is given this defaults to `rummage_ecto`.
 
   ## Examples
   When no config is set, if returns the default hook
   (`Rummage.Ecto.Hooks.Search`):
       iex> alias Rummage.Ecto.Config
-      iex> Config.default_search
+      iex> Config.search
       Rummage.Ecto.Hooks.Search
   """
-  def default_search do
-    config(:default_search, Rummage.Ecto.Hooks.Search)
+  def search(application \\ :rummage_ecto) do
+    config(:search, Rummage.Ecto.Hooks.Search, application)
   end
 
   @doc """
-  `:default_sort` hook can also be set at run time
+  `:sort` hook can also be set at run time
   in the `config.exs` file
 
   ## Examples
   When no config is set, if returns the default hook
   (`Rummage.Ecto.Hooks.Sort`):
       iex> alias Rummage.Ecto.Config
-      iex> Config.default_sort
+      iex> Config.sort
       Rummage.Ecto.Hooks.Sort
   """
-  def default_sort do
-    config(:default_sort, Rummage.Ecto.Hooks.Sort)
+  def sort(application \\ :rummage_ecto) do
+    config(:sort, Rummage.Ecto.Hooks.Sort, application)
   end
 
   @doc """
-  `:default_paginate` hook can also be set at run time
+  `:paginate` hook can also be set at run time
   in the `config.exs` file
 
   ## Examples
   When no config is set, if returns the default hook
   (`Rummage.Ecto.Hooks.Paginate`):
       iex> alias Rummage.Ecto.Config
-      iex> Config.default_paginate
+      iex> Config.paginate
       Rummage.Ecto.Hooks.Paginate
   """
-  def default_paginate do
-    config(:default_paginate, Rummage.Ecto.Hooks.Paginate)
+  def paginate(application \\ :rummage_ecto) do
+    config(:paginate, Rummage.Ecto.Hooks.Paginate, application)
   end
 
   @doc """
-  `:default_per_page` can also be set at run time
+  `:per_page` can also be set at run time
   in the `config.exs` file
 
   ## Examples
   Returns default `Repo` set in the config
   (`2 in `rummage_ecto`'s test env):
       iex> alias Rummage.Ecto.Config
-      iex> Config.default_per_page
+      iex> Config.per_page
       2
   """
-  def default_per_page do
-    config(:default_per_page, 10)
+  def per_page(application \\ :rummage_ecto) do
+    config(:per_page, 10, application)
   end
 
   @doc """
-  `:default_repo` can also be set at run time
+  `:repo` can also be set at run time
   in the config.exs file
 
   ## Examples
   Returns default `Repo` set in the config
   (`Rummage.Ecto.Repo` in `rummage_ecto`'s test env):
       iex> alias Rummage.Ecto.Config
-      iex> Config.default_repo
+      iex> Config.repo
       Rummage.Ecto.Repo
   """
-  def default_repo do
-    config(:default_repo, nil)
+  def repo(application \\ :rummage_ecto) do
+    config(:repo, nil, application)
   end
 
-  @doc """
-  `resolve_system_config` returns a `system` variable set up with `var_name` key
-   or returns the specified `default` value. Takes in `arg` whose first element is
-   an atom `:system`.
-
-  ## Examples
-  Returns value corresponding to a system variable config or returns the `default` value:
-      iex> alias Rummage.Ecto.Config
-      iex> Config.resolve_system_config({:system, "some random config"}, "default")
-      "default"
-  """
-  @spec resolve_system_config(Tuple.t, term) :: {term}
-  def resolve_system_config({:system, var_name}, default) do
-    System.get_env(var_name) || default
+  defp config(application) do
+    Application.get_env(application, Rummage.Ecto, [])
   end
 
-  defp config do
-    Application.get_env(:rummage_ecto, Rummage.Ecto, [])
-  end
-
-  defp config(key, default) do
-    config()
+  defp config(key, default, application) do
+    config(application)
     |> Keyword.get(key, default)
     |> resolve_config(default)
   end

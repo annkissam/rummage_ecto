@@ -1,16 +1,16 @@
 language: elixir
 elixir:
-  - 1.3.4
   - 1.4.5
   - 1.5.2
 otp_release:
-  - 19.0
+  - 20.1
 sudo: false
 env:
   - MIX_ENV=test ECTO_PGSQL_USER=postgres ECTO_PGSQL_PASSWORD=
 script:
   - mix test
 after_script:
+  - mix hex.audit
   - mix coveralls.travis
   - mix credo
   - mix deps.get --only docs

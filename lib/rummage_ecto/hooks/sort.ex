@@ -1,9 +1,89 @@
 defmodule Rummage.Ecto.Hooks.Sort do
   @moduledoc """
-  `Rummage.Ecto.Hooks.Sort` is the default sort hook that comes shipped
-  with `Rummage.Ecto`.
+  `Rummage.Ecto.Hooks.Sort` is the default sort hook that comes with
+  `Rummage.Ecto`.
 
-  Usage:
+  This module provides a operations that can add sorting functionality to
+  a pipeline of `Ecto` queries. This module works by taking the `field` that should
+  be used to `order_by`, `order` which can be `asc` or `desc` and `assoc`,
+  which is a keyword list of assocations associated with those `fields`.
+
+  NOTE: This module doesn't return a list of entries, but a `Ecto.Query.t`.
+  This module `uses` `Rummage.Ecto.Hook`.
+
+  _____________________________________________________________________________
+
+  # ABOUT:
+
+  ## Arguments:
+
+  This Hook expects a `queryable` (an `Ecto.Queryable`) and
+  `sort_params` (a `Map`). The map should be in the format:
+  `%{field: :field_name, assoc: [], order: :asc}`
+
+  Details:
+
+  * `field`: The field name (atom) to sorted by.
+  * `assoc`: List of associations in the sort.
+  * `order`: Specifies the type of order `asc` or `desc`.
+  * `ci` : Case Insensitivity. Defaults to `false`
+
+
+  For example, if we want to sort products with descending `price`, we would
+  do the following:
+
+  ```elixir
+  Rummage.Ecto.Hooks.Sort.run(Product, %{field: :price,
+    assoc: [], order: :desc})
+  ```
+
+  ## Assoications:
+
+  Assocaitions can be given to this module's run function as a key corresponding
+  to params associated with a field. For example, if we want to sort products
+  that belong to a category by ascending category_name, we would do the
+  following:
+
+  ```elixir
+  params = %{field: :category_name, assoc: [inner: :category],
+    order: :asc}
+
+  Rummage.Ecto.Hooks.Sort.run(Product, params)
+  ```
+
+  The above operation will return an `Ecto.Query.t` struct which represents
+  a query equivalent to:
+
+  ```elixir
+  from p in Product
+  |> join(:inner, :category)
+  |> order_by([p, c], {asc, c.category_name})
+  ```
+
+  ____________________________________________________________________________
+
+  # ASSUMPTIONS/NOTES:
+
+  * This Hook has the default `order` of `:asc`.
+  * This Hook has the default `assoc` of `[]`.
+  * This Hook assumes that the field passed is a field on the `Ecto.Schema`
+  that corresponds to the last association in the `assoc` list or the `Ecto.Schema`
+  that corresponds to the `from` in `queryable`, if `assoc` is an empty list.
+
+  NOTE: It is adviced to not use multiple associated sorts in one operation
+  as `assoc` still has some minor bugs when used with multiple sorts. If you
+  need to use two sorts with associations, I would pipe the call to another
+  sort operation:
+
+  ```elixir
+  Sort.run(queryable, params1}
+  |> Sort.run(%{field2: params2}
+  ```
+
+  ____________________________________________________________________________
+
+  # USAGE:
+
   For a regular sort:
 
   This returns a `queryable` which upon running will give a list of `Parent`(s)
@@ -12,7 +92,7 @@ defmodule Rummage.Ecto.Hooks.Sort do
   ```elixir
   alias Rummage.Ecto.Hooks.Sort
 
-  sorted_queryable = Sort.run(Parent, %{"sort" => %{"assoc" => [], "field" => "field_1.asc"}})
+  sorted_queryable = Sort.run(Parent, %{assoc: [], field: :name, order: :asc}})
   ```
 
   For a case-insensitive sort:
@@ -25,7 +105,7 @@ defmodule Rummage.Ecto.Hooks.Sort do
   ```elixir
   alias Rummage.Ecto.Hooks.Sort
 
-  sorted_queryable = Sort.run(Parent, %{"sort" => %{"assoc" => [], "field" => "field_1.asc.ci"}})
+  sorted_queryable = Sort.run(Parent, %{assoc: [], field: :name, order: :asc, ci: true}})
   ```
 
 
@@ -43,228 +123,192 @@ defmodule Rummage.Ecto.Hooks.Sort do
   ```elixir
   config :rummage_ecto,
     Rummage.Ecto,
-    default_sort: CustomHook
+   .sort: CustomHook
   ```
 
-  The `CustomHook` must implement behaviour `Rummage.Ecto.Hook`. For examples of `CustomHook`, check out some
-    `custom_hooks` that are shipped with elixir: `Rummage.Ecto.CustomHooks.SimpleSearch`, `Rummage.Ecto.CustomHooks.SimpleSort`,
+  The `CustomHook` must use `Rummage.Ecto.Hook`. For examples of `CustomHook`,
+  check out some `custom_hooks` that are shipped with `Rummage.Ecto`:
+  `Rummage.Ecto.CustomHooks.SimpleSearch`, `Rummage.Ecto.CustomHooks.SimpleSort`,
     Rummage.Ecto.CustomHooks.SimplePaginate
+
   """
+
+  use Rummage.Ecto.Hook
 
   import Ecto.Query
 
-  @behaviour Rummage.Ecto.Hook
+  @expected_keys ~w(field order assoc)a
+  @err_msg "Error in params, No values given for keys: "
 
   @doc """
-  Builds a sort `queryable` on top of the given `queryable` from the rummage parameters
-  from the given `rummage` struct.
+  This is the callback implementation of `Rummage.Ecto.Hook.run/2`.
+
+  Builds a sort `Ecto.Query.t` on top of the given `Ecto.Queryable` variable
+  using given `params`.
+
+  Besides an `Ecto.Query.t` an `Ecto.Schema` module can also be passed as it
+  implements `Ecto.Queryable`
+
+  Params is a `Map` which is expected to have the keys `#{Enum.join(@expected_keys, ", ")}`.
+
+  This funciton expects a `field` atom, `order` which can be `asc` or `desc`,
+  `ci` which is a boolean indicating the case-insensitivity and `assoc` which
+  is a list of associations with their join types.
 
   ## Examples
-  When rummage `struct` passed doesn't have the key `"sort"`, it simply returns the
-  `queryable` itself:
+  When an empty map is passed as `params`:
 
       iex> alias Rummage.Ecto.Hooks.Sort
-      iex> import Ecto.Query
       iex> Sort.run(Parent, %{})
-      Parent
+      ** (RuntimeError) Error in params, No values given for keys: field, order, assoc
 
-  When the `queryable` passed is not just a `struct`:
+  When a non-empty map is passed as `params`, but with a missing key:
+
+      iex> alias Rummage.Ecto.Hooks.Sort
+      iex> Sort.run(Parent, %{field: :name})
+      ** (RuntimeError) Error in params, No values given for keys: order, assoc
+
+  When a valid map of params is passed with an `Ecto.Schema` module:
+
+      iex> alias Rummage.Ecto.Hooks.Sort
+      iex> Sort.run(Rummage.Ecto.Product, %{field: :name, assoc: [], order: :asc})
+      #Ecto.Query<from p in subquery(from p in Rummage.Ecto.Product), order_by: [asc: p.name]>
+
+  When the `queryable` passed is an `Ecto.Query` variable:
 
       iex> alias Rummage.Ecto.Hooks.Sort
       iex> import Ecto.Query
-      iex> queryable = from u in "parents"
-      #Ecto.Query<from p in "parents">
-      iex>  Sort.run(queryable, %{})
-      #Ecto.Query<from p in "parents">
+      iex> queryable = from u in "products"
+      #Ecto.Query<from p in "products">
+      iex> Sort.run(queryable, %{field: :name, assoc: [], order: :asc})
+      #Ecto.Query<from p in subquery(from p in "products"), order_by: [asc: p.name]>
 
-  When rummage `struct` passed has the key `"sort"`, but with a value of `{}`, `""`
-  or `[]` it simply returns the `queryable` itself:
 
-      iex> alias Rummage.Ecto.Hooks.Sort
-      iex> import Ecto.Query
-      iex> Sort.run(Parent, %{"sort" => {}})
-      Parent
+  When the `queryable` passed is an `Ecto.Query` variable, with `desc` order:
 
       iex> alias Rummage.Ecto.Hooks.Sort
       iex> import Ecto.Query
-      iex> Sort.run(Parent, %{"sort" => ""})
-      Parent
+      iex> queryable = from u in "products"
+      #Ecto.Query<from p in "products">
+      iex> Sort.run(queryable, %{field: :name, assoc: [], order: :desc})
+      #Ecto.Query<from p in subquery(from p in "products"), order_by: [desc: p.name]>
+
+  When the `queryable` passed is an `Ecto.Query` variable, with `ci` true:
 
       iex> alias Rummage.Ecto.Hooks.Sort
       iex> import Ecto.Query
-      iex> Sort.run(Parent, %{"sort" => %{}})
-      Parent
+      iex> queryable = from u in "products"
+      #Ecto.Query<from p in "products">
+      iex> Sort.run(queryable, %{field: :name, assoc: [], order: :asc, ci: true})
+      #Ecto.Query<from p in subquery(from p in "products"), order_by: [asc: fragment("lower(?)", p.name)]>
 
-  When rummage `struct` passed has the key `"sort"`, but empty associations array
-  it just orders it by the passed `queryable`:
-
-      iex> alias Rummage.Ecto.Hooks.Sort
-      iex> import Ecto.Query
-      iex> rummage = %{"sort" => %{"assoc" => [], "field" => "field_1.asc"}}
-      %{"sort" => %{"assoc" => [],
-        "field" => "field_1.asc"}}
-      iex> queryable = from u in "parents"
-      #Ecto.Query<from p in "parents">
-      iex> Sort.run(queryable, rummage)
-      #Ecto.Query<from p in subquery(from p in "parents"), order_by: [asc: p.field_1]>
+  When the `queryable` passed is an `Ecto.Query` variable, with associations:
 
       iex> alias Rummage.Ecto.Hooks.Sort
       iex> import Ecto.Query
-      iex> rummage = %{"sort" => %{"assoc" => [], "field" => "field_1.desc"}}
-      %{"sort" => %{"assoc" => [],
-        "field" => "field_1.desc"}}
-      iex> queryable = from u in "parents"
-      #Ecto.Query<from p in "parents">
-      iex> Sort.run(queryable, rummage)
-      #Ecto.Query<from p in subquery(from p in "parents"), order_by: [desc: p.field_1]>
+      iex> queryable = from u in "products"
+      #Ecto.Query<from p in "products">
+      iex> Sort.run(queryable, %{field: :name, assoc: [inner: :category, left: :category], order: :asc})
+      #Ecto.Query<from p in subquery(from p in "products"), join: c0 in assoc(p, :category), left_join: c1 in assoc(c0, :category), order_by: [asc: c1.name]>
 
-  When no `order` is specified, it returns the `queryable` itself:
+  When the `queryable` passed is an `Ecto.Schema` module with associations,
+  `desc` order and `ci` true:
 
       iex> alias Rummage.Ecto.Hooks.Sort
-      iex> import Ecto.Query
-      iex> rummage = %{"sort" => %{"assoc" => [], "field" => "field_1"}}
-      %{"sort" => %{"assoc" => [],
-        "field" => "field_1"}}
-      iex> queryable = from u in "parents"
-      #Ecto.Query<from p in "parents">
-      iex> Sort.run(queryable, rummage)
-      #Ecto.Query<from p in subquery(from p in "parents")>
-
-
-  When rummage `struct` passed has the key `"sort"`, with `field` and `order`
-  it returns a sorted version of the `queryable` passed in as the argument:
-
-      iex> alias Rummage.Ecto.Hooks.Sort
-      iex> import Ecto.Query
-      iex> rummage = %{"sort" => %{"assoc" => ["parent", "parent"], "field" => "field_1.asc"}}
-      %{"sort" => %{"assoc" => ["parent", "parent"], "field" => "field_1.asc"}}
-      iex> queryable = from u in "parents"
-      #Ecto.Query<from p in "parents">
-      iex> Sort.run(queryable, rummage)
-      #Ecto.Query<from p0 in subquery(from p in "parents"), join: p1 in assoc(p0, :parent), join: p2 in assoc(p1, :parent), order_by: [asc: p2.field_1]>
-
-
-      iex> alias Rummage.Ecto.Hooks.Sort
-      iex> import Ecto.Query
-      iex> rummage = %{"sort" => %{"assoc" => ["parent", "parent"], "field" => "field_1.desc"}}
-      %{"sort" => %{"assoc" => ["parent", "parent"], "field" => "field_1.desc"}}
-      iex> queryable = from u in "parents"
-      #Ecto.Query<from p in "parents">
-      iex> Sort.run(queryable, rummage)
-      #Ecto.Query<from p0 in subquery(from p in "parents"), join: p1 in assoc(p0, :parent), join: p2 in assoc(p1, :parent), order_by: [desc: p2.field_1]>
-
-  When no `order` is specified even with the associations, it returns the `queryable` itself:
-
-      iex> alias Rummage.Ecto.Hooks.Sort
-      iex> import Ecto.Query
-      iex> rummage = %{"sort" => %{"assoc" => ["parent", "parent"], "field" => "field_1"}}
-      %{"sort" => %{"assoc" => ["parent", "parent"],
-        "field" => "field_1"}}
-      iex> queryable = from u in "parents"
-      #Ecto.Query<from p in "parents">
-      iex> Sort.run(queryable, rummage)
-      #Ecto.Query<from p0 in subquery(from p in "parents"), join: p1 in assoc(p0, :parent), join: p2 in assoc(p1, :parent)>
-
-  When rummage `struct` passed has `case-insensitive` sort, it returns
-  a sorted version of the `queryable` with `case_insensitive` arguments:
-
-      iex> alias Rummage.Ecto.Hooks.Sort
-      iex> import Ecto.Query
-      iex> rummage = %{"sort" => %{"assoc" => ["parent", "parent"], "field" => "field_1.asc.ci"}}
-      %{"sort" => %{"assoc" => ["parent", "parent"], "field" => "field_1.asc.ci"}}
-      iex> queryable = from u in "parents"
-      #Ecto.Query<from p in "parents">
-      iex> Sort.run(queryable, rummage)
-      #Ecto.Query<from p0 in subquery(from p in "parents"), join: p1 in assoc(p0, :parent), join: p2 in assoc(p1, :parent), order_by: [asc: fragment("lower(?)", p2.field_1)]>
+      iex> queryable = Rummage.Ecto.Product
+      Rummage.Ecto.Product
+      iex> Sort.run(queryable, %{field: :name, assoc: [inner: :category], order: :desc, ci: true})
+      #Ecto.Query<from p in subquery(from p in Rummage.Ecto.Product), join: c in assoc(p, :category), order_by: [desc: fragment("lower(?)", c.name)]>
   """
-  @spec run(Ecto.Query.t, map) :: {Ecto.Query.t, map}
-  def run(queryable, rummage) do
-    case Map.get(rummage, "sort") do
-      a when a in [nil, [], {}, [""], "", %{}] -> queryable
-      sort_params ->
-        sort_params = case sort_params["assoc"] do
-          s when s in [nil, ""] -> Map.put(sort_params, "assoc", [])
-          _ -> sort_params
-        end
+  @spec run(Ecto.Query.t(), map()) :: Ecto.Query.t()
+  def run(queryable, sort_params) do
+    :ok = validate_params(sort_params)
 
-        case Regex.match?(~r/\w.ci+$/, sort_params["field"]) do
-          true ->
-            order_param = sort_params["field"]
-              |> String.split(".")
-              |> Enum.drop(-1)
-              |> Enum.join(".")
-
-            sort_params = {sort_params["assoc"], order_param}
-
-            handle_sort(queryable,sort_params, true)
-          _ ->
-            handle_sort(queryable, {sort_params["assoc"], sort_params["field"]})
-        end
-    end
+    handle_sort(queryable, sort_params)
   end
 
-  @doc """
-  Implementation of `before_hook` for `Rummage.Ecto.Hooks.Sort`. This just returns back `rummage` at this point.
-  It doesn't matter what `queryable` or `opts` are, it just returns back `rummage`.
+  # Helper function which handles addition of paginated query on top of
+  # the sent queryable variable
+  defp handle_sort(queryable, sort_params) do
+    order = Map.get(sort_params, :order)
+    field = Map.get(sort_params, :field)
+    assocs = Map.get(sort_params, :assoc)
+    ci = Map.get(sort_params, :ci, false)
 
-  ## Examples
-      iex> alias Rummage.Ecto.Hooks.Sort
-      iex> Sort.before_hook(Parent, %{}, %{})
-      %{}
-  """
-  @spec before_hook(Ecto.Query.t, map, map) :: map
-  def before_hook(_queryable, rummage, _opts), do: rummage
-
-  defp handle_sort(queryable, sort_params, ci \\ false) do
-    order_param = sort_params
-      |> elem(1)
-
-    association_names = sort_params
-      |> elem(0)
-
-    queryable = from(e in subquery(queryable))
-
-    association_names
-    |> Enum.reduce(queryable, &join_by_association(&1, &2))
-    |> handle_ordering(order_param, ci)
+    assocs
+    |> Enum.reduce(from(e in subquery(queryable)), &join_by_assoc(&1, &2))
+    |> handle_ordering(field, order, ci)
   end
 
+  # Helper function which handles associations in a query with a join
+  # type.
+  defp join_by_assoc({join, assoc}, query) do
+    join(query, join, [..., p1], p2 in assoc(p1, ^assoc))
+  end
+
+  # This is a helper macro to get case_insensitive query using fragments
   defmacrop case_insensitive(field) do
     quote do
       fragment("lower(?)", unquote(field))
     end
   end
 
+  # NOTE: These functions can be used in future for multiple sort fields that
+  # are associated.
   # defp applied_associations(queryable) when is_atom(queryable), do: []
   # defp applied_associations(queryable), do: Enum.map(queryable.joins, & Atom.to_string(elem(&1.assoc, 1)))
 
-  defp handle_ordering(queryable, order_param, ci) do
-    case Regex.match?(~r/\w.asc+$/, order_param)
-      or Regex.match?(~r/\w.desc+$/, order_param) do
-      true ->
-        parsed_field = order_param
-          |> String.split(".")
-          |> Enum.drop(-1)
-          |> Enum.join(".")
+  # Helper function that handles adding order_by to a query based on order type
+  # case insensitivity and field
+  defp handle_ordering(queryable, field, order, ci) do
+    order_by_assoc(queryable, order, field, ci)
+  end
 
-        order_type = order_param
-          |> String.split(".")
-          |> Enum.at(-1)
+  defp order_by_assoc(queryable, order_type, field, false) do
+    order_by(queryable, [p0, ..., p2], [{^order_type, field(p2, ^field)}])
+  end
 
-        queryable |> order_by_assoc(order_type, parsed_field, ci)
-       _ -> queryable
+  defp order_by_assoc(queryable, order_type, field, true) do
+    order_by(queryable, [p0, ..., p2],
+             [{^order_type, case_insensitive(field(p2, ^field))}])
+  end
+
+  # Helper function that validates the list of params based on
+  # @expected_keys list
+  defp validate_params(params) do
+    key_validations = Enum.map(@expected_keys, &Map.fetch(params, &1))
+
+    case Enum.filter(key_validations, & &1 == :error) do
+      [] -> :ok
+      _ -> raise @err_msg <> missing_keys(key_validations)
     end
   end
 
-  defp join_by_association(association, queryable) do
-    join(queryable, :inner, [..., p1], p2 in assoc(p1, ^String.to_atom(association)))
+  # Helper function used to build error message using missing keys
+  defp missing_keys(key_validations) do
+    key_validations
+    |> Enum.with_index()
+    |> Enum.filter(fn {v, _i} -> v == :error end)
+    |> Enum.map(fn {_v, i} -> Enum.at(@expected_keys, i) end)
+    |> Enum.map(&to_string/1)
+    |> Enum.join(", ")
   end
 
-  defp order_by_assoc(queryable, order_type, parsed_field, false) do
-    order_by(queryable, [p0, ..., p2], [{^String.to_atom(order_type), field(p2, ^String.to_atom(parsed_field))}])
-  end
+  @doc """
+  Callback implementation for `Rummage.Ecto.Hook.format_params/2`.
 
-  defp order_by_assoc(queryable, order_type, parsed_field, true) do
-    order_by(queryable, [p0, ..., p2], [{^String.to_atom(order_type), case_insensitive(field(p2, ^String.to_atom(parsed_field)))}])
+  This function ensures that params for each field have keys `assoc`, `order1
+  which are essential for running this hook module.
+
+  ## Examples
+      iex> alias Rummage.Ecto.Hooks.Sort
+      iex> Sort.format_params(Parent, %{}, [])
+      %{assoc: [], order: :asc}
+  """
+  @spec format_params(Ecto.Query.t(), map(), keyword()) :: map()
+  def format_params(_queryable, sort_params, _opts) do
+    sort_params
+    |> Map.put_new(:assoc, [])
+    |> Map.put_new(:order, :asc)
   end
 end

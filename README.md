@@ -70,7 +70,7 @@ This package is [available in Hex](https://hexdocs.pm/rummage_ecto/), and can be
     ```elixir
     config :rummage_ecto,
       Rummage.Ecto,
-      default_search: MyApp.SearchModule
+      search: MyApp.SearchModule
     ```
 
   - For configuring a repo:
@@ -78,12 +78,12 @@ This package is [available in Hex](https://hexdocs.pm/rummage_ecto/), and can be
     ```elixir
     config :rummage_ecto,
       Rummage.Ecto,
-      default_repo: MyApp.Repo # This can be overridden per model basis, if need be.
+      repo: MyApp.Repo # This can be overridden per model basis, if need be.
     ```
 
-  - Other config options are: `default_repo`, `default_sort`, `default_paginate`, `default_per_page`
+  - Other config options are: `repo`, `sort`, `paginate`, `per_page`
 
-  - `Rummage.Ecto` can be configured globally with a `default_per_page` value (which can be overridden for a model).
+  - `Rummage.Ecto` can be configured globally with a `per_page` value (which can be overridden for a model).
     If you want to set different `per_page` for different the models, add it to `model.exs` file while using `Rummage.Ecto`
     as shown in the [Advanced Usage Section](#advanced-usage).
 
@@ -99,8 +99,8 @@ Below are the ways `Rummage.Ecto` can be used:
 
   ```elixir
   config :rummage_ecto, Rummage.Ecto,
-    default_repo: MyApp.Repo,
-    default_per_page: 10
+    repo: MyApp.Repo,
+    per_page: 10
   ```
 
   - And you should be able to use `Rummage.Ecto` with any `Ecto` model.
@@ -112,9 +112,9 @@ Below are the ways `Rummage.Ecto` can be used:
 
   ```elixir
   config :rummage_ecto, Rummage.Ecto,
-    default_repo: MyApp.Repo,
-    default_search: MyApp.SearchModule,
-    default_paginate: MyApp.PaginateModule
+    repo: MyApp.Repo,
+    search: MyApp.SearchModule,
+    paginate: MyApp.PaginateModule
   ```
 
   - When using `Rummage.Ecto` with an app that has multiple `Repo`s, or when there's a need to configure `Repo` per model basis, it can be passed along with

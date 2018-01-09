@@ -31,40 +31,27 @@ defmodule Rummage.EctoTest do
   test "rummage call with paginate returns the correct results for Product" do
     create_categories_and_products()
 
-    rummage = %{
-      "paginate" => %{
-        "page" => "2",
-      },
-    }
+    rummage = %{paginate: %{page: 2}}
 
-    {queryable, rummage} = Rummage.Ecto.rummage(Product, rummage)
+    {queryable, rummage} = Product.rummage(rummage)
 
     products = Repo.all(queryable)
 
     # Test length
-    assert length(products) == 2
+    assert length(products) == 1
 
     # Test rummage params
     assert rummage == %{
-      "paginate" => %{
-        "per_page" => "2",
-        "page" => "2",
-        "max_page" => "4",
-        "total_count" => "8",
-      },
+      paginate: %{per_page: 1, page: 2, max_page: 8, total_count: 8}
     }
   end
 
   test "rummage call with paginate returns the correct results for Category" do
     create_categories_and_products()
 
-    rummage = %{
-      "paginate" => %{
-        "page" => "1",
-      },
-    }
+    rummage = %{paginate: %{page: 2}}
 
-    {queryable, rummage} = Rummage.Ecto.rummage(Category, rummage, per_page: 3)
+    {queryable, rummage} = Category.rummage(rummage, per_page: 3)
 
     categories = Repo.all(queryable)
 
@@ -73,23 +60,16 @@ defmodule Rummage.EctoTest do
 
     # Test rummage params
     assert rummage == %{
-      "paginate" => %{
-        "per_page" => "3",
-        "page" => "1",
-        "max_page" => "3",
-        "total_count" => "8",
-      },
+      paginate: %{per_page: 3, page: 2, max_page: 3, total_count: 8},
     }
   end
 
   test "rummage call with sort without assoc params returns the correct results" do
     create_categories_and_products()
 
-    rummage = %{
-      "sort" => %{"field" => "name.asc"}
-    }
+    rummage = %{sort: %{field: :name, order: :asc}}
 
-    {queryable, rummage} = Rummage.Ecto.rummage(Product, rummage)
+    {queryable, rummage} = Product.rummage(rummage)
 
     products = Repo.all(queryable)
 
@@ -103,9 +83,7 @@ defmodule Rummage.EctoTest do
     assert Enum.all?(products_2, & &1.name == "Product 2")
 
     # Test rummage params
-    assert rummage == %{
-      "sort" => %{"field" => "name.asc"}
-    }
+    assert rummage == %{sort: %{assoc: [], field: :name, order: :asc}}
   end
 
   test "rummage call with sort and assoc params returns the correct results" do
@@ -139,11 +117,9 @@ defmodule Rummage.EctoTest do
   test "rummage call with search and search_type lteq returns the correct results" do
     create_categories_and_products()
 
-    rummage = %{
-      "search" => %{"price" => %{"search_type" => "lteq", "search_term" => 10}}
-    }
+    rummage = %{search: %{price: %{search_type: :lteq, search_term: 10}}}
 
-    {queryable, rummage} = Rummage.Ecto.rummage(Product, rummage)
+    {queryable, rummage} = Product.rummage(rummage)
 
     products = Repo.all(queryable)
 
@@ -155,18 +131,17 @@ defmodule Rummage.EctoTest do
 
     # Test rummage params
     assert rummage == %{
-      "search" => %{"price" => %{"search_type" => "lteq", "search_term" => 10}}
+      search: %{price: %{search_type: :lteq, search_term: 10,
+        search_expr: :where, assoc: []}}
     }
   end
 
   test "rummage call with search and search_type eq returns the correct results" do
     create_categories_and_products()
 
-    rummage = %{
-      "search" => %{"price" => %{"search_type" => "eq", "search_term" => 10}}
-    }
+    rummage = %{search: %{price: %{search_type: :eq, search_term: 10}}}
 
-    {queryable, rummage} = Rummage.Ecto.rummage(Product, rummage)
+    {queryable, rummage} = Product.rummage(rummage)
 
     products = Repo.all(queryable)
 
@@ -178,7 +153,8 @@ defmodule Rummage.EctoTest do
 
     # Test rummage params
     assert rummage == %{
-      "search" => %{"price" => %{"search_type" => "eq", "search_term" => 10}}
+      search: %{price: %{search_type: :eq, search_term: 10, assoc: [],
+        search_expr: :where}}
     }
   end
 
@@ -186,10 +162,10 @@ defmodule Rummage.EctoTest do
     create_categories_and_products()
 
     rummage = %{
-      "search" => %{"price" => %{"search_type" => "gteq", "search_term" => 10}}
+      search: %{price: %{search_type: :gteq, search_term: 10}}
     }
 
-    {queryable, rummage} = Rummage.Ecto.rummage(Product, rummage)
+    {queryable, rummage} = Product.rummage(rummage)
 
     products = Repo.all(queryable)
 
@@ -201,7 +177,8 @@ defmodule Rummage.EctoTest do
 
     # Test rummage params
     assert rummage == %{
-      "search" => %{"price" => %{"search_type" => "gteq", "search_term" => 10}}
+      search: %{price: %{search_type: :gteq, search_term: 10, assoc: [],
+        search_expr: :where}}
     }
   end
 
@@ -209,10 +186,11 @@ defmodule Rummage.EctoTest do
     create_categories_and_products()
 
     rummage = %{
-      "search" => %{"category_name" => %{"assoc" => ["category"], "search_type" => "like", "search_term" => "1"}}
+      search: %{category_name: %{assoc: [inner: :category], search_type: :like,
+        search_term: "1"}}
     }
 
-    {queryable, rummage} = Rummage.Ecto.rummage(Product, rummage)
+    {queryable, rummage} = Product.rummage(rummage)
 
     products = Repo.all(queryable)
 
@@ -224,7 +202,8 @@ defmodule Rummage.EctoTest do
 
     # Test rummage params
     assert rummage == %{
-      "search" => %{"category_name" => %{"assoc" => ["category"], "search_type" => "like", "search_term" => "1"}}
+      search: %{category_name: %{assoc: [inner: :category], search_type: :like,
+        search_term: "1", search_expr: :where}}
     }
   end
 
@@ -232,14 +211,12 @@ defmodule Rummage.EctoTest do
     create_categories_and_products()
 
     rummage = %{
-      "paginate" => %{
-        "page" => "2",
-      },
-      "search" => %{"price" => %{"search_type" => "lteq", "search_term" => 10}},
-      "sort" => %{"field" => "name.asc"},
+      paginate: %{page: 2, per_page: 2},
+      search: %{price: %{search_type: :lteq, search_term: 10}},
+      sort: %{field: :name, order: :asc},
     }
 
-    {queryable, rummage} = Rummage.Ecto.rummage(Product, rummage)
+    {queryable, rummage} = Product.rummage(rummage)
 
     products = Repo.all(queryable)
 
@@ -253,14 +230,10 @@ defmodule Rummage.EctoTest do
 
     # Test rummage params
     assert rummage == %{
-      "search" => %{"price" => %{"search_type" => "lteq", "search_term" => 10}},
-      "sort" => %{"field" => "name.asc"},
-      "paginate" => %{
-        "per_page" => "2",
-        "page" => "2",
-        "max_page" => "2",
-        "total_count" => "4",
-      },
+      search: %{price: %{search_type: :lteq, search_term: 10, assoc: [],
+        search_expr: :where}},
+      sort: %{field: :name, order: :asc, assoc: []},
+      paginate: %{per_page: 2, page: 2, max_page: 4, total_count: 8},
     }
   end
 
@@ -268,14 +241,13 @@ defmodule Rummage.EctoTest do
     create_categories_and_products()
 
     rummage = %{
-      "paginate" => %{
-        "page" => "2",
-      },
-      "search" => %{"category_name" => %{"assoc" => ["category"], "search_type" => "like", "search_term" => "1"}},
-      "sort" => %{"assoc" => ["category"], "field" => "category_name.asc"}
+      paginate: %{page: 1, per_page: 2},
+      search: %{category_name: %{assoc: [inner: :category], search_type: :like,
+        search_term: "1"}},
+      sort: %{assoc: [inner: :category], field: :category_name, order: :asc}
     }
 
-    {queryable, rummage} = Rummage.Ecto.rummage(Product, rummage)
+    {queryable, rummage} = Product.rummage(rummage)
 
     products = Repo.all(queryable)
 
@@ -287,14 +259,10 @@ defmodule Rummage.EctoTest do
 
     # Test rummage params
     assert rummage == %{
-      "search" => %{"category_name" => %{"assoc" => ["category"], "search_term" => "1", "search_type" => "like"}},
-      "sort" => %{"field" => "category_name.asc", "assoc" => ["category"]},
-      "paginate" => %{
-        "per_page" => "2",
-        "page" => "1",
-        "max_page" => "1",
-        "total_count" => "2",
-      },
+      search: %{category_name: %{assoc: [inner: :category], search_term: "1",
+        search_type: :like, search_expr: :where}},
+      sort: %{field: :category_name, order: :asc, assoc: [inner: :category]},
+      paginate: %{per_page: 2, page: 1, max_page: 4, total_count: 8}
     }
   end
 
@@ -302,19 +270,18 @@ defmodule Rummage.EctoTest do
     create_categories_and_products()
 
     rummage = %{
-      "paginate" => %{
-        "page" => "1",
-      },
-      "search" => %{"category_name" => %{"assoc" => ["category", "category"], "search_type" => "like", "search_term" => "Parent"}},
-      "sort" => %{"assoc" => ["category"], "field" => "category_name.asc"}
+      paginate: %{page: 1},
+      search: %{category_name: %{assoc: [{:inner, :category}, {:inner, :category}],
+        search_type: :like, search_term: "Parent"}},
+      sort: %{assoc: [{:inner, :category}], field: :category_name, order: :asc}
     }
 
-    {queryable, rummage} = Rummage.Ecto.rummage(Product, rummage)
+    {queryable, rummage} = Product.rummage(rummage)
 
     products = Repo.all(queryable)
 
     # Test length
-    assert length(products) == 2
+    assert length(products) == 1
 
     # Test search
     assert Enum.all?(Repo.preload(products, :category), & Repo.preload(&1.category, :category).category.category_name =~ "Parent Category")
@@ -325,13 +292,14 @@ defmodule Rummage.EctoTest do
 
     # Test rummage params
     assert rummage == %{
-      "search" => %{"category_name" => %{"assoc" => ["category", "category"], "search_term" => "Parent", "search_type" => "like"}},
-      "sort" => %{"field" => "category_name.asc", "assoc" => ["category"]},
-      "paginate" => %{
-        "per_page" => "2",
-        "page" => "1",
-        "max_page" => "4",
-        "total_count" => "8",
+      search: %{category_name: %{assoc: [inner: :category, inner: :category],
+        search_term: "Parent", search_type: :like, search_expr: :where}},
+      sort: %{field: :category_name, order: :asc, assoc: [inner: :category]},
+      paginate: %{
+        per_page: 1,
+        page: 1,
+        max_page: 8,
+        total_count: 8,
       },
     }
   end
@@ -340,14 +308,14 @@ defmodule Rummage.EctoTest do
     create_categories_and_products()
 
     rummage = %{
-      "paginate" => %{
-        "page" => "1",
-      },
-      "search" => %{"category_name" => %{"assoc" => ["category", "category"], "search_type" => "like", "search_term" => "Parent"}},
-      "sort" => %{"assoc" => ["category", "category"], "field" => "category_name.asc"}
+      paginate: %{page: 1, per_page: 2},
+      search: %{category_name: %{assoc: [inner: :category, inner: :category],
+        search_type: :like, search_term: "Parent"}},
+      sort: %{assoc: [inner: :category, inner: :category],
+        field: :category_name, order: :asc}
     }
 
-    {queryable, rummage} = Rummage.Ecto.rummage(Product, rummage)
+    {queryable, rummage} = Product.rummage(rummage)
 
     products = Repo.all(queryable)
 
@@ -363,14 +331,11 @@ defmodule Rummage.EctoTest do
 
     # Test rummage params
     assert rummage == %{
-      "search" => %{"category_name" => %{"assoc" => ["category", "category"], "search_term" => "Parent", "search_type" => "like"}},
-      "sort" => %{"field" => "category_name.asc", "assoc" => ["category", "category"]},
-      "paginate" => %{
-        "per_page" => "2",
-        "page" => "1",
-        "max_page" => "4",
-        "total_count" => "8",
-      },
+      search: %{category_name: %{assoc: [inner: :category, inner: :category],
+        search_term: "Parent", search_type: :like, search_expr: :where}},
+      sort: %{field: :category_name, order: :asc,
+        assoc: [inner: :category, inner: :category]},
+      paginate: %{per_page: 2, page: 1, max_page: 4, total_count: 8},
     }
   end
 
@@ -378,19 +343,19 @@ defmodule Rummage.EctoTest do
     create_categories_and_products()
 
     rummage = %{
-      "paginate" => %{
-        "page" => "1",
-      },
-      "search" => %{"category_name" => %{"assoc" => ["category"], "search_type" => "like", "search_term" => "Category"}},
-      "sort" => %{"assoc" => ["category", "category"], "field" => "category_name.asc"}
+      paginate: %{page: 1},
+      search: %{category_name: %{assoc: [{:inner, :category}],
+        search_type: :like, search_term: "Category"}},
+      sort: %{assoc: [{:inner, :category}, {:inner, :category}],
+        field: :category_name, order: :asc}
     }
 
-    {queryable, rummage} = Rummage.Ecto.rummage(Product, rummage)
+    {queryable, rummage} = Product.rummage(rummage)
 
     products = Repo.all(queryable)
 
     # Test length
-    assert length(products) == 2
+    assert length(products) == 1
 
     # Test search
     assert Enum.all?(Repo.preload(products, :category), & &1.category.category_name =~ "Category")
@@ -401,14 +366,11 @@ defmodule Rummage.EctoTest do
 
     # Test rummage params
     assert rummage == %{
-      "search" => %{"category_name" => %{"assoc" => ["category"], "search_term" => "Category", "search_type" => "like"}},
-      "sort" => %{"field" => "category_name.asc", "assoc" => ["category", "category"]},
-      "paginate" => %{
-        "per_page" => "2",
-        "page" => "1",
-        "max_page" => "4",
-        "total_count" => "8",
-      },
+      search: %{category_name: %{assoc: [inner: :category],
+        search_term: "Category", search_type: :like, search_expr: :where}},
+      sort: %{field: :category_name, order: :asc,
+        assoc: [inner: :category, inner: :category]},
+      paginate: %{per_page: 1, page: 1, max_page: 8, total_count: 8}
     }
   end
 end
