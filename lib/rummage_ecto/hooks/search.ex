@@ -1,7 +1,5 @@
 defmodule Rummage.Ecto.Hooks.Search do
   @moduledoc """
-  TODO: Explain how to use `assoc` better
-
   `Rummage.Ecto.Hooks.Search` is the default search hook that comes with
   `Rummage.Ecto`.
 
@@ -10,6 +8,78 @@ defmodule Rummage.Ecto.Hooks.Search do
   `search_term` and `assoc` associated with those `fields`.
 
   NOTE: This module doesn't return a list of entries, but a `Ecto.Query.t`.
+  This module `uses` `Rummage.Ecto.Hook`.
+
+  _____________________________________________________________________________
+
+  # ABOUT:
+
+  ## Arguments:
+
+  This Hook expects a `queryable` (an `Ecto.Queryable`) and
+  `search_params` (a `Map`). The map should be in the format:
+  `%{field_name: %{assoc: [], search_term: true, search_type: :eq}}`
+
+  Details:
+
+  * `field_name`: The field name to search by.
+  * `assoc`: List of associations in the search.
+  * `search_term`: Term to compare the `field_name` against.
+  * `search_type`: Determines the kind of search to perform. If `:eq`, it
+                  expects the `field_name`'s value to be equal to `search_term`,
+                  If `lt`, it expects it to be less than `search_term`.
+                  To see all the `search_type`s, check `Rummage.Ecto.Services.BuildSearchQuery`
+  * `search_expr`: This is optional. Defaults to `:where`. This is the way current
+                   search expression is appended to the existing query.
+                   To see all the `search_expr`s, check `Rummage.Ecto.Services.BuildSearchQuery`
+
+
+  For example, if we want to search products with `available` = `true`, we would
+  do the following:
+
+  ```elixir
+  Rummage.Ecto.Hooks.Search.run(Product, %{available: %{assoc: [],
+    search_type: :eq,
+    search_term: true}}
+  ```
+
+  This can be used for a search with multiple fields as well. Say, we want to
+  search for products that are `available`, but have a price less than `10.0`.
+
+  ```elixir
+  Rummage.Ecto.Hooks.Search.run(Product,
+    %{available: %{assoc: [],
+      search_type: :eq,
+      search_term: true},
+    %{price: %{assoc: [],
+      search_type: :lt,
+      search_term: 10.0}}
+  ```
+
+  ## Assoications:
+
+  Assocaitions can be given to this module's run function as a key corresponding
+  to params associated with a field. For example, if we want to search products
+  that belong to a category with category_name, "super", we would do the
+  following:
+
+  ```elixir
+  category_name_params = %{assoc: [inner: :category], search_term: "super",
+    search_type: :eq, search_expr: :where}
+
+  Rummage.Ecto.Hooks.Search.run(Product, %{category_name: category_name_params})
+  ```
+
+  The above operation will return an `Ecto.Query.t` struct which represents
+  a query equivalent to:
+
+  ```elixir
+  from p in Product
+  |> join(:inner, :category)
+  |> where([p, c], c.category_name == ^"super")
+  ```
+
+  ____________________________________________________________________________
 
   # ASSUMPTIONS/NOTES:
 
@@ -30,10 +100,10 @@ defmodule Rummage.Ecto.Hooks.Search do
   |> Search.run(%{field2: %{assoc: [inner: :some_assoc2]}}
   ```
 
+  ____________________________________________________________________________
 
-  This module `uses` `Rummage.Ecto.Hook`.
+  # USAGE:
 
-  Usage:
   For a regular search:
 
   This returns a `queryable` which upon running will give a list of `Parent`(s)
