@@ -1,7 +1,5 @@
 defmodule Rummage.Ecto.Hooks.Sort do
   @moduledoc """
-  TODO: Explain how to use `assoc` better
-
   `Rummage.Ecto.Hooks.Sort` is the default sort hook that comes with
   `Rummage.Ecto`.
 
@@ -11,11 +9,81 @@ defmodule Rummage.Ecto.Hooks.Sort do
   which is a keyword list of assocations associated with those `fields`.
 
   NOTE: This module doesn't return a list of entries, but a `Ecto.Query.t`.
-
-
   This module `uses` `Rummage.Ecto.Hook`.
 
-  Usage:
+  _____________________________________________________________________________
+
+  # ABOUT:
+
+  ## Arguments:
+
+  This Hook expects a `queryable` (an `Ecto.Queryable`) and
+  `sort_params` (a `Map`). The map should be in the format:
+  `%{field: :field_name, assoc: [], order: :asc}`
+
+  Details:
+
+  * `field`: The field name (atom) to sorted by.
+  * `assoc`: List of associations in the sort.
+  * `order`: Specifies the type of order `asc` or `desc`.
+  * `ci` : Case Insensitivity. Defaults to `false`
+
+
+  For example, if we want to sort products with descending `price`, we would
+  do the following:
+
+  ```elixir
+  Rummage.Ecto.Hooks.Sort.run(Product, %{field: :price,
+    assoc: [], order: :desc})
+  ```
+
+  ## Assoications:
+
+  Assocaitions can be given to this module's run function as a key corresponding
+  to params associated with a field. For example, if we want to sort products
+  that belong to a category by ascending category_name, we would do the
+  following:
+
+  ```elixir
+  params = %{field: :category_name, assoc: [inner: :category],
+    order: :asc}
+
+  Rummage.Ecto.Hooks.Sort.run(Product, params)
+  ```
+
+  The above operation will return an `Ecto.Query.t` struct which represents
+  a query equivalent to:
+
+  ```elixir
+  from p in Product
+  |> join(:inner, :category)
+  |> order_by([p, c], {asc, c.category_name})
+  ```
+
+  ____________________________________________________________________________
+
+  # ASSUMPTIONS/NOTES:
+
+  * This Hook has the default `order` of `:asc`.
+  * This Hook has the default `assoc` of `[]`.
+  * This Hook assumes that the field passed is a field on the `Ecto.Schema`
+  that corresponds to the last association in the `assoc` list or the `Ecto.Schema`
+  that corresponds to the `from` in `queryable`, if `assoc` is an empty list.
+
+  NOTE: It is adviced to not use multiple associated sorts in one operation
+  as `assoc` still has some minor bugs when used with multiple sorts. If you
+  need to use two sorts with associations, I would pipe the call to another
+  sort operation:
+
+  ```elixir
+  Sort.run(queryable, params1}
+  |> Sort.run(%{field2: params2}
+  ```
+
+  ____________________________________________________________________________
+
+  # USAGE:
+
   For a regular sort:
 
   This returns a `queryable` which upon running will give a list of `Parent`(s)
@@ -62,6 +130,7 @@ defmodule Rummage.Ecto.Hooks.Sort do
   check out some `custom_hooks` that are shipped with `Rummage.Ecto`:
   `Rummage.Ecto.CustomHooks.SimpleSearch`, `Rummage.Ecto.CustomHooks.SimpleSort`,
     Rummage.Ecto.CustomHooks.SimplePaginate
+
   """
 
   use Rummage.Ecto.Hook
