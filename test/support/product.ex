@@ -4,6 +4,7 @@ defmodule Rummage.Ecto.Product do
   and boolean values
   """
   use Ecto.Schema
+  use Rummage.Ecto, per_page: 1
 
   schema "products" do
     field :name, :string
