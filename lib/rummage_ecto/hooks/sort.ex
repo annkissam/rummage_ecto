@@ -232,14 +232,18 @@ defmodule Rummage.Ecto.Hooks.Sort do
   @doc """
   Callback implementation for `Rummage.Ecto.Hook.format_params/2`.
 
-  This just returns back `search_params` at this point.
-  It doesn't matter what `queryable` or `opts` are.
+  This function ensures that params for each field have keys `assoc`, `order1
+  which are essential for running this hook module.
 
   ## Examples
       iex> alias Rummage.Ecto.Hooks.Sort
-      iex> Sort.format_params(Parent, %{}, %{})
-      %{}
+      iex> Sort.format_params(Parent, %{}, [])
+      %{assoc: [], order: :asc}
   """
   @spec format_params(Ecto.Query.t(), map(), keyword()) :: map()
-  def format_params(_queryable, sort_params, _opts), do: sort_params
+  def format_params(_queryable, sort_params, _opts) do
+    sort_params
+    |> Map.put_new(:assoc, [])
+    |> Map.put_new(:order, :asc)
+  end
 end
