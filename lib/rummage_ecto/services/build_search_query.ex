@@ -116,34 +116,9 @@ defmodule Rummage.Ecto.Services.BuildSearchQuery do
         iex> BuildSearchQuery.run(queryable, :field_1, {:where, :lteq}, "field_!")
         #Ecto.Query<from p in "parents", where: p.field_1 <= ^"field_!">
 
-  When `field`, `search_type` and `queryable` are passed with an invalid `search_type`
-  and `search_expr`:
-
-      iex> alias Rummage.Ecto.Services.BuildSearchQuery
-      iex> import Ecto.Query
-      iex> queryable = from u in "parents"
-      #Ecto.Query<from p in "parents">
-      iex> BuildSearchQuery.run(queryable, :field_1, {:pizza, :cheese}, "field_!")
-      ** (RuntimeError) Unknown {search_expr, search_type}, {:pizza, :cheese}
-      search_type should be one of #{inspect @search_types}
-      search_expr should be one of #{inspect @search_exprs}
-
-
-  When `field`, `search_type` and `queryable` are passed with an invalid `search_type`
-  but valid `search_expr:
-
-      iex> alias Rummage.Ecto.Services.BuildSearchQuery
-      iex> import Ecto.Query
-      iex> queryable = from u in "parents"
-      #Ecto.Query<from p in "parents">
-      iex> BuildSearchQuery.run(queryable, :field_1, {:where, :pizza}, "field_!")
-      ** (RuntimeError) Unknown {search_expr, search_type}, {:where, :pizza}
-      search_type should be one of #{inspect @search_types}
-      search_expr should be one of #{inspect @search_exprs}
-
   When `search_type` is `or_where`:
 
-    When `field`, `search_type` and `queryable` are passed with `search_type` of `like`:
+  When `field`, `search_type` and `queryable` are passed with `search_type` of `like`:
 
         iex> alias Rummage.Ecto.Services.BuildSearchQuery
         iex> import Ecto.Query
@@ -152,7 +127,7 @@ defmodule Rummage.Ecto.Services.BuildSearchQuery do
         iex> BuildSearchQuery.run(queryable, :field_1, {:or_where, :like}, "field_!")
         #Ecto.Query<from p in "parents", or_where: like(p.field_1, ^"%field_!%")>
 
-    When `field`, `search_type` and `queryable` are passed with `search_type` of `ilike`:
+  When `field`, `search_type` and `queryable` are passed with `search_type` of `ilike`:
 
         iex> alias Rummage.Ecto.Services.BuildSearchQuery
         iex> import Ecto.Query
@@ -161,7 +136,7 @@ defmodule Rummage.Ecto.Services.BuildSearchQuery do
         iex> BuildSearchQuery.run(queryable, :field_1, {:or_where, :ilike}, "field_!")
         #Ecto.Query<from p in "parents", or_where: ilike(p.field_1, ^"%field_!%")>
 
-    When `field`, `search_type` and `queryable` are passed with `search_type` of `eq`:
+  When `field`, `search_type` and `queryable` are passed with `search_type` of `eq`:
 
         iex> alias Rummage.Ecto.Services.BuildSearchQuery
         iex> import Ecto.Query
@@ -170,7 +145,7 @@ defmodule Rummage.Ecto.Services.BuildSearchQuery do
         iex> BuildSearchQuery.run(queryable, :field_1, {:or_where, :eq}, "field_!")
         #Ecto.Query<from p in "parents", or_where: p.field_1 == ^"field_!">
 
-    When `field`, `search_type` and `queryable` are passed with `search_type` of `gt`:
+  When `field`, `search_type` and `queryable` are passed with `search_type` of `gt`:
 
         iex> alias Rummage.Ecto.Services.BuildSearchQuery
         iex> import Ecto.Query
@@ -179,7 +154,7 @@ defmodule Rummage.Ecto.Services.BuildSearchQuery do
         iex> BuildSearchQuery.run(queryable, :field_1, {:or_where, :gt}, "field_!")
         #Ecto.Query<from p in "parents", or_where: p.field_1 > ^"field_!">
 
-    When `field`, `search_type` and `queryable` are passed with `search_type` of `lt`:
+  When `field`, `search_type` and `queryable` are passed with `search_type` of `lt`:
 
         iex> alias Rummage.Ecto.Services.BuildSearchQuery
         iex> import Ecto.Query
@@ -188,7 +163,7 @@ defmodule Rummage.Ecto.Services.BuildSearchQuery do
         iex> BuildSearchQuery.run(queryable, :field_1, {:or_where, :lt}, "field_!")
         #Ecto.Query<from p in "parents", or_where: p.field_1 < ^"field_!">
 
-    When `field`, `search_type` and `queryable` are passed with `search_type` of `gteq`:
+  When `field`, `search_type` and `queryable` are passed with `search_type` of `gteq`:
 
         iex> alias Rummage.Ecto.Services.BuildSearchQuery
         iex> import Ecto.Query
@@ -197,7 +172,7 @@ defmodule Rummage.Ecto.Services.BuildSearchQuery do
         iex> BuildSearchQuery.run(queryable, :field_1, {:or_where, :gteq}, "field_!")
         #Ecto.Query<from p in "parents", or_where: p.field_1 >= ^"field_!">
 
-    When `field`, `search_type` and `queryable` are passed with `search_type` of `lteq`:
+  When `field`, `search_type` and `queryable` are passed with `search_type` of `lteq`:
 
         iex> alias Rummage.Ecto.Services.BuildSearchQuery
         iex> import Ecto.Query
@@ -205,6 +180,20 @@ defmodule Rummage.Ecto.Services.BuildSearchQuery do
         #Ecto.Query<from p in "parents">
         iex> BuildSearchQuery.run(queryable, :field_1, {:or_where, :lteq}, "field_!")
         #Ecto.Query<from p in "parents", or_where: p.field_1 <= ^"field_!">
+
+  When `field`, `search_type` and `queryable` are passed with an invalid `search_type`
+  and `search_expr`:
+
+        iex> alias Rummage.Ecto.Services.BuildSearchQuery
+        iex> import Ecto.Query
+        iex> queryable = from u in "parents"
+        #Ecto.Query<from p in "parents">
+        iex> BuildSearchQuery.run(queryable, :field_1, {:pizza, :cheese}, "field_!")
+        ** (RuntimeError) Unknown {search_expr, search_type}, {:pizza, :cheese}
+        search_type should be one of #{inspect @search_types}
+        search_expr should be one of #{inspect @search_exprs}
+
+
   """
   @spec run(Ecto.Query.t, {__MODULE__.search_expr(), __MODULE__.search_type()},
             String.t, term) :: {Ecto.Query.t}
