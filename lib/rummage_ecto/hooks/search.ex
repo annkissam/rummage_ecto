@@ -28,10 +28,12 @@ defmodule Rummage.Ecto.Hooks.Search do
   * `search_type`: Determines the kind of search to perform. If `:eq`, it
                   expects the `field_name`'s value to be equal to `search_term`,
                   If `lt`, it expects it to be less than `search_term`.
-                  To see all the `search_type`s, check `Rummage.Ecto.Services.BuildSearchQuery`
+                  To see all the `search_type`s, check
+                  `Rummage.Ecto.Services.BuildSearchQuery`
   * `search_expr`: This is optional. Defaults to `:where`. This is the way current
                    search expression is appended to the existing query.
-                   To see all the `search_expr`s, check `Rummage.Ecto.Services.BuildSearchQuery`
+                   To see all the `search_expr`s, check
+                   `Rummage.Ecto.Services.BuildSearchQuery`
 
 
   For example, if we want to search products with `available` = `true`, we would
@@ -132,8 +134,8 @@ defmodule Rummage.Ecto.Hooks.Search do
 
   ```
 
-  There are many other `search_types`. Check out `Rummage.Ecto.Services.BuildSearchQuery` docs
-  to explore more `search_types`
+  There are many other `search_types`. Check out
+  `Rummage.Ecto.Services.BuildSearchQuery` docs to explore more `search_types`
 
   This module can be overridden with a custom module while using `Rummage.Ecto`
   in `Ecto` struct module:
