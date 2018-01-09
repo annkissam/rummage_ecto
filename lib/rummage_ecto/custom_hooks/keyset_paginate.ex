@@ -6,16 +6,41 @@ defmodule Rummage.Ecto.CustomHooks.KeysetPaginate do
   This module uses `keyset` pagination to add a pagination query expression
   on top a given `Ecto.Queryable`.
 
-  For more information on Keyset Pagination, check this [article](http://use-the-index-luke.com/no-offset)
+  For more information on Keyset Pagination, check this
+  [article](http://use-the-index-luke.com/no-offset)
 
   NOTE: This module doesn't return a list of entries, but a `Ecto.Query.t`.
+  This module `uses` `Rummage.Ecto.Hook`.
 
-  # ASSUMPTIONS/NOTES:
+  _____________________________________________________________________________
 
-  * This Hook assumes that the querried `Ecto.Schema` has a `primary_key`.
-  * This Hook also orders the query by ascending `primary_key`
+  # ABOUT:
 
-  # When to Use KeysetPaginate?
+  ## Arguments:
+
+  This Hook expects a `queryable` (an `Ecto.Queryable`) and
+  `paginate_params` (a `Map`). The map should be in the format:
+  `%{per_page: 10, page: 1, last_seen_pk: 10, pk: :id}`
+
+  Details:
+
+  * `per_page`: Specifies the entries in each page.
+  * `page`: Specifies the `page` number.
+  * `last_seen_pk`: Specifies the primary_key value of last_seen entry,
+                    This hook uses this entry instead of offset.
+  * `pk`: Specifies what's the `primary_key` for the entries being paginated.
+          Cannot be `nil`
+
+
+  For example, if we want to paginate products (primary_key = :id), we would
+  do the following:
+
+  ```elixir
+  Rummage.Ecto.CustomHooks.KeysetPaginate.run(Product,
+    %{per_page: 10, page: 1, last_seen_pk: 10, pk: :id}
+  ```
+
+  ## When to Use KeysetPaginate?
 
   - Keyset Pagination is mainly here to make pagination faster for complex
   pages. It is recommended that you use `Rummage.Ecto.Hooks.Paginate` for a
@@ -24,12 +49,31 @@ defmodule Rummage.Ecto.CustomHooks.KeysetPaginate do
 
   NOTE: __It is not recommended to use this with the native sort hook__
 
+  _____________________________________________________________________________
+
+  # ASSUMPTIONS/NOTES:
+
+  * This Hook assumes that the querried `Ecto.Schema` has a `primary_key`.
+  * This Hook also orders the query by ascending `primary_key`
+
+  _____________________________________________________________________________
+
+  # USAGE
+
+  ```elixir
+  alias Rummage.Ecto.CustomHooks.KeysetPaginate
+
+  queryable = KeysetPaginate.run(Parent,
+    %{per_page: 10, page: 1, last_seen_pk: 10, pk: :id})
+  ```
+
   This module can be used by overriding the default module. This can be done
   in the following ways:
 
   In the `Rummage.Ecto` call:
   ```elixir
-  Rummage.Ecto.rummage(queryable, rummage, paginate: Rummage.Ecto.CustomHooks.KeysetPaginate)
+  Rummage.Ecto.rummage(queryable, rummage,
+    paginate: Rummage.Ecto.CustomHooks.KeysetPaginate)
   ```
 
   OR

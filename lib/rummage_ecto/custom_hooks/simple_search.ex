@@ -4,8 +4,8 @@ defmodule Rummage.Ecto.CustomHooks.SimpleSearch do
   comes with `Rummage.Ecto`.
 
   This module provides a operations that can add searching functionality to
-  a pipeline of `Ecto` queries. This module works by taking fields, and `search_type`,
-  `search_term` and `assoc` associated with those `fields`.
+  a pipeline of `Ecto` queries. This module works by taking fields, and
+  `search_type`, `search_term` and `assoc` associated with those `fields`.
 
   This module doesn't support associations and hence is a simple alternative
   to Rummage's default search hook.
@@ -30,17 +30,20 @@ defmodule Rummage.Ecto.CustomHooks.SimpleSearch do
   * `search_type`: Determines the kind of search to perform. If `:eq`, it
                   expects the `field_name`'s value to be equal to `search_term`,
                   If `lt`, it expects it to be less than `search_term`.
-                  To see all the `search_type`s, check `Rummage.Ecto.Services.BuildSearchQuery`
-  * `search_expr`: This is optional. Defaults to `:where`. This is the way current
+                  To see all the `search_type`s, check
+                  `Rummage.Ecto.Services.BuildSearchQuery`
+  * `search_expr`: This is optional. Defaults to `:where`. This is the way the
                    search expression is appended to the existing query.
-                   To see all the `search_expr`s, check `Rummage.Ecto.Services.BuildSearchQuery`
+                   To see all the `search_expr`s, check
+                   `Rummage.Ecto.Services.BuildSearchQuery`
 
 
   For example, if we want to search products with `available` = `true`, we would
   do the following:
 
   ```elixir
-  Rummage.Ecto.CustomHooks.SimpleSearch.run(Product, %{available: %{search_type: :eq,
+  Rummage.Ecto.CustomHooks.SimpleSearch.run(Product, %{available:
+    %{search_type: :eq,
     search_term: true}}
   ```
 
@@ -61,7 +64,6 @@ defmodule Rummage.Ecto.CustomHooks.SimpleSearch do
 
   ____________________________________________________________________________
 
-
   # ASSUMPTIONS/NOTES:
 
   * This Hook assumes that the searched field is a part of the schema passed
@@ -69,13 +71,51 @@ defmodule Rummage.Ecto.CustomHooks.SimpleSearch do
   * This Hook has the default `search_type` of `:eq`.
   * This Hook has the default `search_expr` of `:where`.
 
+  ____________________________________________________________________________
+
+  # USAGE:
+
+  For a regular search:
+
+  This returns a `queryable` which upon running will give a list of `Parent`(s)
+  searched by ascending `field_1`
+
+  ```elixir
+  alias Rummage.Ecto.CustomHooks.SimpleSearch
+
+  searched_queryable = SimpleSearch.run(Parent,
+    %{field_1: %{search_type: :like, search_term: "field_!"}}})
+
+  ```
+
+  For a case-insensitive search:
+
+  This returns a `queryable` which upon running will give a list of `Parent`(s)
+  searched by ascending case insensitive `field_1`.
+
+  Keep in mind that `case_insensitive` can only be called for `text` fields
+
+  ```elixir
+  alias Rummage.Ecto.CustomHooks.SimpleSearch
+
+  searched_queryable = SimpleSearch.run(Parent,
+    %{field_1: %{ search_type: "ilike", search_term: "field_!"}}})
+
+  ```
+
+  There are many other `search_types`. Check out
+  `Rummage.Ecto.Services.BuildSearchQuery` docs to explore more `search_types`.
+
   This module can be used by overriding the default module. This can be done
   in the following ways:
 
   In the `Rummage.Ecto` call:
   ```elixir
-  Rummage.Ecto.rummage(queryable, rummage, search: Rummage.Ecto.CustomHooks.SimpleSearch)
+  Rummage.Ecto.rummage(queryable, rummage,
+    search: Rummage.Ecto.CustomHooks.SimpleSearch)
+
   or
+
   MySchema.rummage(rummage, search: Rummage.Ecto.CustomHooks.SimpleSearch)
   ```
 
@@ -96,59 +136,6 @@ defmodule Rummage.Ecto.CustomHooks.SimpleSearch do
     use Rummage.Ecto, repo: SomeRepo,
       search: Rummage.Ecto.CustomHooks.SimpleSearch
   end
-
-  ## Usage:
-
-  For a regular search:
-
-  This returns a `queryable` which upon running will give a list of `Parent`(s)
-  searched by ascending `field_1`
-
-  ```elixir
-  alias Rummage.Ecto.CustomHooks.SimpleSearch
-
-  searched_queryable = SimpleSearch.run(Parent, %{field_1: %{search_type: :like, search_term: "field_!"}}})
-
-  ```
-
-  For a case-insensitive search:
-
-  This returns a `queryable` which upon running will give a list of `Parent`(s)
-  searched by ascending case insensitive `field_1`.
-
-  Keep in mind that `case_insensitive` can only be called for `text` fields
-
-  ```elixir
-  alias Rummage.Ecto.CustomHooks.SimpleSearch
-
-  searched_queryable = SimpleSearch.run(Parent, %{field_1: %{ search_type: "ilike", search_term: "field_!"}}})
-
-  ```
-
-  There are many other `search_types`. Check out `Rummage.Ecto.Services.BuildSearchQuery` docs
-  to explore more `search_types`
-
-  This module can be overridden with a custom module while using `Rummage.Ecto`
-  in `Ecto` struct module:
-
-  In the `Ecto` module:
-  ```elixir
-  Rummage.Ecto.rummage(queryable, rummage, search: CustomHook)
-  ```
-
-  OR
-
-  Globally for all models in `config.exs`:
-  ```elixir
-  config :rummage_ecto,
-    Rummage.Ecto,
-   .search: CustomHook
-  ```
-
-  The `CustomHook` must use `Rummage.Ecto.Hook`. For examples of `CustomHook`,
-  check out some `custom_hooks` that are shipped with `Rummage.Ecto`:
-  `Rummage.Ecto.CustomHooks.SimpleSearch`, `Rummage.Ecto.CustomHooks.SimpleSort`,
-    Rummage.Ecto.CustomHooks.SimplePaginate
   """
 
   use Rummage.Ecto.Hook
