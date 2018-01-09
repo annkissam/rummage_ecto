@@ -260,14 +260,28 @@ defmodule Rummage.Ecto.Hooks.Search do
   @doc """
   Callback implementation for `Rummage.Ecto.Hook.format_params/2`.
 
-  This just returns back `search_params` at this point.
-  It doesn't matter what `queryable` or `opts` are.
+  This function ensures that params for each field have keys `assoc`, `search_type` and
+  `search_expr` which are essential for running this hook module.
 
   ## Examples
       iex> alias Rummage.Ecto.Hooks.Search
-      iex> Search.format_params(Parent, %{}, %{})
-      %{}
+      iex> Search.format_params(Parent, %{field: %{}}, [])
+      %{field: %{assoc: [], search_expr: :where, search_type: :eq}}
   """
   @spec format_params(Ecto.Query.t(), map(), keyword()) :: map()
-  def format_params(_queryable, search_params, _opts), do: search_params
+  def format_params(_queryable, search_params, _opts) do
+    search_params
+    |> Map.to_list()
+    |> Enum.map(&put_keys/1)
+    |> Enum.into(%{})
+  end
+
+  defp put_keys({field, field_params}) do
+    field_params = field_params
+      |> Map.put_new(:assoc, [])
+      |> Map.put_new(:search_type, :eq)
+      |> Map.put_new(:search_expr, :where)
+
+    {field, field_params}
+  end
 end
