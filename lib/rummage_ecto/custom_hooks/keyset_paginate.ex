@@ -358,14 +358,8 @@ defmodule Rummage.Ecto.CustomHooks.KeysetPaginate do
   end
 
   # This function gets count of a query and repo passed.
-  # When primary key passed is nil, it just gets all the elements
-  # and counts them, but when a primary key is passed it just counts
+  # A primary key must be passed and it just counts
   # the distinct primary keys
-  defp get_count(query, repo, nil) do
-    repo
-    |> apply(:all, [distinct(query, :true)])
-    |> Enum.count()
-  end
   defp get_count(query, repo, pk) do
     query = select(query, [s], count(field(s, ^pk), :distinct))
     hd(apply(repo, :all, [query]))
