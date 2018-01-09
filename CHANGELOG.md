@@ -1,16 +1,48 @@
 # Versions CHANGELOG
 
-## Version: 1.3.0
+## Version: 1.3.0-rc.0
 
-### TODO:
+- Better Behaviour definition for Hooks.
+  * Add `__using__` macro, instead of using module_attribute `@behviour`.
+  * Use better function names `run/2` and `format_params`,
+  * Use `defoverridable` for `@behaviour` callbacks.
 
-- Bring back `__using__`
-- Make default hooks more generalized
-- Add NoPrimaryKey pagination hook or add a generalized version of current hook
-- Change the way configurations are done
-- Update Documentation
+- Make Native hooks more generalized instead of targeted for `phoenix`.
+  * Use `atoms` over `strings` for keys in maps and params.
+  * Keep hooks more agnostic of configurations.
+  * Make Rummage.Ecto delegate configurations to hooks.
 
-### DONE:
+- The return of `Rummage.Ecto.__using__/1` macro.
+  * This allows `rummage_ecto` to resolve configurations at compile time.
+  * This allows better/easier usage of `Rummage.Ecto`.
+
+- App specific configurations.
+  * `config :appname, Rummage.Ecto .....` instead of `config: :rummage_ecto, Rummage.Ecto`.
+  *  This allows using rummage with two different apps in an umbrella app with different rummage configurations.
+  * These configurations are loaded with the help of `__using__` macro, based on the application the module belongs to.
+
+- Search hook has `search_expr`.
+  * This allows usage of `or_where` and `not_where` queries.
+  * Defaults to `where`.
+
+- Search hook has `search_type` : `is_null`
+  * This allows for searching for `NULL` or `NOT NULL`
+
+- Tested/Examples with different `field_types`, `boolean`, `float`, `string` etc.
+
+- Paginate hook works with or without a `primary_key`:
+  * the default paginate hook used to work only for Schemas with `id` as primary keys, now it works for all and even Schemas without a primary key.
+
+- Keyset Pagination CustomHook.
+  * Adds faster/lighter weight pagination option.
+  * Documentation specifies when to use it and when not to.
+
+- SimpleSort and SimpleSearch CustomHook updates.
+  * Same as sort and search, but without associations, so cleaner and faster.
+
+- Better documentation.
+  * Search and Sort associations are better documented.
+  * CustomHooks are better documented.
 
 
 ## Version: 1.2.0
