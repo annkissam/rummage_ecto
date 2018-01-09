@@ -11,6 +11,25 @@ defmodule Rummage.Ecto.Hooks.Search do
 
   NOTE: This module doesn't return a list of entries, but a `Ecto.Query.t`.
 
+  # ASSUMPTIONS/NOTES:
+
+  * This Hook has the default `search_type` of `:ilike`, which is
+  case-insensitive.
+  * This Hook has the default `search_expr` of `:where`.
+  * This Hook assumes that the field passed is a field on the `Ecto.Schema`
+  that corresponds to the last association in the `assoc` list or the `Ecto.Schema`
+  that corresponds to the `from` in `queryable`, if `assoc` is an empty list.
+
+  NOTE: It is adviced to not use multiple associated searches in one operation
+  as `assoc` still has some minor bugs when used with multiple searches. If you
+  need to use two searches with associations, I would pipe the call to another
+  search operation:
+
+  ```elixir
+  Search.run(queryable, %{field1: %{assoc: [inner: :some_assoc]}}
+  |> Search.run(%{field2: %{assoc: [inner: :some_assoc2]}}
+  ```
+
 
   This module `uses` `Rummage.Ecto.Hook`.
 
@@ -23,7 +42,8 @@ defmodule Rummage.Ecto.Hooks.Search do
   ```elixir
   alias Rummage.Ecto.Hooks.Search
 
-  searched_queryable = Search.run(Parent, %{field_1: %{assoc: [], search_type: "like", search_term: "field_!"}}})
+  searched_queryable = Search.run(Parent, %{field_1: %{assoc: [],
+    search_type: :like, search_term: "field_!"}}})
 
   ```
 
@@ -37,7 +57,8 @@ defmodule Rummage.Ecto.Hooks.Search do
   ```elixir
   alias Rummage.Ecto.Hooks.Search
 
-  searched_queryable = Search.run(Parent, %{field_1: %{assoc: [], search_type: "ilike", search_term: "field_!"}}})
+  searched_queryable = Search.run(Parent, %{field_1: %{assoc: [],
+    search_type: :ilike, search_term: "field_!"}}})
 
   ```
 
@@ -56,7 +77,7 @@ defmodule Rummage.Ecto.Hooks.Search do
 
   Globally for all models in `config.exs`:
   ```elixir
-  config :rummage_ecto,
+  config :my_app,
     Rummage.Ecto,
    .search: CustomHook
   ```
