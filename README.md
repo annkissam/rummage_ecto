@@ -1,6 +1,6 @@
 # Rummage.Ecto
 
-<img src="src/rummage_logo.png" alt="" width="150" height="150">
+<img src="src/rummage_logo.png" alt="https://hexdocs.pm/rummage_ecto/Rummage.Ecto.html" width="150" height="150">
 
 [![Build Status](https://travis-ci.org/aditya7iyengar/rummage_ecto.svg?branch=master)](https://travis-ci.org/aditya7iyengar/rummage_ecto)
 [![Coverage Status](https://coveralls.io/repos/github/aditya7iyengar/rummage_ecto/badge.svg?branch=master)](https://coveralls.io/github/aditya7iyengar/rummage_ecto?branch=master)
