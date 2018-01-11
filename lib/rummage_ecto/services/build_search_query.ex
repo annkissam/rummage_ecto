@@ -103,7 +103,7 @@ defmodule Rummage.Ecto.Services.BuildSearchQuery do
       iex> queryable = from u in "parents"
       #Ecto.Query<from p in "parents">
       iex> BuildSearchQuery.run(queryable, :field_1, "is_nil", "false")
-      #Ecto.Query<from p in "parents", where: not(is_nil(p.field_1))>
+      #Ecto.Query<from p in "parents", where: not is_nil(p.field_1)>
 
   When `field`, `search_type` and `queryable` are passed with `search_type` of `in`:
 
@@ -283,7 +283,7 @@ defmodule Rummage.Ecto.Services.BuildSearchQuery do
       iex> queryable = from u in "parents"
       #Ecto.Query<from p in "parents">
       iex> BuildSearchQuery.handle_is_nil(queryable, :field_1, "false")
-      #Ecto.Query<from p in "parents", where: not(is_nil(p.field_1))>
+      #Ecto.Query<from p in "parents", where: not is_nil(p.field_1)>
   """
   @spec handle_is_nil(Ecto.Query.t(), atom, term) :: {Ecto.Query.t()}
   def handle_is_nil(queryable, field, "false") do
