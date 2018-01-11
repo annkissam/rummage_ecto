@@ -28,7 +28,5 @@ use Mix.Config
 # here (which is why it is important to import them last).
 #
 
-if Mix.env == :test ||
-    Mix.env == :dev ||
-    Mix.env == :docs, do: import_config "#{Mix.env}.exs"
-
+if Mix.env() == :test || Mix.env() == :dev || Mix.env() == :docs,
+  do: import_config("#{Mix.env()}.exs")

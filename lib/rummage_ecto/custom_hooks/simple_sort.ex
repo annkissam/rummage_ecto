@@ -142,22 +142,27 @@ defmodule Rummage.Ecto.CustomHooks.SimpleSort do
       iex> SimpleSort.run(queryable, rummage)
       #Ecto.Query<from p in "parents", order_by: [desc: fragment("lower(?)", ^:field_1)]>
   """
-  @spec run(Ecto.Query.t, map) :: {Ecto.Query.t, map}
+  @spec run(Ecto.Query.t(), map) :: {Ecto.Query.t(), map}
   def run(queryable, rummage) do
     sort_params = Map.get(rummage, "sort")
 
     case sort_params do
-      a when a in [nil, [], {}, ""] -> queryable
+      a when a in [nil, [], {}, ""] ->
+        queryable
+
       _ ->
         case Regex.match?(~r/\w.ci+$/, sort_params) do
           true ->
-            sort_params = sort_params
+            sort_params =
+              sort_params
               |> String.split(".")
               |> Enum.drop(-1)
               |> Enum.join(".")
 
             handle_ci_sort(queryable, sort_params)
-          _ -> handle_sort(queryable, sort_params)
+
+          _ ->
+            handle_sort(queryable, sort_params)
         end
     end
   end
@@ -171,7 +176,7 @@ defmodule Rummage.Ecto.CustomHooks.SimpleSort do
       iex> SimpleSort.before_hook(Parent, %{}, %{})
       %{}
   """
-  @spec before_hook(Ecto.Query.t, map, map) :: map
+  @spec before_hook(Ecto.Query.t(), map, map) :: map
   def before_hook(_queryable, rummage, _opts), do: rummage
 
   defmacrop case_insensitive(field) do
@@ -180,38 +185,39 @@ defmodule Rummage.Ecto.CustomHooks.SimpleSort do
     end
   end
 
-  defp handle_sort(queryable, sort_params), do: queryable |> order_by(^consolidate_order_params(sort_params))
+  defp handle_sort(queryable, sort_params),
+    do: queryable |> order_by(^consolidate_order_params(sort_params))
 
   defp handle_ci_sort(queryable, sort_params) do
-    order_param = sort_params
+    order_param =
+      sort_params
       |> consolidate_order_params
       |> Enum.at(0)
 
     queryable
-    |> order_by([{^elem(order_param, 0),
-      case_insensitive(^elem(order_param, 1))}])
+    |> order_by([{^elem(order_param, 0), case_insensitive(^elem(order_param, 1))}])
   end
 
   defp consolidate_order_params(sort_params) do
-    case Regex.match?(~r/\w.asc+$/, sort_params)
-      or Regex.match?(~r/\w.desc+$/, sort_params)
-      do
+    case Regex.match?(~r/\w.asc+$/, sort_params) or Regex.match?(~r/\w.desc+$/, sort_params) do
       true -> add_order_params([], sort_params)
       _ -> []
     end
   end
 
   defp add_order_params(order_params, unparsed_field) do
-    parsed_field = unparsed_field
+    parsed_field =
+      unparsed_field
       |> String.split(".")
       |> Enum.drop(-1)
       |> Enum.join(".")
-      |> String.to_atom
+      |> String.to_atom()
 
-    order_type = unparsed_field
+    order_type =
+      unparsed_field
       |> String.split(".")
       |> Enum.at(-1)
-      |> String.to_atom
+      |> String.to_atom()
 
     Keyword.put(order_params, order_type, parsed_field)
   end

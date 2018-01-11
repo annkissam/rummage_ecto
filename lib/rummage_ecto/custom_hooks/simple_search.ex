@@ -114,7 +114,7 @@ defmodule Rummage.Ecto.CustomHooks.SimpleSearch do
       iex> SimpleSearch.run(queryable, rummage)
       #Ecto.Query<from p in "parents", where: ilike(p.field_1, ^"field_!")>
   """
-  @spec run(Ecto.Query.t, map) :: {Ecto.Query.t, map}
+  @spec run(Ecto.Query.t(), map) :: {Ecto.Query.t(), map}
   def run(queryable, rummage) do
     search_params = Map.get(rummage, "search")
 
@@ -133,40 +133,41 @@ defmodule Rummage.Ecto.CustomHooks.SimpleSearch do
       iex> SimpleSearch.before_hook(Parent, %{}, %{})
       %{}
   """
-  @spec before_hook(Ecto.Query.t, map, map) :: map
+  @spec before_hook(Ecto.Query.t(), map, map) :: map
   def before_hook(_queryable, rummage, _opts), do: rummage
 
   defp handle_search(queryable, search_params) do
     search_params
-    |> Map.to_list
+    |> Map.to_list()
     |> Enum.reduce(queryable, &search_queryable(&1, &2))
   end
 
   defp search_queryable(param, queryable) do
-    field = param
+    field =
+      param
       |> elem(0)
 
     case Regex.match?(~r/\w.ci+$/, field) do
       true ->
-        field = field
+        field =
+          field
           |> String.split(".")
           |> Enum.drop(-1)
           |> Enum.join(".")
-          |> String.to_atom
+          |> String.to_atom()
 
-          term = elem(param, 1)
+        term = elem(param, 1)
 
-          queryable
-          |> where([b],
-            ilike(field(b, ^field), ^term))
+        queryable
+        |> where([b], ilike(field(b, ^field), ^term))
+
       _ ->
         field = String.to_atom(field)
 
         term = elem(param, 1)
 
         queryable
-        |> where([b],
-          like(field(b, ^field), ^term))
+        |> where([b], like(field(b, ^field), ^term))
     end
   end
 end

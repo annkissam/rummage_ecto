@@ -26,7 +26,7 @@ defmodule Rummage.Ecto.Services.BuildSearchQuery do
 
   import Ecto.Query
 
-  @search_types ~w(like ilike eq gt lt gteq lteq is_nil)
+  @search_types ~w(like ilike eq gt lt gteq lteq is_nil in)
 
   @doc """
   Builds a searched `queryable` on top of the given `queryable` using `field`, `search_type`
@@ -103,7 +103,16 @@ defmodule Rummage.Ecto.Services.BuildSearchQuery do
       iex> queryable = from u in "parents"
       #Ecto.Query<from p in "parents">
       iex> BuildSearchQuery.run(queryable, :field_1, "is_nil", "false")
-      #Ecto.Query<from p in "parents", where: not is_nil(p.field_1)>
+      #Ecto.Query<from p in "parents", where: not(is_nil(p.field_1))>
+
+  When `field`, `search_type` and `queryable` are passed with `search_type` of `in`:
+
+      iex> alias Rummage.Ecto.Services.BuildSearchQuery
+      iex> import Ecto.Query
+      iex> queryable = from u in "parents"
+      #Ecto.Query<from p in "parents">
+      iex> BuildSearchQuery.run(queryable, :field_1, "in", ["1", "2"])
+      #Ecto.Query<from p in "parents", where: p.field_1 in ^["1", "2"]>
 
   When `field`, `search_type` and `queryable` are passed with an invalid `search_type`:
 
@@ -115,11 +124,18 @@ defmodule Rummage.Ecto.Services.BuildSearchQuery do
       #Ecto.Query<from p in "parents">
 
   """
-  @spec run(Ecto.Query.t, atom, String.t, term) :: {Ecto.Query.t}
+  @spec run(Ecto.Query.t(), atom, String.t(), term) :: {Ecto.Query.t()}
   def run(queryable, field, search_type, search_term) do
     case Enum.member?(@search_types, search_type) do
-      true -> apply(__MODULE__, String.to_atom("handle_" <> search_type), [queryable, field, search_term])
-      _ -> queryable
+      true ->
+        apply(__MODULE__, String.to_atom("handle_" <> search_type), [
+          queryable,
+          field,
+          search_term
+        ])
+
+      _ ->
+        queryable
     end
   end
 
@@ -136,13 +152,11 @@ defmodule Rummage.Ecto.Services.BuildSearchQuery do
       iex> BuildSearchQuery.handle_like(queryable, :field_1, "field_!")
       #Ecto.Query<from p in "parents", where: like(p.field_1, ^"field_!")>
   """
-  @spec handle_like(Ecto.Query.t, atom, term) :: {Ecto.Query.t}
+  @spec handle_like(Ecto.Query.t(), atom, term) :: {Ecto.Query.t()}
   def handle_like(queryable, field, search_term) do
     queryable
-    |> where([..., b],
-      like(field(b, ^field), ^search_term))
+    |> where([..., b], like(field(b, ^field), ^search_term))
   end
-
 
   @doc """
   Builds a searched `queryable` on top of the given `queryable` using `field` and `search_type`
@@ -157,13 +171,11 @@ defmodule Rummage.Ecto.Services.BuildSearchQuery do
       iex> BuildSearchQuery.handle_ilike(queryable, :field_1, "field_!")
       #Ecto.Query<from p in "parents", where: ilike(p.field_1, ^"field_!")>
   """
-  @spec handle_ilike(Ecto.Query.t, atom, term) :: {Ecto.Query.t}
+  @spec handle_ilike(Ecto.Query.t(), atom, term) :: {Ecto.Query.t()}
   def handle_ilike(queryable, field, search_term) do
     queryable
-    |> where([..., b],
-      ilike(field(b, ^field), ^search_term))
+    |> where([..., b], ilike(field(b, ^field), ^search_term))
   end
-
 
   @doc """
   Builds a searched `queryable` on top of the given `queryable` using `field` and `search_type`
@@ -178,13 +190,11 @@ defmodule Rummage.Ecto.Services.BuildSearchQuery do
       iex> BuildSearchQuery.handle_eq(queryable, :field_1, "field_!")
       #Ecto.Query<from p in "parents", where: p.field_1 == ^"field_!">
   """
-  @spec handle_eq(Ecto.Query.t, atom, term) :: {Ecto.Query.t}
+  @spec handle_eq(Ecto.Query.t(), atom, term) :: {Ecto.Query.t()}
   def handle_eq(queryable, field, search_term) do
     queryable
-    |> where([..., b],
-      field(b, ^field) == ^search_term)
+    |> where([..., b], field(b, ^field) == ^search_term)
   end
-
 
   @doc """
   Builds a searched `queryable` on top of the given `queryable` using `field` and `search_type`
@@ -199,13 +209,11 @@ defmodule Rummage.Ecto.Services.BuildSearchQuery do
       iex> BuildSearchQuery.handle_gt(queryable, :field_1, "field_!")
       #Ecto.Query<from p in "parents", where: p.field_1 > ^"field_!">
   """
-  @spec handle_gt(Ecto.Query.t, atom, term) :: {Ecto.Query.t}
+  @spec handle_gt(Ecto.Query.t(), atom, term) :: {Ecto.Query.t()}
   def handle_gt(queryable, field, search_term) do
     queryable
-    |> where([..., b],
-      field(b, ^field) > ^search_term)
+    |> where([..., b], field(b, ^field) > ^search_term)
   end
-
 
   @doc """
   Builds a searched `queryable` on top of the given `queryable` using `field` and `search_type`
@@ -220,13 +228,11 @@ defmodule Rummage.Ecto.Services.BuildSearchQuery do
       iex> BuildSearchQuery.handle_lt(queryable, :field_1, "field_!")
       #Ecto.Query<from p in "parents", where: p.field_1 < ^"field_!">
   """
-  @spec handle_lt(Ecto.Query.t, atom, term) :: {Ecto.Query.t}
+  @spec handle_lt(Ecto.Query.t(), atom, term) :: {Ecto.Query.t()}
   def handle_lt(queryable, field, search_term) do
     queryable
-    |> where([..., b],
-      field(b, ^field) < ^search_term)
+    |> where([..., b], field(b, ^field) < ^search_term)
   end
-
 
   @doc """
   Builds a searched `queryable` on top of the given `queryable` using `field` and `search_type`
@@ -241,13 +247,11 @@ defmodule Rummage.Ecto.Services.BuildSearchQuery do
       iex> BuildSearchQuery.handle_gteq(queryable, :field_1, "field_!")
       #Ecto.Query<from p in "parents", where: p.field_1 >= ^"field_!">
   """
-  @spec handle_gteq(Ecto.Query.t, atom, term) :: {Ecto.Query.t}
+  @spec handle_gteq(Ecto.Query.t(), atom, term) :: {Ecto.Query.t()}
   def handle_gteq(queryable, field, search_term) do
     queryable
-    |> where([..., b],
-      field(b, ^field) >= ^search_term)
+    |> where([..., b], field(b, ^field) >= ^search_term)
   end
-
 
   @doc """
   Builds a searched `queryable` on top of the given `queryable` using `field` and `search_type`
@@ -262,13 +266,11 @@ defmodule Rummage.Ecto.Services.BuildSearchQuery do
       iex> BuildSearchQuery.handle_lteq(queryable, :field_1, "field_!")
       #Ecto.Query<from p in "parents", where: p.field_1 <= ^"field_!">
   """
-  @spec handle_lteq(Ecto.Query.t, atom, term) :: {Ecto.Query.t}
+  @spec handle_lteq(Ecto.Query.t(), atom, term) :: {Ecto.Query.t()}
   def handle_lteq(queryable, field, search_term) do
     queryable
-    |> where([..., b],
-      field(b, ^field) <= ^search_term)
+    |> where([..., b], field(b, ^field) <= ^search_term)
   end
-
 
   @doc """
   Builds a searched `queryable` on top of the given `queryable` using `field` and `search_type`
@@ -281,17 +283,35 @@ defmodule Rummage.Ecto.Services.BuildSearchQuery do
       iex> queryable = from u in "parents"
       #Ecto.Query<from p in "parents">
       iex> BuildSearchQuery.handle_is_nil(queryable, :field_1, "false")
-      #Ecto.Query<from p in "parents", where: not is_nil(p.field_1)>
+      #Ecto.Query<from p in "parents", where: not(is_nil(p.field_1))>
   """
-  @spec handle_is_nil(Ecto.Query.t, atom, term) :: {Ecto.Query.t}
+  @spec handle_is_nil(Ecto.Query.t(), atom, term) :: {Ecto.Query.t()}
   def handle_is_nil(queryable, field, "false") do
     queryable
-    |> where([..., b],
-      not is_nil(field(b, ^field)))
+    |> where([..., b], not is_nil(field(b, ^field)))
   end
+
   def handle_is_nil(queryable, field, _) do
     queryable
-    |> where([..., b],
-      is_nil(field(b, ^field)))
+    |> where([..., b], is_nil(field(b, ^field)))
+  end
+
+  @doc """
+  Builds a searched `queryable` on top of the given `queryable` using `field` and `search_type`
+  when the `search_term` is `in`.
+
+  ## Examples
+
+      iex> alias Rummage.Ecto.Services.BuildSearchQuery
+      iex> import Ecto.Query
+      iex> queryable = from u in "parents"
+      #Ecto.Query<from p in "parents">
+      iex> BuildSearchQuery.handle_in(queryable, :field_1, ["1", "2"])
+      #Ecto.Query<from p in "parents", where: p.field_1 in ^["1", "2"]>
+  """
+  @spec handle_in(Ecto.Query.t(), atom, term) :: {Ecto.Query.t()}
+  def handle_in(queryable, field, search_term) do
+    queryable
+    |> where([..., b], field(b, ^field) in ^search_term)
   end
 end

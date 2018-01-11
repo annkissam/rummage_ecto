@@ -90,7 +90,7 @@ defmodule Rummage.Ecto.Config do
       iex> Config.resolve_system_config({:system, "some random config"}, "default")
       "default"
   """
-  @spec resolve_system_config(Tuple.t, term) :: {term}
+  @spec resolve_system_config(Tuple.t(), term) :: {term}
   def resolve_system_config({:system, var_name}, default) do
     System.get_env(var_name) || default
   end

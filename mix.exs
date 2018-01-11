@@ -8,16 +8,16 @@ defmodule Rummage.Ecto.Mixfile do
     [
       app: :rummage_ecto,
       version: @version,
-      elixir: "~> 1.5.1",
+      elixir: ">= 1.5.1",
       deps: deps(),
-      build_embedded: Mix.env == :prod,
-      start_permanent: Mix.env == :prod,
+      build_embedded: Mix.env() == :prod,
+      start_permanent: Mix.env() == :prod,
 
       # Test
       test_coverage: [tool: ExCoveralls],
       preferred_cli_env: [coveralls: :test],
       aliases: aliases(),
-      elixirc_paths: elixirc_paths(Mix.env),
+      elixirc_paths: elixirc_paths(Mix.env()),
 
       # Hex
       description: description(),
@@ -25,7 +25,7 @@ defmodule Rummage.Ecto.Mixfile do
 
       # Docs
       name: "Rumamge.Ecto",
-      docs: docs(),
+      docs: docs()
     ]
   end
 
@@ -34,8 +34,8 @@ defmodule Rummage.Ecto.Mixfile do
       applications: [
         :logger,
         :ecto,
-        :postgrex,
-      ],
+        :postgrex
+      ]
     ]
   end
 
@@ -44,7 +44,7 @@ defmodule Rummage.Ecto.Mixfile do
       files: ["lib", "mix.exs", "README.md"],
       maintainers: ["Adi Iyengar"],
       licenses: ["MIT"],
-      links: %{"Github" => @url},
+      links: %{"Github" => @url}
     ]
   end
 
@@ -55,7 +55,7 @@ defmodule Rummage.Ecto.Mixfile do
       {:excoveralls, "~> 0.3", only: :test},
       {:ex_doc, "~> 0.14", only: :dev, runtime: false},
       {:inch_ex, "~> 0.5", only: [:dev, :test, :docs]},
-      {:postgrex, ">= 0.0.0", only: [:test]},
+      {:postgrex, ">= 0.0.0", only: [:test]}
     ]
   end
 
@@ -80,19 +80,19 @@ defmodule Rummage.Ecto.Mixfile do
         "ecto.create",
         "ecto.migrate"
       ],
-     "ecto.reset": [
+      "ecto.reset": [
         "ecto.drop",
         "ecto.setup"
       ],
-     "test": [
+      test: [
         # "ecto.drop",
         "ecto.create --quiet",
         "ecto.migrate",
         "test"
-      ],
+      ]
     ]
   end
 
   defp elixirc_paths(:test), do: ["lib", "priv", "test/support"]
-  defp elixirc_paths(_),     do: ["lib"]
+  defp elixirc_paths(_), do: ["lib"]
 end

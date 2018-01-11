@@ -98,7 +98,7 @@ defmodule Rummage.Ecto.CustomHooks.KeysetPaginate do
       iex> KeysetPaginate.run(queryable, rummage)
       #Ecto.Query<from p in "parents", limit: ^10, offset: ^0>
   """
-  @spec run(Ecto.Query.t, map) :: {Ecto.Query.t, map}
+  @spec run(Ecto.Query.t(), map) :: {Ecto.Query.t(), map}
   def run(queryable, rummage) do
     paginate_params = Map.get(rummage, "paginate")
 
@@ -129,12 +129,14 @@ defmodule Rummage.Ecto.CustomHooks.KeysetPaginate do
       iex> KeysetPaginate.before_hook(Category, rummage, %{})
       %{"paginate" => %{"max_page" => "3", "page" => "1", "per_page" => "1", "total_count" => "3"}}
   """
-  @spec before_hook(Ecto.Query.t, map, map) :: map
+  @spec before_hook(Ecto.Query.t(), map, map) :: map
   def before_hook(queryable, rummage, opts) do
     paginate_params = Map.get(rummage, "paginate")
 
     case paginate_params do
-      nil -> rummage
+      nil ->
+        rummage
+
       _ ->
         total_count = get_total_count(queryable, opts)
 
@@ -143,17 +145,21 @@ defmodule Rummage.Ecto.CustomHooks.KeysetPaginate do
         per_page = if per_page < 1, do: 1, else: per_page
 
         max_page_fl = total_count / per_page
-        max_page = max_page_fl
-          |> Float.ceil
+
+        max_page =
+          max_page_fl
+          |> Float.ceil()
           |> round
 
-        page = cond do
-          page < 1 ->  1
-          max_page > 0 && page > max_page -> max_page
-          true -> page
-        end
+        page =
+          cond do
+            page < 1 -> 1
+            max_page > 0 && page > max_page -> max_page
+            true -> page
+          end
 
-        paginate_params = paginate_params
+        paginate_params =
+          paginate_params
           |> Map.put("page", Integer.to_string(page))
           |> Map.put("per_page", Integer.to_string(per_page))
           |> Map.put("total_count", Integer.to_string(total_count))
@@ -166,29 +172,33 @@ defmodule Rummage.Ecto.CustomHooks.KeysetPaginate do
   defp get_total_count(queryable, opts), do: length(apply(get_repo(opts), :all, [queryable]))
 
   defp get_repo(opts) do
-    opts[:repo] || Config.default_repo
+    opts[:repo] || Config.default_repo()
   end
 
   defp parse_page_and_per_page(paginate_params, opts) do
-    per_page = paginate_params
-      |> Map.get("per_page", Integer.to_string(opts[:per_page] || Config.default_per_page))
-      |> String.to_integer
+    per_page =
+      paginate_params
+      |> Map.get("per_page", Integer.to_string(opts[:per_page] || Config.default_per_page()))
+      |> String.to_integer()
 
-    page = paginate_params
+    page =
+      paginate_params
       |> Map.get("page", "1")
-      |> String.to_integer
+      |> String.to_integer()
 
     {page, per_page}
   end
 
   defp handle_paginate(queryable, paginate_params) do
-    per_page = paginate_params
+    per_page =
+      paginate_params
       |> Map.get("per_page")
-      |> String.to_integer
+      |> String.to_integer()
 
-    page = paginate_params
+    page =
+      paginate_params
       |> Map.get("page", "1")
-      |> String.to_integer
+      |> String.to_integer()
 
     offset = per_page * (page - 1)
 

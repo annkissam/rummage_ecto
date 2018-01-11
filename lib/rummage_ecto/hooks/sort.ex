@@ -177,26 +177,31 @@ defmodule Rummage.Ecto.Hooks.Sort do
       iex> Sort.run(queryable, rummage)
       #Ecto.Query<from p0 in subquery(from p in "parents"), join: p1 in assoc(p0, :parent), join: p2 in assoc(p1, :parent), order_by: [asc: fragment("lower(?)", p2.field_1)]>
   """
-  @spec run(Ecto.Query.t, map) :: {Ecto.Query.t, map}
+  @spec run(Ecto.Query.t(), map) :: {Ecto.Query.t(), map}
   def run(queryable, rummage) do
     case Map.get(rummage, "sort") do
-      a when a in [nil, [], {}, [""], "", %{}] -> queryable
+      a when a in [nil, [], {}, [""], "", %{}] ->
+        queryable
+
       sort_params ->
-        sort_params = case sort_params["assoc"] do
-          s when s in [nil, ""] -> Map.put(sort_params, "assoc", [])
-          _ -> sort_params
-        end
+        sort_params =
+          case sort_params["assoc"] do
+            s when s in [nil, ""] -> Map.put(sort_params, "assoc", [])
+            _ -> sort_params
+          end
 
         case Regex.match?(~r/\w.ci+$/, sort_params["field"]) do
           true ->
-            order_param = sort_params["field"]
+            order_param =
+              sort_params["field"]
               |> String.split(".")
               |> Enum.drop(-1)
               |> Enum.join(".")
 
             sort_params = {sort_params["assoc"], order_param}
 
-            handle_sort(queryable,sort_params, true)
+            handle_sort(queryable, sort_params, true)
+
           _ ->
             handle_sort(queryable, {sort_params["assoc"], sort_params["field"]})
         end
@@ -212,14 +217,16 @@ defmodule Rummage.Ecto.Hooks.Sort do
       iex> Sort.before_hook(Parent, %{}, %{})
       %{}
   """
-  @spec before_hook(Ecto.Query.t, map, map) :: map
+  @spec before_hook(Ecto.Query.t(), map, map) :: map
   def before_hook(_queryable, rummage, _opts), do: rummage
 
   defp handle_sort(queryable, sort_params, ci \\ false) do
-    order_param = sort_params
+    order_param =
+      sort_params
       |> elem(1)
 
-    association_names = sort_params
+    association_names =
+      sort_params
       |> elem(0)
 
     queryable = from(e in subquery(queryable))
@@ -239,20 +246,23 @@ defmodule Rummage.Ecto.Hooks.Sort do
   # defp applied_associations(queryable), do: Enum.map(queryable.joins, & Atom.to_string(elem(&1.assoc, 1)))
 
   defp handle_ordering(queryable, order_param, ci) do
-    case Regex.match?(~r/\w.asc+$/, order_param)
-      or Regex.match?(~r/\w.desc+$/, order_param) do
+    case Regex.match?(~r/\w.asc+$/, order_param) or Regex.match?(~r/\w.desc+$/, order_param) do
       true ->
-        parsed_field = order_param
+        parsed_field =
+          order_param
           |> String.split(".")
           |> Enum.drop(-1)
           |> Enum.join(".")
 
-        order_type = order_param
+        order_type =
+          order_param
           |> String.split(".")
           |> Enum.at(-1)
 
         queryable |> order_by_assoc(order_type, parsed_field, ci)
-       _ -> queryable
+
+      _ ->
+        queryable
     end
   end
 
@@ -261,10 +271,14 @@ defmodule Rummage.Ecto.Hooks.Sort do
   end
 
   defp order_by_assoc(queryable, order_type, parsed_field, false) do
-    order_by(queryable, [p0, ..., p2], [{^String.to_atom(order_type), field(p2, ^String.to_atom(parsed_field))}])
+    order_by(queryable, [p0, ..., p2], [
+      {^String.to_atom(order_type), field(p2, ^String.to_atom(parsed_field))}
+    ])
   end
 
   defp order_by_assoc(queryable, order_type, parsed_field, true) do
-    order_by(queryable, [p0, ..., p2], [{^String.to_atom(order_type), case_insensitive(field(p2, ^String.to_atom(parsed_field)))}])
+    order_by(queryable, [p0, ..., p2], [
+      {^String.to_atom(order_type), case_insensitive(field(p2, ^String.to_atom(parsed_field)))}
+    ])
   end
 end

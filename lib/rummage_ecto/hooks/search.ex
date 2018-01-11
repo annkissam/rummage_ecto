@@ -277,7 +277,7 @@ defmodule Rummage.Ecto.Hooks.Search do
         iex> Search.run(queryable, rummage)
         #Ecto.Query<from p in subquery(from p in "parents"), where: is_nil(p.field_1)>
   """
-  @spec run(Ecto.Query.t, map) :: {Ecto.Query.t, map}
+  @spec run(Ecto.Query.t(), map) :: {Ecto.Query.t(), map}
   def run(queryable, rummage) do
     search_params = Map.get(rummage, "search")
 
@@ -296,33 +296,38 @@ defmodule Rummage.Ecto.Hooks.Search do
       iex> Search.before_hook(Parent, %{}, %{})
       %{}
   """
-  @spec before_hook(Ecto.Query.t, map, map) :: map
+  @spec before_hook(Ecto.Query.t(), map, map) :: map
   def before_hook(_queryable, rummage, _opts), do: rummage
 
   defp handle_search(queryable, search_params) do
     search_params
-    |> Map.to_list
+    |> Map.to_list()
     |> Enum.reduce(queryable, &search_queryable(&1, &2))
   end
 
   defp search_queryable(param, queryable) do
-    field = param
+    field =
+      param
       |> elem(0)
-      |> String.to_atom
+      |> String.to_atom()
 
-    field_params = param
+    field_params =
+      param
       |> elem(1)
 
-    association_names = case field_params["assoc"] do
-      a when a in [nil, "", []] -> []
-      assoc -> assoc
-    end
+    association_names =
+      case field_params["assoc"] do
+        a when a in [nil, "", []] -> []
+        assoc -> assoc
+      end
 
     search_type = field_params["search_type"]
     search_term = field_params["search_term"]
 
     case search_term do
-      s when s in [nil, "", []] -> queryable
+      s when s in [nil, "", []] ->
+        queryable
+
       _ ->
         queryable = from(e in subquery(queryable))
 
