@@ -26,7 +26,7 @@ defmodule Rummage.Ecto.Services.BuildSearchQuery do
 
   import Ecto.Query
 
-  @search_types ~w(like ilike eq gt lt gteq lteq is_nil in)
+  @search_types ~w(like ilike eq gt lt gteq lteq is_nil in nin)
 
   @doc """
   Builds a searched `queryable` on top of the given `queryable` using `field`, `search_type`
@@ -113,6 +113,15 @@ defmodule Rummage.Ecto.Services.BuildSearchQuery do
       #Ecto.Query<from p in "parents">
       iex> BuildSearchQuery.run(queryable, :field_1, "in", ["1", "2"])
       #Ecto.Query<from p in "parents", where: p.field_1 in ^["1", "2"]>
+
+  When `field`, `search_type` and `queryable` are passed with `search_type` of `nin`:
+
+      iex> alias Rummage.Ecto.Services.BuildSearchQuery
+      iex> import Ecto.Query
+      iex> queryable = from u in "parents"
+      #Ecto.Query<from p in "parents">
+      iex> BuildSearchQuery.run(queryable, :field_1, "nin", ["1", "2"])
+      #Ecto.Query<from p in "parents", where: p.field_1 not in ^["1", "2"]>
 
   When `field`, `search_type` and `queryable` are passed with an invalid `search_type`:
 
@@ -313,5 +322,24 @@ defmodule Rummage.Ecto.Services.BuildSearchQuery do
   def handle_in(queryable, field, search_term) do
     queryable
     |> where([..., b], field(b, ^field) in ^search_term)
+  end
+
+  @doc """
+  Builds a searched `queryable` on top of the given `queryable` using `field` and `search_type`
+  when the `search_term` is `nin`.
+
+  ## Examples
+
+      iex> alias Rummage.Ecto.Services.BuildSearchQuery
+      iex> import Ecto.Query
+      iex> queryable = from u in "parents"
+      #Ecto.Query<from p in "parents">
+      iex> BuildSearchQuery.handle_nin(queryable, :field_1, ["1", "2"])
+      #Ecto.Query<from p in "parents", where: p.field_1 not in ^["1", "2"]>
+  """
+  @spec handle_nin(Ecto.Query.t(), atom, term) :: {Ecto.Query.t()}
+  def handle_nin(queryable, field, search_term) do
+    queryable
+    |> where([..., b], field(b, ^field) not in ^search_term)
   end
 end
