@@ -34,7 +34,6 @@ defmodule Rummage.Ecto.Mixfile do
       applications: [
         :logger,
         :ecto,
-        :sqlite_ecto2,
       ],
     ]
   end
