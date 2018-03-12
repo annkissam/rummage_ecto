@@ -312,6 +312,7 @@ defmodule Rummage.Ecto.Hooks.Search do
     search_type = Map.get(field_params, :search_type)
     search_term = Map.get(field_params, :search_term)
     search_expr = Map.get(field_params, :search_expr, :where)
+    field = Map.get(field_params, :search_field, field)
 
     assocs
     |> Enum.reduce(from(e in subquery(queryable)), &join_by_assoc(&1, &2))

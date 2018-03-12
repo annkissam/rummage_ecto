@@ -375,7 +375,11 @@ defmodule Rummage.Ecto.Hooks.Paginate do
   # Helper function which returns the primary key associated with a
   # Queryable.
   defp pk(queryable) do
-    schema = is_map(queryable) && elem(queryable.from, 1) || queryable
+    schema = case queryable do
+      %{from: %{query: %{from: {_, schema}}}} -> schema
+      %{from: {_, schema}} -> schema
+      _ -> queryable
+    end
 
     case schema.__schema__(:primary_key) do
       [] -> nil
