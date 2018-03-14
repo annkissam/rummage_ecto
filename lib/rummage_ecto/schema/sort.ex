@@ -66,6 +66,8 @@ defmodule Rummage.Schema.Sort do
         end
       end
 
+      def rummage(query, nil), do: query
+
       def rummage(query, sort) do
         if sort.name do
           sort(query, sort.name, sort.order)

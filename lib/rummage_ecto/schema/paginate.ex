@@ -47,9 +47,7 @@ defmodule Rummage.Schema.Paginate do
         |> cast(attrs, [:max_page, :total_count])
       end
 
-      # TODO: Test this...
-      # def rummage(query, nil), do: {query, nil}
-      # def rummage(query, paginate) when paginate == %{}, do: {query, nil}
+      def rummage(query, nil), do: {query, nil}
 
       def rummage(query, paginate) do
         # Add total_count & max_page

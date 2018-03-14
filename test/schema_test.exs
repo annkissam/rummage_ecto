@@ -34,7 +34,7 @@ defmodule Rummage.SchemaTest do
   test "opts: preload" do
   end
 
-  test "no paginate, sort, or search" do
+  test "default paginate, sort, or search" do
     create_categories_and_products()
 
     params = %{}
@@ -226,5 +226,32 @@ defmodule Rummage.SchemaTest do
     assert rummage.search == %Rummage.Ecto.Rummage.Product.Search{category_name: nil, month: nil, name: "-2", price_gteq: nil, price_lteq: nil, year: nil}
 
     assert rummage.sort == %Rummage.Ecto.Rummage.Product.Sort{name: "name", order: "desc"}
+  end
+
+  test "nil paginate, sort, or search" do
+    create_categories_and_products()
+
+    params = %{
+      "search" => nil,
+      "sort" => nil,
+      "paginate" => nil
+    }
+
+    {rummage, products} = Rummage.Ecto.Rummage.Product.rummage(params)
+
+    assert length(products) == 8
+    assert Enum.map(products, &(&1.name)) |> Enum.sort() == ["Product 1-1", "Product 1-2", "Product 2-1", "Product 2-2", "Product 3-1", "Product 3-2", "Product 4-1", "Product 4-2"]
+
+    assert rummage.changeset.changes == %{}
+    assert rummage.changeset.data == %Rummage.Ecto.Rummage.Product{}
+    assert rummage.changeset.params == %{"paginate" => nil, "search" => nil, "sort" => nil}
+
+    assert rummage.params == %{paginate: nil, search: nil, sort: nil}
+
+    assert rummage.paginate == nil
+
+    assert rummage.search == nil
+
+    assert rummage.sort == nil
   end
 end

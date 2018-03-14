@@ -78,6 +78,8 @@ defmodule Rummage.Schema.Search do
         |> cast(attrs, unquote(changeset_fields))
       end
 
+      def rummage(query, nil), do: query
+
       def rummage(query, search) do
         fields = unquote(changeset_fields)
 

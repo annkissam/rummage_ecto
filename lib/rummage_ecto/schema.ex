@@ -72,14 +72,26 @@ defmodule Rummage.Schema do
 
         records = unquote(repo).all(query)
 
-        params = %{
-          paginate: %{page: rummage.paginate.page, per_page: rummage.paginate.per_page},
-          search: Map.from_struct(rummage.search),
-          sort: Map.from_struct(rummage.sort),
-        }
+        paginate_params = if rummage.paginate do
+          %{page: rummage.paginate.page, per_page: rummage.paginate.per_page}
+        else
+          nil
+        end
+
+        search_params = if rummage.search do
+          Map.from_struct(rummage.search)
+        else
+          nil
+        end
+
+        sort_params = if rummage.sort do
+          Map.from_struct(rummage.sort)
+        else
+          nil
+        end
 
         # params - For use w/ sort and paginate links...
-        rummage = Map.put(rummage, :params, params)
+        rummage = Map.put(rummage, :params, %{paginate: paginate_params, search: search_params, sort: sort_params})
 
         {rummage, records}
       end
