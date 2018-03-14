@@ -1,4 +1,42 @@
 defmodule Rummage.Schema.Search do
+  @moduledoc """
+
+  Usage:
+
+  ```elixir
+  defmodule MyApp.Rummage.MyModel.Search do
+    use Rummage.Schema.Search,
+      handlers: [
+        category_name: %{search_field: :name, search_type: :ilike, assoc: [inner: :category]},
+        price_gteq: %{search_field: :price, search_type: :gteq},
+        price_lteq: %{search_field: :price, search_type: :lteq},
+        name: %{search_type: :ilike},
+        month: :integer,
+        year: :integer,
+      ]
+
+    # Skip blank searches
+    def search(query, name, nil), do: query
+    def search(query, name, ""), do: query
+
+    def search(query, :month, month) do
+      from p in query,
+        where: fragment("date_part('month', ?)", p.inserted_at) == ^month
+    end
+
+    def search(query, :year, year) do
+      from p in query,
+        where: fragment("date_part('year', ?)", p.inserted_at) == ^year
+    end
+
+    # Because we're overriding search we need to call super...
+    def search(query, name, value) do
+      super(query, name, value)
+    end
+  end
+  ```
+  """
+
   defmacro __using__(opts) do
     handlers = Keyword.get(opts, :handlers, [])
     changeset_fields = Keyword.keys(handlers)

@@ -1,4 +1,15 @@
 defmodule Rummage.Schema.Paginate do
+  @moduledoc """
+
+  Usage:
+
+  ```elixir
+  defmodule MyApp.Rummage.Paginate do
+    use Rummage.Schema.Paginate
+  end
+  ```
+  """
+
   defmacro __using__(opts) do
     per_page = Keyword.get(opts, :per_page, Rummage.Ecto.Config.per_page())
     repo = Keyword.get(opts, :repo, Rummage.Ecto.Config.repo())
@@ -21,7 +32,7 @@ defmodule Rummage.Schema.Paginate do
         |> set_default_per_page()
       end
 
-      def set_default_per_page(changeset) do
+      defp set_default_per_page(changeset) do
         per_page = get_field(changeset, :per_page)
 
         if per_page && per_page != "" do
@@ -31,10 +42,14 @@ defmodule Rummage.Schema.Paginate do
         end
       end
 
-      def rummage_changeset(paginate, attrs) do
+      defp rummage_changeset(paginate, attrs) do
         paginate
         |> cast(attrs, [:max_page, :total_count])
       end
+
+      # TODO: Test this...
+      # def rummage(query, nil), do: {query, nil}
+      # def rummage(query, paginate) when paginate == %{}, do: {query, nil}
 
       def rummage(query, paginate) do
         # Add total_count & max_page

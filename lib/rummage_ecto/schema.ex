@@ -1,4 +1,19 @@
 defmodule Rummage.Schema do
+  @moduledoc """
+
+  Usage:
+
+  ```elixir
+  defmodule MyApp.Rummage.MyModel do
+    use Rummage.Schema,
+      paginate: MyApp.Rummage.Paginate,
+      sort: MyApp.Rummage.MyModel.Sort,
+      search: MyApp.Rummage.MyModel.Search,
+      schema: MyApp.MyModel
+  end
+  ```
+  """
+
   defmacro __using__(opts) do
     paginate = Keyword.fetch!(opts, :paginate)
     sort = Keyword.fetch!(opts, :sort)
@@ -70,16 +85,16 @@ defmodule Rummage.Schema do
       end
 
       # Note: rummage.paginate is modified - it gets a total_count
-      def paginate(query, %{paginate: paginate} = rummage) do
+      defp paginate(query, %{paginate: paginate} = rummage) do
         {query, paginate} = unquote(paginate).rummage(query, paginate)
         {query, Map.put(rummage, :paginate, paginate)}
       end
 
-      def search(query, %{search: search}) do
+      defp search(query, %{search: search}) do
         unquote(search).rummage(query, search)
       end
 
-      def sort(query, %{sort: sort}) do
+      defp sort(query, %{sort: sort}) do
         unquote(sort).rummage(query, sort)
       end
     end

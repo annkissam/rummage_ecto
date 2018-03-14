@@ -1,4 +1,37 @@
 defmodule Rummage.Schema.Sort do
+  @moduledoc """
+
+  Usage:
+
+  ```elixir
+  defmodule MyApp.Rummage.MyModel.Sort do
+    use Rummage.Schema.Sort,
+      default_name: "inserted_at",
+      handlers: [
+        category_name: %{field: :name, assoc: [inner: :category], ci: true},
+        name: %{ci: true},
+        price: %{},
+      ]
+
+    # Custom handlers...
+    def sort(query, "inserted_at", order) do
+      order = String.to_atom(order)
+
+      from p in query,
+        order_by: [
+          {^order, p.inserted_at},
+          {^order, p.id}
+        ]
+    end
+
+    # Because we're overriding sort we need to call super...
+    def sort(query, name, order) do
+      super(query, name, order)
+    end
+  end
+  ```
+  """
+
   defmacro __using__(opts) do
     handlers = Keyword.get(opts, :handlers, [])
     default_name = Keyword.get(opts, :default_name, nil)
@@ -21,7 +54,7 @@ defmodule Rummage.Schema.Sort do
         |> default_sort()
       end
 
-      def default_sort(changeset) do
+      defp default_sort(changeset) do
         name = get_field(changeset, :name)
 
         if name && name != "" do
