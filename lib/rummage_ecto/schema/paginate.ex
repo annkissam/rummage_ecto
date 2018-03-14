@@ -1,0 +1,51 @@
+defmodule Rummage.Schema.Paginate do
+  defmacro __using__(opts) do
+    per_page = Keyword.get(opts, :per_page, Rummage.Ecto.Config.per_page())
+    repo = Keyword.get(opts, :repo, Rummage.Ecto.Config.repo())
+
+    quote location: :keep do
+      use Ecto.Schema
+      import Ecto.Changeset
+
+      @primary_key false
+      embedded_schema do
+        field :page, :integer, default: 1
+        field :per_page, :integer
+        field :max_page, :integer
+        field :total_count, :integer
+      end
+
+      def changeset(paginate, attrs \\ %{}) do
+        paginate
+        |> cast(attrs, [:page, :per_page])
+        |> set_default_per_page()
+      end
+
+      def set_default_per_page(changeset) do
+        per_page = get_field(changeset, :per_page)
+
+        if per_page && per_page != "" do
+          changeset
+        else
+          put_change(changeset, :per_page, unquote(per_page))
+        end
+      end
+
+      def rummage_changeset(paginate, attrs) do
+        paginate
+        |> cast(attrs, [:max_page, :total_count])
+      end
+
+      def rummage(query, paginate) do
+        # Add total_count & max_page
+        params = Rummage.Ecto.Hooks.Paginate.format_params(query, paginate, [repo: unquote(repo)])
+
+        query = Rummage.Ecto.Hooks.Paginate.run(query, paginate)
+
+        paginate = rummage_changeset(paginate, params) |> apply_changes()
+
+        {query, paginate}
+      end
+    end
+  end
+end
