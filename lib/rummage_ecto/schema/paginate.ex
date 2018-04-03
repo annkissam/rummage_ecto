@@ -53,7 +53,19 @@ defmodule Rummage.Schema.Paginate do
         # Add total_count & max_page
         params = Rummage.Ecto.Hooks.Paginate.format_params(query, paginate, [repo: unquote(repo)])
 
-        query = Rummage.Ecto.Hooks.Paginate.run(query, paginate)
+        # per_page -1 == Show all results
+        params = if paginate.per_page == -1 do
+          Map.put(params, :max_page, 1)
+        else
+          params
+        end
+
+        # skip pagination if there's only one page
+        query = if params.max_page == 1 do
+          query
+        else
+          Rummage.Ecto.Hooks.Paginate.run(query, paginate)
+        end
 
         paginate = rummage_changeset(paginate, params) |> apply_changes()
 
