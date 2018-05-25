@@ -39,13 +39,13 @@ defmodule Rummage.Schema.SearchTest do
   end
 
   test "changeset" do
-    params = %{"name" => "3-"}
+    params = %{"name" => "3-", "price_gteq" => "10.1"}
 
     changeset = Rummage.Ecto.Rummage.Product.Search.changeset(%Rummage.Ecto.Rummage.Product.Search{}, params)
 
-    assert changeset.changes == %{name: "3-"}
+    assert changeset.changes == %{name: "3-", price_gteq: 10.1}
     assert changeset.data == %Rummage.Ecto.Rummage.Product.Search{}
-    assert changeset.params == %{"name" => "3-"}
+    assert changeset.params == %{"name" => "3-", "price_gteq" => "10.1"}
   end
 
   test "rummage" do

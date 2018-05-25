@@ -39,8 +39,8 @@ defmodule Rummage.Ecto.Rummage.Product.Search do
   use Rummage.Schema.Search,
     handlers: [
       category_name: %{search_field: :name, search_type: :like, assoc: [inner: :category]},
-      price_gteq: %{search_field: :price, search_type: :gteq},
-      price_lteq: %{search_field: :price, search_type: :lteq},
+      price_gteq: %{search_field: :price, search_type: :gteq, type: :float},
+      price_lteq: %{search_field: :price, search_type: :lteq, type: :float},
       name: %{search_type: :like},
       month: :integer,
       year: :integer,

@@ -44,7 +44,10 @@ defmodule Rummage.Schema.Search do
       if is_atom(handler) do
         quote do field unquote(name), unquote(handler) end
       else
-        quote do field unquote(name), :string end
+        quote do
+          type = Map.get(unquote(handler), :type, :string)
+          field unquote(name), type
+        end
       end
     end)
 
@@ -98,6 +101,7 @@ defmodule Rummage.Schema.Search do
 
         if handler && is_map(handler) do
           params = handler
+          |> Map.drop([:type])
           |> Map.put_new(:assoc, [])
           |> Map.put_new(:search_field, name)
           |> Map.put(:search_term, value)
