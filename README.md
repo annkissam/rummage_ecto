@@ -1,5 +1,7 @@
 # Rummage.Ecto
 
+<img src="src/rummage_logo.png" alt="https://hexdocs.pm/rummage_ecto/Rummage.Ecto.html" width="150" height="150">
+
 [![Build Status](https://travis-ci.org/aditya7iyengar/rummage_ecto.svg?branch=master)](https://travis-ci.org/aditya7iyengar/rummage_ecto)
 [![Coverage Status](https://coveralls.io/repos/github/aditya7iyengar/rummage_ecto/badge.svg?branch=master)](https://coveralls.io/github/aditya7iyengar/rummage_ecto?branch=master)
 [![Hex Version](http://img.shields.io/hexpm/v/rummage_ecto.svg?style=flat)](https://hex.pm/packages/rummage_ecto)
@@ -26,6 +28,8 @@ hook.
 If you'd like to have something like that, you can always configure `Rummage` to use your `Search` module for that model. This
 is why Rummage has been made configurable.**
 
+To see an example usage of `rummage`, check [this](https://github.com/aditya7iyengar/rummage_ecto_example) repository.
+
 ## Installation
 
 This package is [available in Hex](https://hexdocs.pm/rummage_ecto/), and can be installed as:
@@ -34,7 +38,7 @@ This package is [available in Hex](https://hexdocs.pm/rummage_ecto/), and can be
 
     ```elixir
     def deps do
-      [{:rummage_ecto, "~> 1.2.0"}]
+      [{:rummage_ecto, "~> 1.3"}]
     end
     ```
 
@@ -53,12 +57,14 @@ This package is [available in Hex](https://hexdocs.pm/rummage_ecto/), and can be
   - Using the Rummage Sort hook
   - Writing a Custom Rummage.Ecto Hook
   - Writing a Custom Rummage.Phoenix HTML helper
-  - Using Rummage with other Libraries: Kerosene
-  - Using Rummage with other Libraries: Scrivener
 
 ## Hooks
 
-
+- Hooks are modules (that use `Rummage.Ecto.Hook`) and implement callbacks for
+`Rummage.Ecto.Hook` behaviour. Each ecto operation which can transform the
+query is defined by a `Hook`. Hooks have `run/2` function using which they
+can transform an `Ecto.Queryable` variable and have `format_params/3` function
+using which they can transform params passed to them through `rummage_ecto`
 
 
 ## Configuration
@@ -90,7 +96,9 @@ This package is [available in Hex](https://hexdocs.pm/rummage_ecto/), and can be
 
 ## Usage
 
-`Rummage.Ecto` comes with a lot of powerful features which are available right away, without writing a whole lot of code.
+`Rummage.Ecto` comes with a lot of powerful features which are available right away,
+without writing a whole lot of code.
+
 Below are the ways `Rummage.Ecto` can be used:
 
 ### Basic Usage:
@@ -134,9 +142,9 @@ Below are the ways `Rummage.Ecto` can be used:
 
   ```elixir
   rummage = %{
-    "search" => %{"field_1" => %{"assoc" => [], "search_type" => "like", "search_term" => "field_!"}},
-    "sort" => %{"assoc" => [], "field" => "field_1.asc"},
-    "paginate" => %{"per_page" => "5", "page" => "1"}
+    search: %{field_1 => %{search_type: :like, search_term: "field_!"}},
+    sort: %{field: :field1, order: :asc},
+    paginate: %{per_page: 5, page: 1}
   }
 
   {queryable, rummage} = Product
@@ -151,29 +159,21 @@ Below are the ways `Rummage.Ecto` can be used:
     If invalid keys are passed, they won't alter any operations in rummage. Here's an example of `Rummage` params:
 
   ```elixir
-  %{
-    "search" => %{"field_1" => %{"assoc" => [], "search_type" => "like", "search_term" => "field_!"},
-    "sort" => %{"assoc" => [], "field" => "field_1.asc"},
-    "paginate" => %{"per_page" => "5", "page" => "1"}
+  rummage = %{
+    search: %{field_1 => %{search_type: :like, search_term: "field_!"}},
+    sort: %{field: :field1, order: :asc},
+    paginate: %{per_page: 5, page: 1}
   }
   ```
 
 ## Example with Screenshots
 
-  - Rummage Search example:
-  ![rummage search](src/rummage_search.png)
+- Coming soon...
 
-  - Rummage Search with Association example:
-  ![rummage search assoc](src/rummage_search_assoc.png)
 
-  - Rummage Sort example:
-  ![rummage sort](src/rummage_sort.png)
+## Next Steps
 
-  - Rummage Sort with Association example:
-  ![rummage sort assoc](src/rummage_sort_assoc.png)
+- [ ] Strealine associations
+- [ ] `rummage_ecto` should have a custom hook to handle embedded_fields
+- [ ] Continued writing blogs
 
-  - Rummage Search with Sort example:
-  ![rummage search sort](src/rummage_search_and_sort.png)
-
-  - Rummage Search, Sort and Paginate example:
-  ![rummage search sort paginate](src/rummage_search_sort_and_paginate.png)

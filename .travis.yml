@@ -6,7 +6,7 @@ otp_release:
   - 20.2
 sudo: false
 env:
-  - MIX_ENV=test ECTO_PGSQL_USER=postgres ECTO_PGSQL_PASSWORD=
+  - MIX_ENV=test POSTGRES_USERNAME=postgres POSTGRES_PASSWORD=
 script:
   - mix test
 after_script:
