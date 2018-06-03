@@ -9,14 +9,25 @@ defmodule Rummage.Ecto.Schema do
   defmacro __using__(opts) do
     quote do
       use Ecto.Schema
+      use Rummage.Ecto, unquote(opts)
       import Ecto.Query
       import unquote(__MODULE__)
     end
   end
 
   defmacro rummage_field(field, do: block) do
+    name = :"field_#{field}"
+
     quote do
-      defmacro unquote(field)(), do: unquote(block)
+      def unquote(name)(), do: unquote(block)
+    end
+  end
+
+  defmacro search_scope(scope, do: block) do
+    name = :"scope_#{scope}"
+
+    quote do
+      def unquote(name)(term), do: unquote(block).(term)
     end
   end
 end

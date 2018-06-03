@@ -312,12 +312,26 @@ defmodule Rummage.Ecto.Hook.Search do
     search_type = Map.get(field_params, :search_type)
     search_term = Map.get(field_params, :search_term)
     search_expr = Map.get(field_params, :search_expr, :where)
-    field = Map.get(field_params, :search_field, field)
+    field = resolve_field(field, queryable)
 
     assocs
     |> Enum.reduce(from(e in subquery(queryable)), &join_by_assoc(&1, &2))
     |> BuildSearchQuery.run(field, {search_expr, search_type}, search_term)
   end
+
+  defp resolve_field(field, queryable) do
+    module = get_module(queryable)
+    name = :"field_#{field}"
+    case function_exported?(module, name, 0) do
+      true -> apply(module, name, [])
+      _ -> field
+    end
+  end
+
+  defp get_module(%Ecto.Query{} = query), do: get_module(query.from.query)
+  defp get_module(%Ecto.SubQuery{} = query), do: get_module(query.from.query)
+  defp get_module({_, module}) when is_atom(module), do: module
+  defp get_module(module) when is_atom(module), do: module
 
   # Helper function which handles associations in a query with a join
   # type.

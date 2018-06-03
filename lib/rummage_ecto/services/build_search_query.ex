@@ -46,6 +46,13 @@ defmodule Rummage.Ecto.Services.BuildSearchQuery do
 
   @search_types ~w{like ilike eq gt lt gteq lteq is_null}a
   @search_exprs ~w{where or_where not_where}a
+  # Only for Postgres (only one interpolation is supported)
+  @supported_fragments ["date_part('day', ?)",
+                        "date_part('month', ?)",
+                        "date_part('year', ?)",
+                        "date_part('hour', ?)",
+                        "lower(?)",
+                        "upper(?)"]
 
   @doc """
   Builds a searched `queryable` on top of the given `queryable` using `field`, `search_type`
@@ -250,18 +257,44 @@ defmodule Rummage.Ecto.Services.BuildSearchQuery do
       #Ecto.Query<from p in "parents", where: not(like(p.field_1, ^"%field_!%"))>
 
   """
-  @spec handle_like(Ecto.Query.t(), atom(), String.t(),
+  @spec handle_like(Ecto.Query.t(), atom() | tuple(), String.t(),
                     __MODULE__.search_expr()) :: Ecto.Query.t()
+  for fragment <- @supported_fragments do
+    def handle_like(queryable, {:fragment, unquote(fragment), field}, search_term, :where) do
+      queryable
+      |> where([..., b],
+        like(fragment(unquote(fragment), field(b, ^field)), ^"%#{String.replace(search_term, "%", "\\%")}%"))
+    end
+  end
+
   def handle_like(queryable, field, search_term, :where) do
     queryable
     |> where([..., b],
       like(field(b, ^field), ^"%#{String.replace(search_term, "%", "\\%")}%"))
   end
+
+  for fragment <- @supported_fragments do
+    def handle_like(queryable, {:fragment, unquote(fragment), field}, search_term, :or_where) do
+      queryable
+      |> or_where([..., b],
+        like(fragment(unquote(fragment), field(b, ^field)), ^"%#{String.replace(search_term, "%", "\\%")}%"))
+    end
+  end
+
   def handle_like(queryable, field, search_term, :or_where) do
     queryable
     |> or_where([..., b],
       like(field(b, ^field), ^"%#{String.replace(search_term, "%", "\\%")}%"))
   end
+
+  for fragment <- @supported_fragments do
+    def handle_like(queryable, {:fragment, unquote(fragment), field}, search_term, :not_where) do
+      queryable
+      |> where([..., b],
+        not like(fragment(unquote(fragment), field(b, ^field)), ^"%#{String.replace(search_term, "%", "\\%")}%"))
+    end
+  end
+
   def handle_like(queryable, field, search_term, :not_where) do
     queryable
     |> where([..., b],
@@ -309,16 +342,43 @@ defmodule Rummage.Ecto.Services.BuildSearchQuery do
   """
   @spec handle_ilike(Ecto.Query.t(), atom(), String.t(),
                     __MODULE__.search_expr()) :: Ecto.Query.t()
+
+  for fragment <- @supported_fragments do
+    def handle_ilike(queryable, {:fragment, unquote(fragment), field}, search_term, :where) do
+      queryable
+      |> where([..., b],
+        ilike(fragment(unquote(fragment), field(b, ^field)), ^"%#{String.replace(search_term, "%", "\\%")}%"))
+    end
+  end
+
   def handle_ilike(queryable, field, search_term, :where) do
     queryable
     |> where([..., b],
       ilike(field(b, ^field), ^"%#{String.replace(search_term, "%", "\\%")}%"))
   end
+
+  for fragment <- @supported_fragments do
+    def handle_ilike(queryable, {:fragment, unquote(fragment), field}, search_term, :or_where) do
+      queryable
+      |> or_where([..., b],
+        ilike(fragment(unquote(fragment), field(b, ^field)), ^"%#{String.replace(search_term, "%", "\\%")}%"))
+    end
+  end
+
   def handle_ilike(queryable, field, search_term, :or_where) do
     queryable
     |> or_where([..., b],
       ilike(field(b, ^field), ^"%#{String.replace(search_term, "%", "\\%")}%"))
   end
+
+  for fragment <- @supported_fragments do
+    def handle_ilike(queryable, {:fragment, unquote(fragment), field}, search_term, :not_where) do
+      queryable
+      |> where([..., b],
+        not ilike(fragment(unquote(fragment), field(b, ^field)), ^"%#{String.replace(search_term, "%", "\\%")}%"))
+    end
+  end
+
   def handle_ilike(queryable, field, search_term, :not_where) do
     queryable
     |> where([..., b],
@@ -363,16 +423,42 @@ defmodule Rummage.Ecto.Services.BuildSearchQuery do
   """
   @spec handle_eq(Ecto.Query.t(), atom(), term(),
                   __MODULE__.search_expr()) :: Ecto.Query.t()
+  for fragment <- @supported_fragments do
+    def handle_eq(queryable, {:fragment, unquote(fragment), field}, search_term, :where) do
+      queryable
+      |> where([..., b],
+        fragment(unquote(fragment), field(b, ^field)) == ^search_term)
+    end
+  end
+
   def handle_eq(queryable, field, search_term, :where) do
     queryable
     |> where([..., b],
       field(b, ^field) == ^search_term)
   end
+
+  for fragment <- @supported_fragments do
+    def handle_eq(queryable, {:fragment, unquote(fragment), field}, search_term, :or_where) do
+      queryable
+      |> or_where([..., b],
+        fragment(unquote(fragment), field(b, ^field)) == ^search_term)
+    end
+  end
+
   def handle_eq(queryable, field, search_term, :or_where) do
     queryable
     |> or_where([..., b],
       field(b, ^field) == ^search_term)
   end
+
+  for fragment <- @supported_fragments do
+    def handle_eq(queryable, {:fragment, unquote(fragment), field}, search_term, :not_where) do
+      queryable
+      |> where([..., b],
+        fragment(unquote(fragment), field(b, ^field)) != ^search_term)
+    end
+  end
+
   def handle_eq(queryable, field, search_term, :not_where) do
     queryable
     |> where([..., b],
@@ -417,16 +503,42 @@ defmodule Rummage.Ecto.Services.BuildSearchQuery do
   """
   @spec handle_gt(Ecto.Query.t(), atom(), term(),
                   __MODULE__.search_expr()) :: Ecto.Query.t()
+  for fragment <- @supported_fragments do
+    def handle_gt(queryable, {:fragment, unquote(fragment), field}, search_term, :where) do
+      queryable
+      |> where([..., b],
+        fragment(unquote(fragment), field(b, ^field)) > ^search_term)
+    end
+  end
+
   def handle_gt(queryable, field, search_term, :where) do
     queryable
     |> where([..., b],
       field(b, ^field) > ^search_term)
   end
+
+  for fragment <- @supported_fragments do
+    def handle_gt(queryable, {:fragment, unquote(fragment), field}, search_term, :or_where) do
+      queryable
+      |> or_where([..., b],
+        fragment(unquote(fragment), field(b, ^field)) > ^search_term)
+    end
+  end
+
   def handle_gt(queryable, field, search_term, :or_where) do
     queryable
     |> or_where([..., b],
       field(b, ^field) > ^search_term)
   end
+
+  for fragment <- @supported_fragments do
+    def handle_gt(queryable, {:fragment, unquote(fragment), field}, search_term, :not_where) do
+      queryable
+      |> where([..., b],
+        fragment(unquote(fragment), field(b, ^field)) <= ^search_term)
+    end
+  end
+
   def handle_gt(queryable, field, search_term, :not_where) do
     queryable
     |> where([..., b],
@@ -471,16 +583,42 @@ defmodule Rummage.Ecto.Services.BuildSearchQuery do
   """
   @spec handle_lt(Ecto.Query.t(), atom(), term(),
                   __MODULE__.search_expr()) :: Ecto.Query.t()
+  for fragment <- @supported_fragments do
+    def handle_lt(queryable, {:fragment, unquote(fragment), field}, search_term, :where) do
+      queryable
+      |> where([..., b],
+        fragment(unquote(fragment), field(b, ^field)) < ^search_term)
+    end
+  end
+
   def handle_lt(queryable, field, search_term, :where) do
     queryable
     |> where([..., b],
       field(b, ^field) < ^search_term)
   end
+
+  for fragment <- @supported_fragments do
+    def handle_lt(queryable, {:fragment, unquote(fragment), field}, search_term, :or_where) do
+      queryable
+      |> or_where([..., b],
+        fragment(unquote(fragment), field(b, ^field)) < ^search_term)
+    end
+  end
+
   def handle_lt(queryable, field, search_term, :or_where) do
     queryable
     |> or_where([..., b],
       field(b, ^field) < ^search_term)
   end
+
+  for fragment <- @supported_fragments do
+    def handle_lt(queryable, {:fragment, unquote(fragment), field}, search_term, :not_where) do
+      queryable
+      |> where([..., b],
+        fragment(unquote(fragment), field(b, ^field)) >= ^search_term)
+    end
+  end
+
   def handle_lt(queryable, field, search_term, :not_where) do
     queryable
     |> where([..., b],
@@ -525,16 +663,42 @@ defmodule Rummage.Ecto.Services.BuildSearchQuery do
   """
   @spec handle_gteq(Ecto.Query.t(), atom(), term(),
                     __MODULE__.search_expr()) :: Ecto.Query.t()
+  for fragment <- @supported_fragments do
+    def handle_gteq(queryable, {:fragment, unquote(fragment), field}, search_term, :where) do
+      queryable
+      |> where([..., b],
+        fragment(unquote(fragment), field(b, ^field)) >= ^search_term)
+    end
+  end
+
   def handle_gteq(queryable, field, search_term, :where) do
     queryable
     |> where([..., b],
       field(b, ^field) >= ^search_term)
   end
+
+  for fragment <- @supported_fragments do
+    def handle_gteq(queryable, {:fragment, unquote(fragment), field}, search_term, :or_where) do
+      queryable
+      |> or_where([..., b],
+        fragment(unquote(fragment), field(b, ^field)) >= ^search_term)
+    end
+  end
+
   def handle_gteq(queryable, field, search_term, :or_where) do
     queryable
     |> or_where([..., b],
       field(b, ^field) >= ^search_term)
   end
+
+  for fragment <- @supported_fragments do
+    def handle_gteq(queryable, {:fragment, unquote(fragment), field}, search_term, :not_where) do
+      queryable
+      |> where([..., b],
+        fragment(unquote(fragment), field(b, ^field)) < ^search_term)
+    end
+  end
+
   def handle_gteq(queryable, field, search_term, :not_where) do
     queryable
     |> where([..., b],
@@ -579,16 +743,42 @@ defmodule Rummage.Ecto.Services.BuildSearchQuery do
   """
   @spec handle_lteq(Ecto.Query.t(), atom(), term(),
                     __MODULE__.search_expr()) :: Ecto.Query.t()
+  for fragment <- @supported_fragments do
+    def handle_lteq(queryable, {:fragment, unquote(fragment), field}, search_term, :where) do
+      queryable
+      |> where([..., b],
+        fragment(unquote(fragment), field(b, ^field)) <= ^search_term)
+    end
+  end
+
   def handle_lteq(queryable, field, search_term, :where) do
     queryable
     |> where([..., b],
       field(b, ^field) <= ^search_term)
   end
+
+  for fragment <- @supported_fragments do
+    def handle_lteq(queryable, {:fragment, unquote(fragment), field}, search_term, :or_where) do
+      queryable
+      |> or_where([..., b],
+        fragment(unquote(fragment), field(b, ^field)) <= ^search_term)
+    end
+  end
+
   def handle_lteq(queryable, field, search_term, :or_where) do
     queryable
     |> or_where([..., b],
       field(b, ^field) <= ^search_term)
   end
+
+  for fragment <- @supported_fragments do
+    def handle_lteq(queryable, {:fragment, unquote(fragment), field}, search_term, :not_where) do
+      queryable
+      |> where([..., b],
+        fragment(unquote(fragment), field(b, ^field)) > ^search_term)
+    end
+  end
+
   def handle_lteq(queryable, field, search_term, :not_where) do
     queryable
     |> where([..., b],
@@ -642,31 +832,84 @@ defmodule Rummage.Ecto.Services.BuildSearchQuery do
   """
   @spec handle_is_null(Ecto.Query.t(), atom(), boolean(),
                       __MODULE__.search_expr()) :: Ecto.Query.t()
+  for fragment <- @supported_fragments do
+    def handle_is_null(queryable, {:fragment, unquote(fragment), field}, true, :where) do
+      queryable
+      |> where([..., b],
+        is_nil(fragment(unquote(fragment), field(b, ^field))))
+    end
+  end
+
   def handle_is_null(queryable, field, true, :where)do
     queryable
     |> where([..., b],
       is_nil(field(b, ^field)))
   end
+
+  for fragment <- @supported_fragments do
+    def handle_is_null(queryable, {:fragment, unquote(fragment), field}, true, :or_where) do
+      queryable
+      |> or_where([..., b],
+        is_nil(fragment(unquote(fragment), field(b, ^field))))
+    end
+  end
+
   def handle_is_null(queryable, field, true, :or_where)do
     queryable
     |> or_where([..., b],
       is_nil(field(b, ^field)))
   end
+
+  for fragment <- @supported_fragments do
+    def handle_is_null(queryable, {:fragment, unquote(fragment), field}, true, :not_where) do
+      queryable
+      |> where([..., b],
+        not is_nil(fragment(unquote(fragment), field(b, ^field))))
+    end
+  end
+
   def handle_is_null(queryable, field, true, :not_where)do
     queryable
     |> where([..., b],
       not is_nil(field(b, ^field)))
   end
+
+  for fragment <- @supported_fragments do
+    def handle_is_null(queryable, {:fragment, unquote(fragment), field}, false, :where) do
+      queryable
+      |> where([..., b],
+        not is_nil(fragment(unquote(fragment), field(b, ^field))))
+    end
+  end
+
   def handle_is_null(queryable, field, :false, :where) do
     queryable
     |> where([..., b],
       not is_nil(field(b, ^field)))
   end
+
+  for fragment <- @supported_fragments do
+    def handle_is_null(queryable, {:fragment, unquote(fragment), field}, false, :or_where) do
+      queryable
+      |> or_where([..., b],
+        not is_nil(fragment(unquote(fragment), field(b, ^field))))
+    end
+  end
+
   def handle_is_null(queryable, field, :false, :or_where) do
     queryable
     |> or_where([..., b],
       not is_nil(field(b, ^field)))
   end
+
+  for fragment <- @supported_fragments do
+    def handle_is_null(queryable, {:fragment, unquote(fragment), field}, false, :not_where) do
+      queryable
+      |> where([..., b],
+        is_nil(fragment(unquote(fragment), field(b, ^field))))
+    end
+  end
+
   def handle_is_null(queryable, field, :false, :not_where) do
     queryable
     |> where([..., b],
