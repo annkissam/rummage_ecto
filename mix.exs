@@ -64,7 +64,7 @@ defmodule Rummage.Ecto.Mixfile do
 
   defp description do
     """
-    A library that allows us to search, sort and paginate ecto queries
+    A library that allows searching, sorting and paginating ecto queries
     """
   end
 
