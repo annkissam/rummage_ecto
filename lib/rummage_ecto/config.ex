@@ -109,7 +109,8 @@ defmodule Rummage.Ecto.Config do
   end
 
   defp config(key, default, application) do
-    config(application)
+    application
+    |> config()
     |> Keyword.get(key, default)
     |> resolve_config(default)
   end
