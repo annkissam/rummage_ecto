@@ -1,5 +1,23 @@
 # Versions CHANGELOG
 
+## Version 2.0.0-rc.0
+
+- Change in namespace/module names:
+  * Replace `Rummage.Ecto.Hooks` with `Rummage.Ecto.Hook`.
+  * Replace `Rummage.Ecto.CustomHooks` with `Rummage.Ecto.CustomHook`.
+
+- Introducing `Rummage.Ecto.Schema`:
+
+- Changes to `Rummage.Ecto.Hook.Search`:
+
+- Changes to `Rummage.Ecto.Hook.Sort`:
+
+- Changes to `Rummage.Ecto.Hook.Paginate`:
+
+- Changes in Configurations:
+
+
+
 ## Version: 1.3.0-rc.0
 
 - Better Behaviour definition for Hooks.
