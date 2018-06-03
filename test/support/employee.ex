@@ -6,29 +6,21 @@ defmodule Rummage.Ecto.Employee do
 
   use Rummage.Ecto.Schema
 
+  @primary_key false
+
   schema "employees" do
     field :first_name, :string
     field :last_name, :string
-    field :price, :float
-    field :available, :boolean
-    belongs_to :category, Rummage.Ecto.Category
+    field :date_of_birth, :date
 
     timestamps()
   end
 
-  rummage_field :month do
-    quote(do: fragment("date_part('month', ?)", q.inserted_at))
+  rummage_field :year_of_birth do
+    {:fragment, "date_part('year', ?)", :date_of_birth}
   end
 
   rummage_field :name do
-    quote(do: fragment("concat(?, ?)", q.first_name, q.last_name))
-  end
-
-  def get_month(queryable) do
-    queryable |> select([q], month())
-  end
-
-  def get_name(queryable) do
-    queryable |> select([q], name())
+    {:fragment, "concat(?, ?)", :first_name, :last_name}
   end
 end
