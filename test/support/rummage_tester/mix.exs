@@ -30,6 +30,7 @@ defmodule RummageTester.MixProject do
   defp aliases do
     [
       "ecto.setup": ["ecto.create", "ecto.migrate"],
+      "ecto.seed": ["run priv/repo/seeds.exs"],
       "ecto.reset": ["ecto.drop", "ecto.setup"],
       "test": ["ecto.setup --quite", "test"],
     ]
