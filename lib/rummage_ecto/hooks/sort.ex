@@ -140,6 +140,14 @@ defmodule Rummage.Ecto.Hook.Sort do
   @expected_keys ~w{field order assoc}a
   @err_msg ~s{Error in params, No values given for keys: }
 
+  # Only for Postgres (only one interpolation is supported)
+  @supported_fragments ["date_part('day', ?)",
+                        "date_part('month', ?)",
+                        "date_part('year', ?)",
+                        "date_part('hour', ?)",
+                        "lower(?)",
+                        "upper(?)"]
+
   @doc """
   This is the callback implementation of `Rummage.Ecto.Hook.run/2`.
 
@@ -231,7 +239,10 @@ defmodule Rummage.Ecto.Hook.Sort do
   # the sent queryable variable
   defp handle_sort(queryable, sort_params) do
     order = Map.get(sort_params, :order)
-    field = Map.get(sort_params, :field)
+    field = sort_params
+      |> Map.get(:field)
+      |> resolve_field(queryable)
+
     assocs = Map.get(sort_params, :assoc)
     ci = Map.get(sort_params, :ci, false)
 
@@ -262,6 +273,17 @@ defmodule Rummage.Ecto.Hook.Sort do
   # case insensitivity and field
   defp handle_ordering(queryable, field, order, ci) do
     order_by_assoc(queryable, order, field, ci)
+  end
+
+  for fragment <- @supported_fragments do
+    defp order_by_assoc(queryable, order_type, {:fragment, unquote(fragment), field}, false) do
+      order_by(queryable, [p0, ..., p2], [{^order_type, fragment(unquote(fragment), field(p2, ^field))}])
+    end
+
+    defp order_by_assoc(queryable, order_type, {:fragment, unquote(fragment), field}, true) do
+      order_by(queryable, [p0, ..., p2],
+               [{^order_type, case_insensitive(fragment(unquote(fragment), field(p2, ^field)))}])
+    end
   end
 
   defp order_by_assoc(queryable, order_type, field, false) do
