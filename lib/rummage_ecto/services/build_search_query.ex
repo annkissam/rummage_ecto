@@ -1,7 +1,7 @@
 defmodule Rummage.Ecto.Services.BuildSearchQuery do
   @moduledoc """
   `Rummage.Ecto.Services.BuildSearchQuery` is a service module which serves the
-  default search hook, `Rummage.Ecto.Hooks.Search` that comes shipped with `Rummage.Ecto`.
+  default search hook, `Rummage.Ecto.Hook.Search` that comes shipped with `Rummage.Ecto`.
 
   ## Module Attributes
 

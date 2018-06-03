@@ -71,7 +71,7 @@ defmodule Rummage.Ecto.Hook do
   end
   ```
 
-  For a better example, check out `Rummage.Ecto.Hooks.Paginate` or any other
+  For a better example, check out `Rummage.Ecto.Hook.Paginate` or any other
   hooks defined in `Rumamge.Ecto`
   """
   defmacro __using__(_opts) do

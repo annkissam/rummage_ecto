@@ -43,7 +43,7 @@ defmodule Rummage.Ecto.CustomHooks.KeysetPaginate do
   ## When to Use KeysetPaginate?
 
   - Keyset Pagination is mainly here to make pagination faster for complex
-  pages. It is recommended that you use `Rummage.Ecto.Hooks.Paginate` for a
+  pages. It is recommended that you use `Rummage.Ecto.Hook.Paginate` for a
   simple pagination operation, as this module has a lot of assumptions and
   it's own ordering on top of the given query.
 
