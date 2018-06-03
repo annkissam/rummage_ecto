@@ -137,8 +137,8 @@ defmodule Rummage.Ecto.Hooks.Sort do
 
   import Ecto.Query
 
-  @expected_keys ~w(field order assoc)a
-  @err_msg "Error in params, No values given for keys: "
+  @expected_keys ~w{field order assoc}a
+  @err_msg ~s{Error in params, No values given for keys: }
 
   @doc """
   This is the callback implementation of `Rummage.Ecto.Hook.run/2`.

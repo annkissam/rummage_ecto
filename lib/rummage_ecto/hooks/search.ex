@@ -164,8 +164,8 @@ defmodule Rummage.Ecto.Hooks.Search do
 
   import Ecto.Query
 
-  @expected_keys ~w(search_type assoc search_term)a
-  @err_msg "Error in params, No values given for keys: "
+  @expected_keys ~w{search_type assoc search_term}a
+  @err_msg ~s{Error in params, No values given for keys: }
 
   alias Rummage.Ecto.Services.BuildSearchQuery
 

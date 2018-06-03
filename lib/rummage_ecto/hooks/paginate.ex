@@ -81,8 +81,8 @@ defmodule Rummage.Ecto.Hooks.Paginate do
 
   import Ecto.Query
 
-  @expected_keys ~w(per_page page)a
-  @err_msg "Error in params, No values given for keys: "
+  @expected_keys ~w{per_page page}a
+  @err_msg ~s{Error in params, No values given for keys: }
 
   @per_page 10
 

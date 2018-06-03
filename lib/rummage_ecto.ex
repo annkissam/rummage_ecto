@@ -237,7 +237,7 @@ defmodule Rummage.Ecto do
       end
 
       defp defaults() do
-        keys = ~w(repo per_page search sort paginate)a
+        keys = ~w{repo per_page search sort paginate}a
         Enum.map(keys, &get_defs/1)
       end
 

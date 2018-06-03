@@ -3,11 +3,11 @@ defmodule Rummage.Ecto.Services.BuildSearchQuery do
   `Rummage.Ecto.Services.BuildSearchQuery` is a service module which serves the
   default search hook, `Rummage.Ecto.Hooks.Search` that comes shipped with `Rummage.Ecto`.
 
-  Has a `Module Attribute` called `search_types`:
+  ## Module Attributes
 
   ```elixir
-  @search_types ~w(like ilike eq gt lt gteq lteq is_null)a
-  @search_exprs ~w(where or_where not_where)a
+  @search_types ~w{like ilike eq gt lt gteq lteq is_null}a
+  @search_exprs ~w{where or_where not_where}a
   ```
 
   `@search_types` is a collection of all the 8 valid `search_types` that come shipped with
@@ -44,8 +44,8 @@ defmodule Rummage.Ecto.Services.BuildSearchQuery do
   @type search_type :: :like | :ilike | :eq | :gt
                   | :lt | :gteq | :lteq | :is_null
 
-  @search_types ~w(like ilike eq gt lt gteq lteq is_null)a
-  @search_exprs ~w(where or_where not_where)a
+  @search_types ~w{like ilike eq gt lt gteq lteq is_null}a
+  @search_exprs ~w{where or_where not_where}a
 
   @doc """
   Builds a searched `queryable` on top of the given `queryable` using `field`, `search_type`
