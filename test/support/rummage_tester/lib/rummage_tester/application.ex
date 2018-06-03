@@ -6,6 +6,7 @@ defmodule RummageTester.Application do
 
   def start(_type, _args) do
     children = [
+      supervisor(RummageTester.Repo, [])
     ]
 
     opts = [strategy: :one_for_one, name: RummageTester.Supervisor]
