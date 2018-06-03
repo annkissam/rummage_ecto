@@ -156,8 +156,8 @@ defmodule Rummage.Ecto.Hook.Search do
 
   The `CustomHook` must use `Rummage.Ecto.Hook`. For examples of `CustomHook`,
   check out some `custom_hooks` that are shipped with `Rummage.Ecto`:
-  `Rummage.Ecto.CustomHooks.SimpleSearch`, `Rummage.Ecto.CustomHooks.SimpleSort`,
-    Rummage.Ecto.CustomHooks.SimplePaginate
+  `Rummage.Ecto.CustomHook.SimpleSearch`, `Rummage.Ecto.CustomHook.SimpleSort`,
+    Rummage.Ecto.CustomHook.SimplePaginate
   """
 
   use Rummage.Ecto.Hook

@@ -1,5 +1,5 @@
-defmodule Rummage.Ecto.CustomHooks.SimpleSearchTest do
+defmodule Rummage.Ecto.CustomHook.SimpleSearchTest do
   use ExUnit.Case
-  doctest Rummage.Ecto.CustomHooks.SimpleSearch
+  doctest Rummage.Ecto.CustomHook.SimpleSearch
 
 end

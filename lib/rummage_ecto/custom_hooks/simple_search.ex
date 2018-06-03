@@ -1,6 +1,6 @@
-defmodule Rummage.Ecto.CustomHooks.SimpleSearch do
+defmodule Rummage.Ecto.CustomHook.SimpleSearch do
   @moduledoc """
-  `Rummage.Ecto.CustomHooks.SimpleSearch` is an example of a Custom Hook that
+  `Rummage.Ecto.CustomHook.SimpleSearch` is an example of a Custom Hook that
   comes with `Rummage.Ecto`.
 
   This module provides a operations that can add searching functionality to
@@ -42,7 +42,7 @@ defmodule Rummage.Ecto.CustomHooks.SimpleSearch do
   do the following:
 
   ```elixir
-  Rummage.Ecto.CustomHooks.SimpleSearch.run(Product, %{available:
+  Rummage.Ecto.CustomHook.SimpleSearch.run(Product, %{available:
     %{search_type: :eq,
     search_term: true}})
   ```
@@ -51,7 +51,7 @@ defmodule Rummage.Ecto.CustomHooks.SimpleSearch do
   search for products that are `available`, but have a price less than `10.0`.
 
   ```elixir
-  Rummage.Ecto.CustomHooks.SimpleSearch.run(Product,
+  Rummage.Ecto.CustomHook.SimpleSearch.run(Product,
     %{available: %{search_type: :eq,
       search_term: true},
     %{price: %{search_type: :lt,
@@ -81,7 +81,7 @@ defmodule Rummage.Ecto.CustomHooks.SimpleSearch do
   searched by ascending `field_1`
 
   ```elixir
-  alias Rummage.Ecto.CustomHooks.SimpleSearch
+  alias Rummage.Ecto.CustomHook.SimpleSearch
 
   searched_queryable = SimpleSearch.run(Parent,
     %{field_1: %{search_type: :like, search_term: "field_!"}}})
@@ -96,7 +96,7 @@ defmodule Rummage.Ecto.CustomHooks.SimpleSearch do
   Keep in mind that `case_insensitive` can only be called for `text` fields
 
   ```elixir
-  alias Rummage.Ecto.CustomHooks.SimpleSearch
+  alias Rummage.Ecto.CustomHook.SimpleSearch
 
   searched_queryable = SimpleSearch.run(Parent,
     %{field_1: %{ search_type: "ilike", search_term: "field_!"}}})
@@ -112,11 +112,11 @@ defmodule Rummage.Ecto.CustomHooks.SimpleSearch do
   In the `Rummage.Ecto` call:
   ```elixir
   Rummage.Ecto.rummage(queryable, rummage,
-    search: Rummage.Ecto.CustomHooks.SimpleSearch)
+    search: Rummage.Ecto.CustomHook.SimpleSearch)
 
   or
 
-  MySchema.rummage(rummage, search: Rummage.Ecto.CustomHooks.SimpleSearch)
+  MySchema.rummage(rummage, search: Rummage.Ecto.CustomHook.SimpleSearch)
   ```
 
   OR
@@ -125,7 +125,7 @@ defmodule Rummage.Ecto.CustomHooks.SimpleSearch do
   ```elixir
   config :my_app,
     Rummage.Ecto,
-    search: Rummage.Ecto.CustomHooks.SimpleSearch
+    search: Rummage.Ecto.CustomHook.SimpleSearch
   ```
 
   OR
@@ -134,7 +134,7 @@ defmodule Rummage.Ecto.CustomHooks.SimpleSearch do
   ```elixir
   defmodule MySchema do
     use Rummage.Ecto, repo: SomeRepo,
-      search: Rummage.Ecto.CustomHooks.SimpleSearch
+      search: Rummage.Ecto.CustomHook.SimpleSearch
   end
   """
 
@@ -177,21 +177,21 @@ defmodule Rummage.Ecto.CustomHooks.SimpleSearch do
   ## Examples
   When search_params are empty, it simply returns the same `queryable`:
 
-      iex> alias Rummage.Ecto.CustomHooks.SimpleSearch
+      iex> alias Rummage.Ecto.CustomHook.SimpleSearch
       iex> import Ecto.Query
       iex> SimpleSearch.run(Parent, %{})
       Parent
 
   When a non-empty map is passed as a field `params`, but with a missing key:
 
-      iex> alias Rummage.Ecto.CustomHooks.SimpleSearch
+      iex> alias Rummage.Ecto.CustomHook.SimpleSearch
       iex> import Ecto.Query
       iex> SimpleSearch.run(Parent, %{field: %{search_type: :eq}})
       ** (RuntimeError) Error in params, No values given for keys: search_term
 
   When a valid map of params is passed with an `Ecto.Schema` module:
 
-      iex> alias Rummage.Ecto.CustomHooks.SimpleSearch
+      iex> alias Rummage.Ecto.CustomHook.SimpleSearch
       iex> import Ecto.Query
       iex> search_params = %{field1: %{
       ...> search_type: :like,
@@ -202,7 +202,7 @@ defmodule Rummage.Ecto.CustomHooks.SimpleSearch do
 
   When a valid map of params is passed with an `Ecto.Query.t`:
 
-      iex> alias Rummage.Ecto.CustomHooks.SimpleSearch
+      iex> alias Rummage.Ecto.CustomHook.SimpleSearch
       iex> import Ecto.Query
       iex> search_params = %{field1: %{
       ...> search_type: :like,
@@ -214,7 +214,7 @@ defmodule Rummage.Ecto.CustomHooks.SimpleSearch do
 
   When a valid map of params is passed with an `Ecto.Query.t` and `:on_where`:
 
-      iex> alias Rummage.Ecto.CustomHooks.SimpleSearch
+      iex> alias Rummage.Ecto.CustomHook.SimpleSearch
       iex> import Ecto.Query
       iex> search_params = %{field1: %{
       ...> search_type: :like,
@@ -227,7 +227,7 @@ defmodule Rummage.Ecto.CustomHooks.SimpleSearch do
   When a valid map of params is passed with an `Ecto.Query.t`, searching on
   a boolean param
 
-      iex> alias Rummage.Ecto.CustomHooks.SimpleSearch
+      iex> alias Rummage.Ecto.CustomHook.SimpleSearch
       iex> import Ecto.Query
       iex> search_params = %{available: %{
       ...> search_type: :eq,
@@ -240,7 +240,7 @@ defmodule Rummage.Ecto.CustomHooks.SimpleSearch do
   When a valid map of params is passed with an `Ecto.Query.t`, searching on
   a float param
 
-      iex> alias Rummage.Ecto.CustomHooks.SimpleSearch
+      iex> alias Rummage.Ecto.CustomHook.SimpleSearch
       iex> import Ecto.Query
       iex> search_params = %{price: %{
       ...> search_type: :gteq,
@@ -254,7 +254,7 @@ defmodule Rummage.Ecto.CustomHooks.SimpleSearch do
   a boolean param, but with a wrong `search_type`.
   NOTE: This doesn't validate the search_type of search_term
 
-      iex> alias Rummage.Ecto.CustomHooks.SimpleSearch
+      iex> alias Rummage.Ecto.CustomHook.SimpleSearch
       iex> import Ecto.Query
       iex> search_params = %{available: %{
       ...> search_type: :ilike,
@@ -321,7 +321,7 @@ defmodule Rummage.Ecto.CustomHooks.SimpleSearch do
   `search_expr` which are essential for running this hook module.
 
   ## Examples
-      iex> alias Rummage.Ecto.CustomHooks.SimpleSearch
+      iex> alias Rummage.Ecto.CustomHook.SimpleSearch
       iex> SimpleSearch.format_params(Parent, %{field: %{}}, [])
       %{field: %{search_expr: :where, search_type: :eq}}
   """
