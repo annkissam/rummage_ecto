@@ -141,12 +141,16 @@ defmodule Rummage.Ecto.Hook.Sort do
   @err_msg ~s{Error in params, No values given for keys: }
 
   # Only for Postgres (only one interpolation is supported)
-  @supported_fragments ["date_part('day', ?)",
-                        "date_part('month', ?)",
-                        "date_part('year', ?)",
-                        "date_part('hour', ?)",
-                        "lower(?)",
-                        "upper(?)"]
+  @supported_fragments_one ["date_part('day', ?)",
+                            "date_part('month', ?)",
+                            "date_part('year', ?)",
+                            "date_part('hour', ?)",
+                            "lower(?)",
+                            "upper(?)"]
+
+  @supported_fragments_two ["concat(?, ?)",
+                            "coalesce(?, ?)"]
+
 
   @doc """
   This is the callback implementation of `Rummage.Ecto.Hook.run/2`.
@@ -275,7 +279,7 @@ defmodule Rummage.Ecto.Hook.Sort do
     order_by_assoc(queryable, order, field, ci)
   end
 
-  for fragment <- @supported_fragments do
+  for fragment <- @supported_fragments_one do
     defp order_by_assoc(queryable, order_type, {:fragment, unquote(fragment), field}, false) do
       order_by(queryable, [p0, ..., p2], [{^order_type, fragment(unquote(fragment), field(p2, ^field))}])
     end
@@ -283,6 +287,17 @@ defmodule Rummage.Ecto.Hook.Sort do
     defp order_by_assoc(queryable, order_type, {:fragment, unquote(fragment), field}, true) do
       order_by(queryable, [p0, ..., p2],
                [{^order_type, case_insensitive(fragment(unquote(fragment), field(p2, ^field)))}])
+    end
+  end
+
+  for fragment <- @supported_fragments_two do
+    defp order_by_assoc(queryable, order_type, {:fragment, unquote(fragment), field1, field2}, false) do
+      order_by(queryable, [p0, ..., p2], [{^order_type, fragment(unquote(fragment), field(p2, ^field1), field(p2, ^field2))}])
+    end
+
+    defp order_by_assoc(queryable, order_type, {:fragment, unquote(fragment), field1, field2}, true) do
+      order_by(queryable, [p0, ..., p2],
+               [{^order_type, case_insensitive(fragment(unquote(fragment), field(p2, ^field1), field(p2, ^field2)))}])
     end
   end
 
