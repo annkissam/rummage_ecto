@@ -17,4 +17,12 @@ defmodule RummageTester.Employee do
 
     timestamps()
   end
+
+  rummage_field :year_of_birth do
+    {:fragment, "date_part('year', ?)", :date_of_birth}
+  end
+
+  rummage_field :name do
+    {:fragment, "concat(?, ?)", :first_name, :last_name}
+  end
 end

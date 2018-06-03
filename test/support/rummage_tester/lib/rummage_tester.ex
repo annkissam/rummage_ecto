@@ -12,6 +12,27 @@ defmodule RummageTester do
     |> RummageTester.Repo.all()
   end
 
+  def list_employees(opts) do
+    opts
+    |> list_employees_query()
+    |> (fn {q, _} -> q end).()
+    |> RummageTester.Repo.all()
+  end
+
+  def list_employees_query(name: name) do
+    Employee.rummage(%{
+      search: %{name: %{assoc: [], search_term: name, search_type: :ilike}},
+      sort: %{assoc: [], field: :last_name, order: :asc},
+      paginate: @paginate})
+  end
+
+  def list_employees_query(year_of_birth: year_of_birth) do
+    Employee.rummage(%{
+      search: %{year_of_birth: %{assoc: [], search_term: year_of_birth, search_type: :eq}},
+      sort: %{assoc: [], field: :last_name, order: :asc},
+      paginate: @paginate})
+  end
+
   def list_products_query(name: name) do
     Product.rummage(%{
       search: %{name: %{assoc: [], search_term: name, search_type: :ilike}},
