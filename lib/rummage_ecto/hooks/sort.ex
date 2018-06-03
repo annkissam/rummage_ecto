@@ -141,6 +141,7 @@ defmodule Rummage.Ecto.Hook.Sort do
   @err_msg ~s{Error in params, No values given for keys: }
 
   # Only for Postgres (only one interpolation is supported)
+  # TODO: Fix this once Ecto 3.0 comes out with `unsafe_fragment`
   @supported_fragments_one ["date_part('day', ?)",
                             "date_part('month', ?)",
                             "date_part('year', ?)",
