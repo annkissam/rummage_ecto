@@ -1,14 +1,15 @@
 defmodule Rummage.Ecto.Mixfile do
   use Mix.Project
 
-  @version "1.3.0-rc.0"
+  @version "2.0.0-rc.0"
+  @elixir "~> 1.6"
   @url "https://github.com/aditya7iyengar/rummage_ecto"
 
   def project do
     [
       app: :rummage_ecto,
       version: @version,
-      elixir: "~> 1.4",
+      elixir: @elixir,
       deps: deps(),
       build_embedded: Mix.env == :prod,
       start_permanent: Mix.env == :prod,
@@ -49,12 +50,15 @@ defmodule Rummage.Ecto.Mixfile do
 
   defp deps do
     [
-      {:credo, "~> 0.5", only: [:dev, :test]},
+      # Development Dependency
       {:ecto, "~> 2.2"},
-      {:excoveralls, "~> 0.3", only: :test},
-      {:ex_doc, "~> 0.14", only: :dev, runtime: false},
-      {:inch_ex, "~> 0.5", only: [:dev, :test, :docs]},
-      {:postgrex, ">= 0.0.0", only: :test},
+
+      # Other Dependencies
+      {:credo, "~> 0.9.1", only: [:dev, :test], runtime: false},
+      {:excoveralls, "~> 0.8", only: :test, runtime: false},
+      {:ex_doc, "~> 0.16", only: :dev, runtime: false},
+      {:inch_ex, "~> 0.5", only: [:dev, :test, :docs], runtime: false},
+      {:postgrex, "~> 0.13", only: :test, optional: true, runtime: false},
     ]
   end
 
@@ -75,20 +79,9 @@ defmodule Rummage.Ecto.Mixfile do
 
   defp aliases do
     [
-      "ecto.setup": [
-        "ecto.create",
-        "ecto.migrate"
-      ],
-     "ecto.reset": [
-        "ecto.drop",
-        "ecto.setup"
-      ],
-     "test": [
-        # "ecto.drop",
-        "ecto.create --quiet",
-        "ecto.migrate",
-        "test"
-      ],
+      "ecto.setup": ["ecto.create", "ecto.migrate"],
+      "ecto.reset": ["ecto.drop", "ecto.setup"],
+      "test": ["ecto.setup --quite", "test", "coveralls"],
     ]
   end
 
