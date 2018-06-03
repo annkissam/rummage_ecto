@@ -31,7 +31,7 @@ defmodule RummageTester.MixProject do
     [
       "ecto.setup": ["ecto.create", "ecto.migrate"],
       "ecto.reset": ["ecto.drop", "ecto.setup"],
-      "test": ["ecto.setup --quite", "test", "coveralls"],
+      "test": ["ecto.setup --quite", "test"],
     ]
   end
 

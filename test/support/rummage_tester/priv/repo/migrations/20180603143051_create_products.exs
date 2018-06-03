@@ -6,7 +6,7 @@ defmodule RummageTester.Repo.Migrations.CreateProducts do
       add :internal_code, :string, primary_key: true
       add :name, :string
       add :price, :float
-      add :available, :boolean
+      add :availability, :boolean
       add :description, :text
       add :category_id, references(:categories)
 
@@ -16,6 +16,6 @@ defmodule RummageTester.Repo.Migrations.CreateProducts do
     create unique_index(:products, [:name])
     create index(:products, [:category_id])
     create index(:products, [:price])
-    create index(:products, [:available])
+    create index(:products, [:availability])
   end
 end
