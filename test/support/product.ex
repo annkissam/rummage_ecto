@@ -13,7 +13,7 @@ defmodule Rummage.Ecto.Product do
     field :availability, :boolean
     field :description, :string
 
-    belongs_to :category, RummageTester.Category
+    belongs_to :category, Rummage.Ecto.Category
 
     timestamps()
   end

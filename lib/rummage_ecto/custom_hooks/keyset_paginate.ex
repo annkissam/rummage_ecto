@@ -262,8 +262,8 @@ defmodule Rummage.Ecto.CustomHook.KeysetPaginate do
       ...> }
       iex> repo = Rummage.Ecto.Repo
       iex> Ecto.Adapters.SQL.Sandbox.checkout(repo)
-      iex> repo.insert!(%Category{category_name: "name"})
-      iex> repo.insert!(%Category{category_name: "name2"})
+      iex> repo.insert!(%Category{name: "name"})
+      iex> repo.insert!(%Category{name: "name2"})
       iex> KeysetPaginate.format_params(Category, paginate_params, [repo: repo])
       %{max_page: 2, last_seen_pk: 0, page: 1,
         per_page: 1, total_count: 2, pk: :id}
@@ -279,8 +279,8 @@ defmodule Rummage.Ecto.CustomHook.KeysetPaginate do
       ...> }
       iex> repo = Rummage.Ecto.Repo
       iex> Ecto.Adapters.SQL.Sandbox.checkout(repo)
-      iex> repo.insert!(%Category{category_name: "name"})
-      iex> repo.insert!(%Category{category_name: "name2"})
+      iex> repo.insert!(%Category{name: "name"})
+      iex> repo.insert!(%Category{name: "name2"})
       iex> KeysetPaginate.format_params(Category, paginate_params, [repo: repo])
       %{max_page: 2, last_seen_pk: 0, page: 1,
         per_page: 1, total_count: 2, pk: :id}
@@ -289,18 +289,18 @@ defmodule Rummage.Ecto.CustomHook.KeysetPaginate do
   passed has a custom `primary_key`.
 
       iex> alias Rummage.Ecto.CustomHook.KeysetPaginate
-      iex> alias Rummage.Ecto.Item
+      iex> alias Rummage.Ecto.Product
       iex> paginate_params = %{
       ...>   per_page: 1,
       ...>   page: 2
       ...> }
       iex> repo = Rummage.Ecto.Repo
       iex> Ecto.Adapters.SQL.Sandbox.checkout(repo)
-      iex> repo.insert!(%Item{item_id: 5})
-      iex> repo.insert!(%Item{item_id: 6})
-      iex> KeysetPaginate.format_params(Item, paginate_params, [repo: repo])
+      iex> repo.insert!(%Product{internal_code: "100"})
+      iex> repo.insert!(%Product{internal_code: "101"})
+      iex> KeysetPaginate.format_params(Product, paginate_params, [repo: repo])
       %{max_page: 2, last_seen_pk: 1, page: 2,
-        per_page: 1, total_count: 2, pk: :item_id}
+        per_page: 1, total_count: 2, pk: :internal_code}
 
   """
   @spec format_params(Ecto.Query.t(), map(), keyword()) :: map()

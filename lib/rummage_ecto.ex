@@ -140,8 +140,8 @@ defmodule Rummage.Ecto do
       iex> rummage = %{paginate: %{per_page: 1, page: 1}}
       iex> repo = Rummage.Ecto.Repo
       iex> Ecto.Adapters.SQL.Sandbox.checkout(repo)
-      iex> repo.insert!(%Product{name: "name"})
-      iex> repo.insert!(%Product{name: "name2"})
+      iex> repo.insert!(%Product{name: "name", internal_code: "100"})
+      iex> repo.insert!(%Product{name: "name2", internal_code: "101"})
       iex> opts = [paginate: Rummage.Ecto.Hook.Paginate,
       ...>  repo: repo]
       iex> {queryable, rummage} = rummage(Product, rummage, opts)
@@ -164,13 +164,6 @@ defmodule Rummage.Ecto do
   end
 
   defp format_hook_params({_, nil}, rummage, _, _), do: rummage
-  defp format_hook_params({type, hook_mod}, rummage, queryable, opts) do
-    case Map.get(rummage, type) do
-      nil -> rummage
-      params -> Map.put(rummage, type,
-            apply(hook_mod, :format_params, [queryable, params, opts]))
-    end
-  end
   defp format_hook_params({type, hook_mod}, rummage, queryable, opts) do
     case Map.get(rummage, type) do
       nil -> rummage
