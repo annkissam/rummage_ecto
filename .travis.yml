@@ -1,12 +1,11 @@
 language: elixir
 elixir:
-  - 1.4.5
-  - 1.5.2
+  - 1.6.5
 otp_release:
-  - 20.2
+  - 20.3
 sudo: false
 env:
-  - MIX_ENV=test POSTGRES_USERNAME=postgres POSTGRES_PASSWORD=
+  - MIX_ENV=test POSTGRES_USER=postgres POSTGRES_PASSWORD=
 script:
   - mix test
 after_script:
