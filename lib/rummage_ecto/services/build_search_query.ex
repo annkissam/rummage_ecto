@@ -914,6 +914,14 @@ defmodule Rummage.Ecto.Services.BuildSearchQuery do
       field(b, ^field) <= ^search_term)
   end
 
+  for fragment <- @supported_fragments_one do
+    def handle_lteq(queryable, {:fragment, unquote(fragment), field}, search_term, :or_where) do
+      queryable
+      |> or_where([..., b],
+        fragment(unquote(fragment), field(b, ^field)) <= ^search_term)
+    end
+  end
+
   for fragment <- @supported_fragments_two do
     def handle_lteq(queryable, {:fragment, unquote(fragment), field1, field2}, search_term, :or_where) do
       queryable
