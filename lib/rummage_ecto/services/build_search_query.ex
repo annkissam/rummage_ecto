@@ -1147,7 +1147,7 @@ defmodule Rummage.Ecto.Services.BuildSearchQuery do
       iex> queryable = from u in "parents"
       #Ecto.Query<from p in "parents">
       iex> BuildSearchQuery.handle_in(queryable, :field_1, ["a", "b"], :where)
-      #Ecto.Query<from p in "parents", where: p.field1 in ["a", "b"]>
+      #Ecto.Query<from p in "parents", where: p.field_1 in ^["a", "b"]>
 
   When `search_expr` is `:or_where`
 
@@ -1156,7 +1156,7 @@ defmodule Rummage.Ecto.Services.BuildSearchQuery do
       iex> queryable = from u in "parents"
       #Ecto.Query<from p in "parents">
       iex> BuildSearchQuery.handle_in(queryable, :field_1, ["a", "b"], :or_where)
-      #Ecto.Query<from p in "parents", or_where: p.field1 in ["a", "b"]>
+      #Ecto.Query<from p in "parents", or_where: p.field_1 in ^["a", "b"]>
 
   When `search_expr` is `:not_where`
 
@@ -1165,7 +1165,7 @@ defmodule Rummage.Ecto.Services.BuildSearchQuery do
       iex> queryable = from u in "parents"
       #Ecto.Query<from p in "parents">
       iex> BuildSearchQuery.handle_in(queryable, :field_1, ["a", "b"], :not_where)
-      #Ecto.Query<from p in "parents", where: not p.field1 in ["a", "b"]>
+      #Ecto.Query<from p in "parents", where: p.field_1 not in ^["a", "b"]>
 
   """
   @spec handle_is_null(Ecto.Query.t(), atom(), boolean(),
