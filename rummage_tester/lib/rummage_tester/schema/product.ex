@@ -20,9 +20,19 @@ defmodule RummageTester.Product do
     {:fragment, "date_part('month', ?)", :inserted_at}
   end
 
-  search_scope :category_name do
-    fn (term) ->
-      %{name: %{assoc: [:category], search_term: term, search_type: :ilike}}
-    end
+  rummage_scope :category_name, [type: :search], fn(term) ->
+    {:name, %{assoc: [inner: :category], search_term: term, search_type: :ilike}}
+  end
+
+  rummage_scope :category_name, [type: :sort], fn ->
+    %{field: :name, assoc: [inner: :category], order: :asc, ci: :true}
+  end
+
+  rummage_scope :product_index, [type: :paginate], fn ->
+    %{per_page: 10, page: 1}
+  end
+
+  rummage_scope :category_show, [type: :paginate], fn ->
+    %{per_page: 5, page: 1}
   end
 end

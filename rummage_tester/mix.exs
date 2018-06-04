@@ -22,7 +22,7 @@ defmodule RummageTester.MixProject do
 
   defp deps do
     [
-      {:rummage_ecto, path: "../../../"},
+      {:rummage_ecto, path: "../"},
       {:postgrex, "~> 0.13"},
     ]
   end
