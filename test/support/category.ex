@@ -3,12 +3,14 @@ defmodule Rummage.Ecto.Category do
   This is a Category Ecto.Schema for testing Rummage.Ecto with a nested
   associations
   """
-  use Ecto.Schema
-  use Rummage.Ecto
+
+  use Rummage.Ecto.Schema
 
   schema "categories" do
-    field :category_name, :string
-    belongs_to :category, Rummage.Ecto.Category
+    field :name, :string
+    field :description, :string
+
+    belongs_to :parent_category, __MODULE__
 
     timestamps()
   end

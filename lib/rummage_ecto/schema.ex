@@ -23,11 +23,19 @@ defmodule Rummage.Ecto.Schema do
     end
   end
 
-  defmacro search_scope(scope, do: block) do
-    name = :"scope_#{scope}"
+  defmacro rummage_scope(scope, [type: :search], fun) do
+    name = :"search_#{scope}"
 
     quote do
-      def unquote(name)(term), do: unquote(block).(term)
+      def unquote(name)(term), do: unquote(fun).(term)
+    end
+  end
+
+  defmacro rummage_scope(scope, [type: type], fun) when type in [:sort, :paginate] do
+    name = :"#{type}_#{scope}"
+
+    quote do
+      def unquote(name)(), do: unquote(fun).()
     end
   end
 end

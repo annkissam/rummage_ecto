@@ -363,19 +363,29 @@ defmodule Rummage.Ecto.Hook.Search do
       %{field: %{assoc: [], search_expr: :where, search_type: :eq}}
   """
   @spec format_params(Ecto.Query.t(), map(), keyword()) :: map()
-  def format_params(_queryable, search_params, _opts) do
+  def format_params(queryable, search_params, _opts) do
     search_params
     |> Map.to_list()
-    |> Enum.map(&put_keys/1)
+    |> Enum.map(&put_keys(&1, queryable))
     |> Enum.into(%{})
   end
 
-  defp put_keys({field, field_params}) do
+  defp put_keys({field, %{} = field_params}, _queryable) do
     field_params = field_params
       |> Map.put_new(:assoc, [])
       |> Map.put_new(:search_type, :eq)
       |> Map.put_new(:search_expr, :where)
 
     {field, field_params}
+  end
+  defp put_keys({search_scope, field_value}, queryable) do
+    module = get_module(queryable)
+    name = :"search_#{search_scope}"
+    {field, search_params} = case function_exported?(module, name, 1) do
+      true -> apply(module, name, [field_value])
+      _ -> raise "No scope `#{search_scope}` of type search defined in the #{module}"
+    end
+
+    put_keys({field, search_params}, queryable)
   end
 end

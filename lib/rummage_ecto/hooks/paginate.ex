@@ -314,7 +314,17 @@ defmodule Rummage.Ecto.Hook.Paginate do
       %{max_page: 1, page: 1, per_page: 1, total_count: 1}
 
   """
-  @spec format_params(Ecto.Query.t(), map(), keyword()) :: map()
+  @spec format_params(Ecto.Query.t(), map() | atom(), keyword()) :: map()
+  def format_params(queryable, paginate_scope, opts) when is_atom(paginate_scope) do
+    module = get_module(queryable)
+    name = :"paginate_#{paginate_scope}"
+    paginate_params = case function_exported?(module, name, 0) do
+      true -> apply(module, name, [])
+      _ -> raise "No scope `#{paginate_scope}` of type paginate defined in the #{module}"
+    end
+
+    format_params(queryable, paginate_params, opts)
+  end
   def format_params(queryable, paginate_params, opts) do
     paginate_params = populate_params(paginate_params, opts)
 

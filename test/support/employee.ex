@@ -20,6 +20,14 @@ defmodule Rummage.Ecto.Employee do
     {:fragment, "date_part('year', ?)", :date_of_birth}
   end
 
+  rummage_field :month_of_birth do
+    {:fragment, "date_part('month', ?)", :date_of_birth}
+  end
+
+  rummage_field :first_name_or_last_name do
+    {:fragment, "coalesce(?, ?)", :first_name, :last_name}
+  end
+
   rummage_field :name do
     {:fragment, "concat(?, ?)", :first_name, :last_name}
   end

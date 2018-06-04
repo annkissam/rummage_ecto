@@ -171,6 +171,13 @@ defmodule Rummage.Ecto do
             apply(hook_mod, :format_params, [queryable, params, opts]))
     end
   end
+  defp format_hook_params({type, hook_mod}, rummage, queryable, opts) do
+    case Map.get(rummage, type) do
+      nil -> rummage
+      params -> Map.put(rummage, type,
+            apply(hook_mod, :format_params, [queryable, params, opts]))
+    end
+  end
 
   defp run_hook({_, nil}, queryable, _), do: queryable
   defp run_hook({type, hook_mod}, queryable, rummage) do

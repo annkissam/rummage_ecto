@@ -343,7 +343,17 @@ defmodule Rummage.Ecto.Hook.Sort do
       iex> Sort.format_params(Parent, %{}, [])
       %{assoc: [], order: :asc}
   """
-  @spec format_params(Ecto.Query.t(), map(), keyword()) :: map()
+  @spec format_params(Ecto.Query.t(), map() | atom(), keyword()) :: map()
+  def format_params(queryable, sort_scope, opts) when is_atom(sort_scope) do
+    module = get_module(queryable)
+    name = :"sort_#{sort_scope}"
+    sort_params = case function_exported?(module, name, 0) do
+      true -> apply(module, name, [])
+      _ -> raise "No scope `#{sort_scope}` of type sort defined in the #{module}"
+    end
+
+    format_params(queryable, sort_params, opts)
+  end
   def format_params(_queryable, sort_params, _opts) do
     sort_params
     |> Map.put_new(:assoc, [])
