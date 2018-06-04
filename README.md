@@ -38,7 +38,7 @@ This package is [available in Hex](https://hexdocs.pm/rummage_ecto/), and can be
 
     ```elixir
     def deps do
-      [{:rummage_ecto, "~> 1.3"}]
+      [{:rummage_ecto, "~> 2.0.0-rc.0"}]
     end
     ```
 
@@ -165,15 +165,3 @@ Below are the ways `Rummage.Ecto` can be used:
     paginate: %{per_page: 5, page: 1}
   }
   ```
-
-## Example with Screenshots
-
-- Coming soon...
-
-
-## Next Steps
-
-- [ ] Strealine associations
-- [ ] `rummage_ecto` should have a custom hook to handle embedded_fields
-- [ ] Continued writing blogs
-
