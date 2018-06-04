@@ -46,15 +46,15 @@ defmodule Rummage.Ecto.Product do
     {:name, %{assoc: [inner: :category], search_term: term, search_type: :ilike}}
   end
 
-  rummage_scope :category_name, [type: :sort], fn ->
-    %{field: :name, assoc: [inner: :category], order: :asc, ci: :true}
+  rummage_scope :category_name, [type: :sort], fn(order) ->
+    %{field: :name, assoc: [inner: :category], order: order, ci: :true}
   end
 
-  rummage_scope :product_index, [type: :paginate], fn ->
-    %{per_page: 10, page: 1}
+  rummage_scope :product_index, [type: :paginate], fn(page) ->
+    %{per_page: 10, page: page}
   end
 
-  rummage_scope :category_show, [type: :paginate], fn ->
-    %{per_page: 5, page: 1}
+  rummage_scope :category_show, [type: :paginate], fn(page) ->
+    %{per_page: 5, page: page}
   end
 end
