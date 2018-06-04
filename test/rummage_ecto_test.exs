@@ -374,4 +374,67 @@ defmodule Rummage.EctoTest do
       paginate: %{per_page: 1, page: 1, max_page: 8, total_count: 8}
     }
   end
+
+  test "rummage call with search scope" do
+    create_categories_and_products()
+
+    rummage = %{search: %{category_name: "Category 1"}}
+
+    {queryable, rummage} = Product.rummage(rummage)
+
+    products = Repo.all(queryable)
+
+    assert length(products) == 2
+
+    assert Enum.map(products, & &1.name) == ["Product 2->1", "Product 1->1"]
+
+    rummage = %{search: %{invalid_scope: "Category 1"}}
+
+    assert_raise RuntimeError, ~r/No scope `invalid_scope`/, fn ->
+      Product.rummage(rummage)
+    end
+  end
+
+  test "rummage call with sort scope" do
+    create_categories_and_products()
+
+    rummage = %{sort: :category_name}
+
+    {queryable, rummage} = Product.rummage(rummage)
+
+    products = Repo.all(queryable)
+
+    assert length(products) == 8
+
+    assert Enum.map(products, & &1.name) == ["Product 2->1", "Product 1->1",
+                                             "Product 2->2", "Product 1->2",
+                                             "Product 2->3", "Product 1->3",
+                                             "Product 2->4", "Product 1->4"]
+    rummage = %{sort: :invalid_scope}
+
+    assert_raise RuntimeError, ~r/No scope `invalid_scope`/, fn ->
+      Product.rummage(rummage)
+    end
+  end
+
+  test "rummage call with paginate scope" do
+    create_categories_and_products()
+
+    rummage = %{paginate: :category_show}
+
+    {queryable, rummage} = Product.rummage(rummage)
+
+    products = Repo.all(queryable)
+
+    assert length(products) == 5
+
+    assert Enum.map(products, & &1.name) == ["Product 1->1", "Product 2->1",
+                                             "Product 1->2", "Product 2->2",
+                                             "Product 1->3"]
+    rummage = %{paginate: :invalid_scope}
+
+    assert_raise RuntimeError, ~r/No scope `invalid_scope`/, fn ->
+      Product.rummage(rummage)
+    end
+  end
 end
