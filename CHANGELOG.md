@@ -43,7 +43,7 @@
   * This allows usage of `or_where` and `not_where` queries.
   * Defaults to `where`.
 
-- Search hook has `search_type` : `is_null`
+- Search hook has `search_type` : `is_nil`
   * This allows for searching for `NULL` or `NOT NULL`
 
 - Tested/Examples with different `field_types`, `boolean`, `float`, `string` etc.
