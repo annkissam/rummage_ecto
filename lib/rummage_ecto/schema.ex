@@ -6,6 +6,8 @@ defmodule Rummage.Ecto.Schema do
   its functionality.
   """
 
+  @rummage_scope_types ~w{search sort paginate custom_search custom_sort custom_paginate}a
+
   defmacro __using__(opts) do
     quote do
       use Ecto.Schema
@@ -16,15 +18,15 @@ defmodule Rummage.Ecto.Schema do
   end
 
   defmacro rummage_field(field, do: block) do
-    name = :"field_#{field}"
+    name = :"__rummage_field_#{field}"
 
     quote do
       def unquote(name)(), do: unquote(block)
     end
   end
 
-  defmacro rummage_scope(scope, [type: type], fun) when type in ~w{search sort paginate}a do
-    name = :"#{type}_#{scope}"
+  defmacro rummage_scope(scope, [type: type], fun) when type in @rummage_scope_types do
+    name = :"__rummage_#{type}_#{scope}"
 
     quote do
       def unquote(name)(term), do: unquote(fun).(term)
