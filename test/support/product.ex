@@ -3,7 +3,10 @@ defmodule Rummage.Ecto.Product do
   This is Product Ecto.Schema for testing Rummage.Ecto with float values
   and boolean values
   """
-  use Rummage.Ecto.Schema, per_page: 1
+  use Rummage.Ecto.Schema, per_page: 1,
+    search: Rummage.Ecto.Hook.CustomSearch,
+    sort: Rummage.Ecto.Hook.CustomSort,
+    paginate: Rummage.Ecto.Hook.CustomPaginate
 
   @primary_key {:internal_code, :string, autogenerate: false}
 
@@ -14,7 +17,6 @@ defmodule Rummage.Ecto.Product do
     field :description, :string
 
     belongs_to :category, Rummage.Ecto.Category
-
     timestamps()
   end
 
@@ -56,5 +58,17 @@ defmodule Rummage.Ecto.Product do
 
   rummage_scope :category_show, [type: :paginate], fn(page) ->
     %{per_page: 5, page: page}
+  end
+
+  rummage_scope :category_quarter, [type: :custom_search], fn({query, term}) ->
+    query
+    |> join(:inner, [q], c in Rummage.Ecto.Category, q.category_id == c.id)
+    |> where([..., c], fragment("date_part('quarter', ?)", c.inserted_at) == ^term)
+  end
+
+  rummage_scope :category_quarter, [type: :custom_sort], fn({query, order}) ->
+    query
+    |> join(:inner, [q], c in Rummage.Ecto.Category, q.category_id == c.id)
+    |> order_by([..., c], [{^order, fragment("date_part('quarter', ?)", c.inserted_at)}])
   end
 end
