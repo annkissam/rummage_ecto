@@ -47,6 +47,7 @@ defmodule Rummage.Ecto.Services.BuildSearchQuery do
 
   @search_types ~w{like ilike eq gt lt gteq lteq is_null in}a
   @search_exprs ~w{where or_where not_where}a
+
   # Only for Postgres (only one or two interpolations are supported)
   # TODO: Fix this once Ecto 3.0 comes out with `unsafe_fragment`
   @supported_fragments_one ["date_part('day', ?)",
