@@ -16,7 +16,7 @@ defmodule Rummage.Ecto.Hook.CustomPaginate do
     name = :"__rummage_custom_paginate_#{field}"
 
     case function_exported?(module, name, 1) do
-      true -> apply(module, name, [{field, page}])
+      true -> apply(module, name, [{queryable, page}])
       _ -> "No scope `#{field}` of type custom_paginate defined in #{module}"
     end
   end

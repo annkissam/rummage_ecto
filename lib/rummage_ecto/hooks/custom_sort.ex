@@ -14,7 +14,7 @@ defmodule Rummage.Ecto.Hook.CustomSort do
     name = :"__rummage_custom_sort_#{field}"
 
     case function_exported?(module, name, 1) do
-      true -> apply(module, name, [{field, order}])
+      true -> apply(module, name, [{queryable, order}])
       _ -> "No scope `#{field}` of type custom_sort defined in #{module}"
     end
   end
