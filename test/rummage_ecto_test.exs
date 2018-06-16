@@ -460,4 +460,49 @@ defmodule Rummage.EctoTest do
       Product.rummage(rummage)
     end
   end
+
+  test "rummage call with custom sort scope" do
+    create_categories_and_products()
+
+    rummage = %{sort: {:category_microseconds, :desc}}
+
+    {queryable, rummage} = Product.rummage(rummage)
+
+    products = Repo.all(queryable)
+
+    assert length(products) == 8
+
+    assert Enum.map(products, & &1.name) == ["Product 2->4", "Product 1->4",
+                                             "Product 2->3", "Product 1->3",
+                                             "Product 2->2", "Product 1->2",
+                                             "Product 2->1", "Product 1->1"]
+
+    rummage = %{sort: {:category_milliseconds, :desc}}
+
+    assert_raise RuntimeError, ~r/No scope `category_milliseconds`/, fn ->
+      Product.rummage(rummage)
+    end
+  end
+
+  test "rummage call with custom paginte scope" do
+    create_categories_and_products()
+
+    rummage = %{paginate: {:small_page, 1}}
+
+    {queryable, rummage} = Product.rummage(rummage)
+
+    products = Repo.all(queryable)
+
+    assert length(products) == 5
+
+    assert Enum.map(products, & &1.name) == ["Product 1->1", "Product 2->1",
+                                             "Product 1->2", "Product 2->2",
+                                             "Product 1->3"]
+
+    rummage = %{paginate: {:category_milliseconds, 1}}
+
+    assert_raise RuntimeError, ~r/No scope `category_milliseconds`/, fn ->
+      Product.rummage(rummage)
+    end
+  end
 end

@@ -43,7 +43,7 @@ defmodule Rummage.Ecto.Hook.CustomSort do
       true -> sort_params = apply(module, name, [order])
         format_params(queryable, sort_params, opts)
       _ ->
-        case function_exported?(module, :"__rummage_custom_search_#{sort_scope}", 1) do
+        case function_exported?(module, :"__rummage_custom_sort_#{sort_scope}", 1) do
           true -> {sort_scope, order}
           _ -> raise "No scope `#{sort_scope}` of type custom_sort defined in the #{module}"
         end

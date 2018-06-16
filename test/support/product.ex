@@ -66,9 +66,17 @@ defmodule Rummage.Ecto.Product do
     |> where([..., c], fragment("date_part('quarter', ?)", c.inserted_at) == ^term)
   end
 
-  rummage_scope :category_quarter, [type: :custom_sort], fn({query, order}) ->
+  rummage_scope :category_microseconds, [type: :custom_sort], fn({query, order}) ->
     query
     |> join(:inner, [q], c in Rummage.Ecto.Category, q.category_id == c.id)
-    |> order_by([..., c], [{^order, fragment("date_part('quarter', ?)", c.inserted_at)}])
+    |> order_by([..., c], [{^order, fragment("date_part('microseconds', ?)", c.inserted_at)}])
+  end
+
+  rummage_scope :small_page, [type: :custom_paginate], fn({query, page}) ->
+    offset = 5 * (page - 1)
+
+    query
+    |> limit(5)
+    |> offset(^offset)
   end
 end

@@ -45,7 +45,7 @@ defmodule Rummage.Ecto.Hook.CustomPaginate do
       true -> paginate_params = apply(module, name, [page])
         format_params(queryable, paginate_params, opts)
       _ ->
-        case function_exported?(module, :"__rummage_custom_search_#{paginate_scope}", 1) do
+        case function_exported?(module, :"__rummage_custom_paginate_#{paginate_scope}", 1) do
           true -> {paginate_scope, page}
           _ -> raise "No scope `#{paginate_scope}` of type custom_paginate defined in the #{module}"
         end
