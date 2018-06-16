@@ -361,6 +361,10 @@ defmodule Rummage.Ecto.Hook.Search do
       iex> alias Rummage.Ecto.Hook.Search
       iex> Search.format_params(Parent, %{field: %{}}, [])
       %{field: %{assoc: [], search_expr: :where, search_type: :eq}}
+
+      iex> alias Rummage.Ecto.Hook.Search
+      iex> Search.format_params(Parent, %{field: 1}, [])
+      ** (RuntimeError) No scope `field` of type search defined in the Elixir.Parent
   """
   @spec format_params(Ecto.Query.t(), map(), keyword()) :: map()
   def format_params(queryable, search_params, _opts) do
