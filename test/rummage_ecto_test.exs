@@ -505,4 +505,38 @@ defmodule Rummage.EctoTest do
       Product.rummage(rummage)
     end
   end
+
+  test "rummage call with rummage_field for search" do
+    create_categories_and_products()
+
+    rummage = %{search: %{created_at_year: %{search_type: :eq, search_term: Date.utc_today.year}}}
+
+    {queryable, rummage} = Product.rummage(rummage)
+
+    products = Repo.all(queryable)
+
+    assert length(products) == 8
+
+    assert Enum.map(products, & &1.name) == ["Product 1->1", "Product 2->1",
+                                             "Product 1->2", "Product 2->2",
+                                             "Product 1->3", "Product 2->3",
+                                             "Product 1->4", "Product 2->4"]
+  end
+
+  test "rummage call with rummage_field for sort" do
+    create_categories_and_products()
+
+    rummage = %{sort: %{field: :created_at_year, order: :asc}}
+
+    {queryable, rummage} = Product.rummage(rummage)
+
+    products = Repo.all(queryable)
+
+    assert length(products) == 8
+
+    assert Enum.map(products, & &1.name) == ["Product 1->1", "Product 2->1",
+                                             "Product 1->2", "Product 2->2",
+                                             "Product 1->3", "Product 2->3",
+                                             "Product 1->4", "Product 2->4"]
+  end
 end

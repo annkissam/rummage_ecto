@@ -95,7 +95,7 @@ defmodule Rummage.Ecto.Hook do
 
   def resolve_field(field, queryable) do
     module = get_module(queryable)
-    name = :"field_#{field}"
+    name = :"__rummage_field_#{field}"
     case function_exported?(module, name, 0) do
       true -> apply(module, name, [])
       _ -> field
