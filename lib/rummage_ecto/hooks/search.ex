@@ -380,7 +380,7 @@ defmodule Rummage.Ecto.Hook.Search do
   end
   defp put_keys({search_scope, field_value}, queryable) do
     module = get_module(queryable)
-    name = :"search_#{search_scope}"
+    name = :"__rummage_search_#{search_scope}"
     {field, search_params} = case function_exported?(module, name, 1) do
       true -> apply(module, name, [field_value])
       _ -> raise "No scope `#{search_scope}` of type search defined in the #{module}"

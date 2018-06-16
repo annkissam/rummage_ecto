@@ -346,7 +346,7 @@ defmodule Rummage.Ecto.Hook.Sort do
   @spec format_params(Ecto.Query.t(), map() | tuple(), keyword()) :: map()
   def format_params(queryable, {sort_scope, order}, opts) do
     module = get_module(queryable)
-    name = :"sort_#{sort_scope}"
+    name = :"__rummage_sort_#{sort_scope}"
     sort_params = case function_exported?(module, name, 1) do
       true -> apply(module, name, [order])
       _ -> raise "No scope `#{sort_scope}` of type sort defined in the #{module}"
