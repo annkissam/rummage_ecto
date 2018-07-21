@@ -276,6 +276,17 @@ defmodule Rummage.Ecto.Hooks.Search do
         #Ecto.Query<from p in "parents">
         iex> Search.run(queryable, rummage)
         #Ecto.Query<from p in subquery(from p in "parents"), where: is_nil(p.field_1)>
+
+    When rummage `struct` passed has `search_type` of `between`, it returns
+    a searched version of the `queryable` with `BETWEEN` search query:
+
+        iex> alias Rummage.Ecto.Hooks.Search
+        iex> import Ecto.Query
+        iex> rummage = %{"search" => %{"field_1" => %{"assoc" => [], "search_type" => "between", "search_term" => ["first", "last"]}}}
+        iex> queryable = from u in "parents"
+        #Ecto.Query<from p in "parents">
+        iex> Search.run(queryable, rummage)
+        #Ecto.Query<from p in subquery(from p in "parents"), where: p.field_1 >= first, p.field_1 <= last>
   """
   @spec run(Ecto.Query.t(), map) :: {Ecto.Query.t(), map}
   def run(queryable, rummage) do

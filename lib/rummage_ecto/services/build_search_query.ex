@@ -20,13 +20,14 @@ defmodule Rummage.Ecto.Services.BuildSearchQuery do
   * `gteq`: Searches for a `term` to be greater than or equal to to a given `field` of a `queryable`.
   * `lteq`: Searches for a `term` to be less than or equal to a given `field` of a `queryable`.
   * `is_nil`: Searches for a `term` to be nil or not nil to a given `field` of a `queryable`.
+  * `between`: Searches for a `term` to be in range `field_1` and `field_2` of a `queryable`.
 
   Feel free to use this module on a custom search hook that you write.
   """
 
   import Ecto.Query
 
-  @search_types ~w(like ilike eq gt lt gteq lteq is_nil in nin)
+  @search_types ~w(like ilike eq gt lt gteq lteq is_nil in nin between)
 
   @doc """
   Builds a searched `queryable` on top of the given `queryable` using `field`, `search_type`
@@ -122,6 +123,15 @@ defmodule Rummage.Ecto.Services.BuildSearchQuery do
       #Ecto.Query<from p in "parents">
       iex> BuildSearchQuery.run(queryable, :field_1, "nin", ["1", "2"])
       #Ecto.Query<from p in "parents", where: p.field_1 not in ^["1", "2"]>
+
+  When `field`, `search_type` and `queryable` are passed with `search_type` of `nin`:
+
+      iex> alias Rummage.Ecto.Services.BuildSearchQuery
+      iex> import Ecto.Query
+      iex> queryable = from u in "parents"
+      #Ecto.Query<from p in "parents">
+      iex> BuildSearchQuery.run(queryable, :field_1, "between", ["1", "2"])
+      #Ecto.Query<from p in "parents", where: p.field_1 >= ^"1", where: p.field_1 <= ^"2">
 
   When `field`, `search_type` and `queryable` are passed with an invalid `search_type`:
 
@@ -341,5 +351,26 @@ defmodule Rummage.Ecto.Services.BuildSearchQuery do
   def handle_nin(queryable, field, search_term) do
     queryable
     |> where([..., b], field(b, ^field) not in ^search_term)
+  end
+
+  @doc """
+  Builds a searched `queryable` on top of the given `queryable` using `field` and `search_type`
+  when the `search_term` is `between`.
+
+  ## Examples
+
+      iex> alias Rummage.Ecto.Services.BuildSearchQuery
+      iex> import Ecto.Query
+      iex> queryable = from u in "parents"
+      #Ecto.Query<from p in "parents">
+      iex> BuildSearchQuery.handle_between(queryable, :field_1, ["1", "2"])
+      #Ecto.Query<from p in "parents", where: p.field_1 >= ^"1", where: p.field_1 <= ^"2">
+  """
+  @spec handle_between(Ecto.Query.t(), atom, term) :: {Ecto.Query.t()}
+  def handle_nin(queryable, field, search_term) do
+    [first | last] = search_term
+    queryable
+    |> where([..., b], field(b, ^field) >= ^first)
+    |> where([..., b], field(b, ^field) <= ^last)
   end
 end
