@@ -367,7 +367,7 @@ defmodule Rummage.Ecto.Services.BuildSearchQuery do
       #Ecto.Query<from p in "parents", where: p.field_1 >= ^"1", where: p.field_1 <= ^"2">
   """
   @spec handle_between(Ecto.Query.t(), atom, term) :: {Ecto.Query.t()}
-  def handle_nin(queryable, field, search_term) do
+  def handle_between(queryable, field, search_term) do
     [first | last] = search_term
     queryable
     |> where([..., b], field(b, ^field) >= ^first)
