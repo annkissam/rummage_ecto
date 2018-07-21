@@ -368,7 +368,7 @@ defmodule Rummage.Ecto.Services.BuildSearchQuery do
   """
   @spec handle_between(Ecto.Query.t(), atom, term) :: {Ecto.Query.t()}
   def handle_between(queryable, field, search_term) do
-    [first | last] = search_term
+    [first, last] = search_term
     queryable
     |> where([..., b], field(b, ^field) >= ^first)
     |> where([..., b], field(b, ^field) <= ^last)

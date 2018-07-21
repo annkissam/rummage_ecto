@@ -286,7 +286,7 @@ defmodule Rummage.Ecto.Hooks.Search do
         iex> queryable = from u in "parents"
         #Ecto.Query<from p in "parents">
         iex> Search.run(queryable, rummage)
-        #Ecto.Query<from p in subquery(from p in "parents"), where: p.field_1 >= first, p.field_1 <= last>
+        #Ecto.Query<from p in subquery(from p in "parents"), where: p.field_1 >= ^"first", where: p.field_1 <= ^"last">
   """
   @spec run(Ecto.Query.t(), map) :: {Ecto.Query.t(), map}
   def run(queryable, rummage) do
