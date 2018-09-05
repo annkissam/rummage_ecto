@@ -1,6 +1,6 @@
-defmodule Rummage.Ecto.Hooks.Search do
+defmodule Rummage.Ecto.Hook.Search do
   @moduledoc """
-  `Rummage.Ecto.Hooks.Search` is the default search hook that comes with
+  `Rummage.Ecto.Hook.Search` is the default search hook that comes with
   `Rummage.Ecto`.
 
   This module provides a operations that can add searching functionality to
@@ -40,7 +40,7 @@ defmodule Rummage.Ecto.Hooks.Search do
   do the following:
 
   ```elixir
-  Rummage.Ecto.Hooks.Search.run(Product, %{available: %{assoc: [],
+  Rummage.Ecto.Hook.Search.run(Product, %{available: %{assoc: [],
     search_type: :eq,
     search_term: true}})
   ```
@@ -49,7 +49,7 @@ defmodule Rummage.Ecto.Hooks.Search do
   search for products that are `available`, but have a price less than `10.0`.
 
   ```elixir
-  Rummage.Ecto.Hooks.Search.run(Product,
+  Rummage.Ecto.Hook.Search.run(Product,
     %{available: %{assoc: [],
       search_type: :eq,
       search_term: true},
@@ -69,7 +69,7 @@ defmodule Rummage.Ecto.Hooks.Search do
   category_name_params = %{assoc: [inner: :category], search_term: "super",
     search_type: :eq, search_expr: :where}
 
-  Rummage.Ecto.Hooks.Search.run(Product, %{category_name: category_name_params})
+  Rummage.Ecto.Hook.Search.run(Product, %{category_name: category_name_params})
   ```
 
   The above operation will return an `Ecto.Query.t` struct which represents
@@ -112,7 +112,7 @@ defmodule Rummage.Ecto.Hooks.Search do
   searched by ascending `field_1`
 
   ```elixir
-  alias Rummage.Ecto.Hooks.Search
+  alias Rummage.Ecto.Hook.Search
 
   searched_queryable = Search.run(Parent, %{field_1: %{assoc: [],
     search_type: :like, search_term: "field_!"}}})
@@ -127,7 +127,7 @@ defmodule Rummage.Ecto.Hooks.Search do
   Keep in mind that `case_insensitive` can only be called for `text` fields
 
   ```elixir
-  alias Rummage.Ecto.Hooks.Search
+  alias Rummage.Ecto.Hook.Search
 
   searched_queryable = Search.run(Parent, %{field_1: %{assoc: [],
     search_type: :ilike, search_term: "field_!"}}})
@@ -156,16 +156,16 @@ defmodule Rummage.Ecto.Hooks.Search do
 
   The `CustomHook` must use `Rummage.Ecto.Hook`. For examples of `CustomHook`,
   check out some `custom_hooks` that are shipped with `Rummage.Ecto`:
-  `Rummage.Ecto.CustomHooks.SimpleSearch`, `Rummage.Ecto.CustomHooks.SimpleSort`,
-    Rummage.Ecto.CustomHooks.SimplePaginate
+  `Rummage.Ecto.CustomHook.SimpleSearch`, `Rummage.Ecto.CustomHook.SimpleSort`,
+    Rummage.Ecto.CustomHook.SimplePaginate
   """
 
   use Rummage.Ecto.Hook
 
   import Ecto.Query
 
-  @expected_keys ~w(search_type assoc search_term)a
-  @err_msg "Error in params, No values given for keys: "
+  @expected_keys ~w{search_type assoc search_term}a
+  @err_msg ~s{Error in params, No values given for keys: }
 
   alias Rummage.Ecto.Services.BuildSearchQuery
 
@@ -201,21 +201,21 @@ defmodule Rummage.Ecto.Hooks.Search do
   ## Examples
   When search_params are empty, it simply returns the same `queryable`:
 
-      iex> alias Rummage.Ecto.Hooks.Search
+      iex> alias Rummage.Ecto.Hook.Search
       iex> import Ecto.Query
       iex> Search.run(Parent, %{})
       Parent
 
   When a non-empty map is passed as a field `params`, but with a missing key:
 
-      iex> alias Rummage.Ecto.Hooks.Search
+      iex> alias Rummage.Ecto.Hook.Search
       iex> import Ecto.Query
       iex> Search.run(Parent, %{field: %{assoc: []}})
       ** (RuntimeError) Error in params, No values given for keys: search_type, search_term
 
   When a valid map of params is passed with an `Ecto.Schema` module:
 
-      iex> alias Rummage.Ecto.Hooks.Search
+      iex> alias Rummage.Ecto.Hook.Search
       iex> import Ecto.Query
       iex> search_params = %{field1: %{assoc: [],
       ...> search_type: :like, search_term: "field1", search_expr: :where}}
@@ -224,7 +224,7 @@ defmodule Rummage.Ecto.Hooks.Search do
 
   When a valid map of params is passed with an `Ecto.Query.t`:
 
-      iex> alias Rummage.Ecto.Hooks.Search
+      iex> alias Rummage.Ecto.Hook.Search
       iex> import Ecto.Query
       iex> search_params = %{field1: %{assoc: [],
       ...> search_type: :like, search_term: "field1", search_expr: :where}}
@@ -234,7 +234,7 @@ defmodule Rummage.Ecto.Hooks.Search do
 
   When a valid map of params is passed with an `Ecto.Query.t`, with `assoc`s:
 
-      iex> alias Rummage.Ecto.Hooks.Search
+      iex> alias Rummage.Ecto.Hook.Search
       iex> import Ecto.Query
       iex> search_params = %{field1: %{assoc: [inner: :category],
       ...> search_type: :like, search_term: "field1", search_expr: :or_where}}
@@ -245,7 +245,7 @@ defmodule Rummage.Ecto.Hooks.Search do
   When a valid map of params is passed with an `Ecto.Query.t`, with `assoc`s, with
   different join types:
 
-      iex> alias Rummage.Ecto.Hooks.Search
+      iex> alias Rummage.Ecto.Hook.Search
       iex> import Ecto.Query
       iex> search_params = %{field1: %{assoc: [inner: :category, left: :category, cross: :category],
       ...> search_type: :like, search_term: "field1", search_expr: :where}}
@@ -256,7 +256,7 @@ defmodule Rummage.Ecto.Hooks.Search do
   When a valid map of params is passed with an `Ecto.Query.t`, searching on
   a boolean param
 
-      iex> alias Rummage.Ecto.Hooks.Search
+      iex> alias Rummage.Ecto.Hook.Search
       iex> import Ecto.Query
       iex> search_params = %{available: %{assoc: [],
       ...> search_type: :eq, search_term: true, search_expr: :where}}
@@ -267,7 +267,7 @@ defmodule Rummage.Ecto.Hooks.Search do
   When a valid map of params is passed with an `Ecto.Query.t`, searching on
   a float param
 
-      iex> alias Rummage.Ecto.Hooks.Search
+      iex> alias Rummage.Ecto.Hook.Search
       iex> import Ecto.Query
       iex> search_params = %{price: %{assoc: [],
       ...> search_type: :gteq, search_term: 10.0, search_expr: :where}}
@@ -279,7 +279,7 @@ defmodule Rummage.Ecto.Hooks.Search do
   a boolean param, but with a wrong `search_type`.
   NOTE: This doesn't validate the search_type of search_term
 
-      iex> alias Rummage.Ecto.Hooks.Search
+      iex> alias Rummage.Ecto.Hook.Search
       iex> import Ecto.Query
       iex> search_params = %{available: %{assoc: [],
       ...> search_type: :ilike, search_term: true, search_expr: :where}}
@@ -312,7 +312,7 @@ defmodule Rummage.Ecto.Hooks.Search do
     search_type = Map.get(field_params, :search_type)
     search_term = Map.get(field_params, :search_term)
     search_expr = Map.get(field_params, :search_expr, :where)
-    field = Map.get(field_params, :search_field, field)
+    field = resolve_field(field, queryable)
 
     assocs
     |> Enum.reduce(from(e in subquery(queryable)), &join_by_assoc(&1, &2))
@@ -358,24 +358,38 @@ defmodule Rummage.Ecto.Hooks.Search do
   `search_expr` which are essential for running this hook module.
 
   ## Examples
-      iex> alias Rummage.Ecto.Hooks.Search
+      iex> alias Rummage.Ecto.Hook.Search
       iex> Search.format_params(Parent, %{field: %{}}, [])
       %{field: %{assoc: [], search_expr: :where, search_type: :eq}}
+
+      iex> alias Rummage.Ecto.Hook.Search
+      iex> Search.format_params(Parent, %{field: 1}, [])
+      ** (RuntimeError) No scope `field` of type search defined in the Elixir.Parent
   """
   @spec format_params(Ecto.Query.t(), map(), keyword()) :: map()
-  def format_params(_queryable, search_params, _opts) do
+  def format_params(queryable, search_params, _opts) do
     search_params
     |> Map.to_list()
-    |> Enum.map(&put_keys/1)
+    |> Enum.map(&put_keys(&1, queryable))
     |> Enum.into(%{})
   end
 
-  defp put_keys({field, field_params}) do
+  defp put_keys({field, %{} = field_params}, _queryable) do
     field_params = field_params
       |> Map.put_new(:assoc, [])
       |> Map.put_new(:search_type, :eq)
       |> Map.put_new(:search_expr, :where)
 
     {field, field_params}
+  end
+  defp put_keys({search_scope, field_value}, queryable) do
+    module = get_module(queryable)
+    name = :"__rummage_search_#{search_scope}"
+    {field, search_params} = case function_exported?(module, name, 1) do
+      true -> apply(module, name, [field_value])
+      _ -> raise "No scope `#{search_scope}` of type search defined in the #{module}"
+    end
+
+    put_keys({field, search_params}, queryable)
   end
 end

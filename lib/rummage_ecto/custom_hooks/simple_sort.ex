@@ -1,6 +1,6 @@
-defmodule Rummage.Ecto.CustomHooks.SimpleSort do
+defmodule Rummage.Ecto.CustomHook.SimpleSort do
   @moduledoc """
-  `Rummage.Ecto.CustomHooks.SimpleSort` is the default sort hook that comes with
+  `Rummage.Ecto.CustomHook.SimpleSort` is the default sort hook that comes with
   `Rummage.Ecto`.
 
   This module provides a operations that can add sorting functionality to
@@ -34,7 +34,7 @@ defmodule Rummage.Ecto.CustomHooks.SimpleSort do
   do the following:
 
   ```elixir
-  Rummage.Ecto.CustomHooks.SimpleSort.run(Product, %{field: :price,
+  Rummage.Ecto.CustomHook.SimpleSort.run(Product, %{field: :price,
     order: :desc})
   ```
 
@@ -60,7 +60,7 @@ defmodule Rummage.Ecto.CustomHooks.SimpleSort do
   sorted by ascending `field_1`
 
   ```elixir
-  alias Rummage.Ecto.CustomHooks.SimpleSort
+  alias Rummage.Ecto.CustomHook.SimpleSort
 
   sorted_queryable = SimpleSort.run(Parent, %{field: :name, order: :asc}})
   ```
@@ -73,7 +73,7 @@ defmodule Rummage.Ecto.CustomHooks.SimpleSort do
   Keep in mind that `case_insensitive` can only be called for `text` fields
 
   ```elixir
-  alias Rummage.Ecto.CustomHooks.SimpleSort
+  alias Rummage.Ecto.CustomHook.SimpleSort
 
   sorted_queryable = SimpleSort.run(Parent, %{field: :name, order: :asc, ci: true}})
   ```
@@ -98,8 +98,8 @@ defmodule Rummage.Ecto.CustomHooks.SimpleSort do
 
   The `CustomHook` must use `Rummage.Ecto.Hook`. For examples of `CustomHook`,
   check out some `custom_hooks` that are shipped with `Rummage.Ecto`:
-  `Rummage.Ecto.CustomHooks.SimpleSearch`, `Rummage.Ecto.CustomHooks.SimpleSort`,
-    Rummage.Ecto.CustomHooks.SimplePaginate
+  `Rummage.Ecto.CustomHook.SimpleSearch`, `Rummage.Ecto.CustomHook.SimpleSort`,
+    Rummage.Ecto.CustomHook.SimplePaginate
 
   """
 
@@ -127,25 +127,25 @@ defmodule Rummage.Ecto.CustomHooks.SimpleSort do
   ## Examples
   When an empty map is passed as `params`:
 
-      iex> alias Rummage.Ecto.CustomHooks.SimpleSort
+      iex> alias Rummage.Ecto.CustomHook.SimpleSort
       iex> SimpleSort.run(Parent, %{})
       ** (RuntimeError) Error in params, No values given for keys: field, order
 
   When a non-empty map is passed as `params`, but with a missing key:
 
-      iex> alias Rummage.Ecto.CustomHooks.SimpleSort
+      iex> alias Rummage.Ecto.CustomHook.SimpleSort
       iex> SimpleSort.run(Parent, %{field: :name})
       ** (RuntimeError) Error in params, No values given for keys: order
 
   When a valid map of params is passed with an `Ecto.Schema` module:
 
-      iex> alias Rummage.Ecto.CustomHooks.SimpleSort
+      iex> alias Rummage.Ecto.CustomHook.SimpleSort
       iex> SimpleSort.run(Rummage.Ecto.Product, %{field: :name, order: :asc})
       #Ecto.Query<from p in subquery(from p in Rummage.Ecto.Product), order_by: [asc: p.name]>
 
   When the `queryable` passed is an `Ecto.Query` variable:
 
-      iex> alias Rummage.Ecto.CustomHooks.SimpleSort
+      iex> alias Rummage.Ecto.CustomHook.SimpleSort
       iex> import Ecto.Query
       iex> queryable = from u in "products"
       #Ecto.Query<from p in "products">
@@ -155,7 +155,7 @@ defmodule Rummage.Ecto.CustomHooks.SimpleSort do
 
   When the `queryable` passed is an `Ecto.Query` variable, with `desc` order:
 
-      iex> alias Rummage.Ecto.CustomHooks.SimpleSort
+      iex> alias Rummage.Ecto.CustomHook.SimpleSort
       iex> import Ecto.Query
       iex> queryable = from u in "products"
       #Ecto.Query<from p in "products">
@@ -164,7 +164,7 @@ defmodule Rummage.Ecto.CustomHooks.SimpleSort do
 
   When the `queryable` passed is an `Ecto.Query` variable, with `ci` true:
 
-      iex> alias Rummage.Ecto.CustomHooks.SimpleSort
+      iex> alias Rummage.Ecto.CustomHook.SimpleSort
       iex> import Ecto.Query
       iex> queryable = from u in "products"
       #Ecto.Query<from p in "products">
@@ -239,7 +239,7 @@ defmodule Rummage.Ecto.CustomHooks.SimpleSort do
   which are essential for running this hook module.
 
   ## Examples
-      iex> alias Rummage.Ecto.CustomHooks.SimpleSort
+      iex> alias Rummage.Ecto.CustomHook.SimpleSort
       iex> SimpleSort.format_params(Parent, %{}, [])
       %{order: :asc}
   """

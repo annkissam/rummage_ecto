@@ -1,6 +1,6 @@
-defmodule Rummage.Ecto.Hooks.Paginate do
+defmodule Rummage.Ecto.Hook.Paginate do
   @moduledoc """
-  `Rummage.Ecto.Hooks.Paginate` is the default pagination hook that comes with
+  `Rummage.Ecto.Hook.Paginate` is the default pagination hook that comes with
   `Rummage.Ecto`.
 
   This module provides a operations that can add pagination functionality to
@@ -32,7 +32,7 @@ defmodule Rummage.Ecto.Hooks.Paginate do
   do the following:
 
   ```elixir
-  Rummage.Ecto.Hooks.Paginate.run(Product, %{per_page: 10, page: 1})
+  Rummage.Ecto.Hook.Paginate.run(Product, %{per_page: 10, page: 1})
   ```
 
   _____________________________________________________________________________
@@ -49,7 +49,7 @@ defmodule Rummage.Ecto.Hooks.Paginate do
   To add pagination to a `Ecto.Queryable`, simply do the following:
 
   ```ex
-  Rummage.Ecto.Hooks.Paginate.run(queryable, %{per_page: 10, page: 2})
+  Rummage.Ecto.Hook.Paginate.run(queryable, %{per_page: 10, page: 2})
   ```
 
   ## Overriding:
@@ -73,16 +73,16 @@ defmodule Rummage.Ecto.Hooks.Paginate do
 
   The `CustomHook` must use `Rummage.Ecto.Hook`. For examples of `CustomHook`,
   check out some `custom_hooks` that are shipped with `Rummage.Ecto`:
-  `Rummage.Ecto.CustomHooks.SimpleSearch`, `Rummage.Ecto.CustomHooks.SimpleSort`,
-    Rummage.Ecto.CustomHooks.SimplePaginate
+  `Rummage.Ecto.CustomHook.SimpleSearch`, `Rummage.Ecto.CustomHook.SimpleSort`,
+    Rummage.Ecto.CustomHook.SimplePaginate
   """
 
   use Rummage.Ecto.Hook
 
   import Ecto.Query
 
-  @expected_keys ~w(per_page page)a
-  @err_msg "Error in params, No values given for keys: "
+  @expected_keys ~w{per_page page}a
+  @err_msg ~s{Error in params, No values given for keys: }
 
   @per_page 10
 
@@ -102,28 +102,28 @@ defmodule Rummage.Ecto.Hooks.Paginate do
   ## Examples
   When an empty map is passed as `params`:
 
-      iex> alias Rummage.Ecto.Hooks.Paginate
+      iex> alias Rummage.Ecto.Hook.Paginate
       iex> import Ecto.Query
       iex> Paginate.run(Parent, %{})
       ** (RuntimeError) Error in params, No values given for keys: per_page, page
 
   When a non-empty map is passed as `params`, but with a missing key:
 
-      iex> alias Rummage.Ecto.Hooks.Paginate
+      iex> alias Rummage.Ecto.Hook.Paginate
       iex> import Ecto.Query
       iex> Paginate.run(Parent, %{per_page: 10})
       ** (RuntimeError) Error in params, No values given for keys: page
 
   When a valid map of params is passed with an `Ecto.Schema` module:
 
-      iex> alias Rummage.Ecto.Hooks.Paginate
+      iex> alias Rummage.Ecto.Hook.Paginate
       iex> import Ecto.Query
       iex> Paginate.run(Rummage.Ecto.Product, %{per_page: 10, page: 1})
       #Ecto.Query<from p in Rummage.Ecto.Product, limit: ^10, offset: ^0>
 
   When the `queryable` passed is an `Ecto.Query` variable:
 
-      iex> alias Rummage.Ecto.Hooks.Paginate
+      iex> alias Rummage.Ecto.Hook.Paginate
       iex> import Ecto.Query
       iex> queryable = from u in "products"
       #Ecto.Query<from p in "products">
@@ -133,7 +133,7 @@ defmodule Rummage.Ecto.Hooks.Paginate do
 
   More examples:
 
-      iex> alias Rummage.Ecto.Hooks.Paginate
+      iex> alias Rummage.Ecto.Hook.Paginate
       iex> import Ecto.Query
       iex> rummage = %{per_page: 1, page: 1}
       iex> queryable = from u in "products"
@@ -141,7 +141,7 @@ defmodule Rummage.Ecto.Hooks.Paginate do
       iex> Paginate.run(queryable, rummage)
       #Ecto.Query<from p in "products", limit: ^1, offset: ^0>
 
-      iex> alias Rummage.Ecto.Hooks.Paginate
+      iex> alias Rummage.Ecto.Hook.Paginate
       iex> import Ecto.Query
       iex> rummage = %{per_page: 5, page: 2}
       iex> queryable = from u in "products"
@@ -206,14 +206,14 @@ defmodule Rummage.Ecto.Hooks.Paginate do
 
   When a `repo` isn't passed in `opts` it gives an error:
 
-      iex> alias Rummage.Ecto.Hooks.Paginate
+      iex> alias Rummage.Ecto.Hook.Paginate
       iex> alias Rummage.Ecto.Category
       iex> Paginate.format_params(Category, %{per_page: 1, page: 1}, [])
       ** (RuntimeError) Expected key `repo` in `opts`, got []
 
   When `paginate_params` given aren't valid, it uses defaults to populate params:
 
-      iex> alias Rummage.Ecto.Hooks.Paginate
+      iex> alias Rummage.Ecto.Hook.Paginate
       iex> alias Rummage.Ecto.Category
       iex> Ecto.Adapters.SQL.Sandbox.checkout(Rummage.Ecto.Repo)
       iex> Paginate.format_params(Category, %{}, [repo: Rummage.Ecto.Repo])
@@ -221,7 +221,7 @@ defmodule Rummage.Ecto.Hooks.Paginate do
 
   When `paginate_params` and `opts` given are valid:
 
-      iex> alias Rummage.Ecto.Hooks.Paginate
+      iex> alias Rummage.Ecto.Hook.Paginate
       iex> alias Rummage.Ecto.Category
       iex> paginate_params = %{
       ...>   per_page: 1,
@@ -234,7 +234,7 @@ defmodule Rummage.Ecto.Hooks.Paginate do
 
   When `paginate_params` and `opts` given are valid:
 
-      iex> alias Rummage.Ecto.Hooks.Paginate
+      iex> alias Rummage.Ecto.Hook.Paginate
       iex> alias Rummage.Ecto.Category
       iex> paginate_params = %{
       ...>   per_page: 1,
@@ -242,15 +242,15 @@ defmodule Rummage.Ecto.Hooks.Paginate do
       ...> }
       iex> repo = Rummage.Ecto.Repo
       iex> Ecto.Adapters.SQL.Sandbox.checkout(repo)
-      iex> repo.insert!(%Category{category_name: "name"})
-      iex> repo.insert!(%Category{category_name: "name2"})
+      iex> repo.insert!(%Category{name: "name"})
+      iex> repo.insert!(%Category{name: "name2"})
       iex> Paginate.format_params(Category, paginate_params, [repo: repo])
       %{max_page: 2, page: 1, per_page: 1, total_count: 2}
 
   When `paginate_params` and `opts` given are valid and when the `queryable`
   passed has a `primary_key` defaulted to `id`.
 
-      iex> alias Rummage.Ecto.Hooks.Paginate
+      iex> alias Rummage.Ecto.Hook.Paginate
       iex> alias Rummage.Ecto.Category
       iex> paginate_params = %{
       ...>   per_page: 1,
@@ -258,63 +258,73 @@ defmodule Rummage.Ecto.Hooks.Paginate do
       ...> }
       iex> repo = Rummage.Ecto.Repo
       iex> Ecto.Adapters.SQL.Sandbox.checkout(repo)
-      iex> repo.insert!(%Category{category_name: "name"})
-      iex> repo.insert!(%Category{category_name: "name2"})
+      iex> repo.insert!(%Category{name: "name"})
+      iex> repo.insert!(%Category{name: "name2"})
       iex> Paginate.format_params(Category, paginate_params, [repo: repo])
       %{max_page: 2, page: 1, per_page: 1, total_count: 2}
 
   When `paginate_params` and `opts` given are valid and when the `queryable`
   passed has a custom `primary_key`.
 
-      iex> alias Rummage.Ecto.Hooks.Paginate
-      iex> alias Rummage.Ecto.Item
+      iex> alias Rummage.Ecto.Hook.Paginate
+      iex> alias Rummage.Ecto.Product
       iex> paginate_params = %{
       ...>   per_page: 1,
       ...>   page: 1
       ...> }
       iex> repo = Rummage.Ecto.Repo
       iex> Ecto.Adapters.SQL.Sandbox.checkout(repo)
-      iex> repo.insert!(%Item{item_id: 5})
-      iex> repo.insert!(%Item{item_id: 6})
-      iex> Paginate.format_params(Item, paginate_params, [repo: repo])
+      iex> repo.insert!(%Product{internal_code: "100"})
+      iex> repo.insert!(%Product{internal_code: "101"})
+      iex> Paginate.format_params(Product, paginate_params, [repo: repo])
       %{max_page: 2, page: 1, per_page: 1, total_count: 2}
 
   When `paginate_params` and `opts` given are valid and when the `queryable`
   passed has a custom `primary_key`.
 
-      iex> alias Rummage.Ecto.Hooks.Paginate
-      iex> alias Rummage.Ecto.Nopk
+      iex> alias Rummage.Ecto.Hook.Paginate
+      iex> alias Rummage.Ecto.Employee
       iex> paginate_params = %{
       ...>   per_page: 1,
       ...>   page: 1
       ...> }
       iex> repo = Rummage.Ecto.Repo
       iex> Ecto.Adapters.SQL.Sandbox.checkout(repo)
-      iex> repo.insert!(%Nopk{field: 5.0})
-      iex> repo.insert!(%Nopk{field: 6.0})
-      iex> Paginate.format_params(Nopk, paginate_params, [repo: repo])
+      iex> repo.insert!(%Employee{first_name: "First"})
+      iex> repo.insert!(%Employee{first_name: "Second"})
+      iex> Paginate.format_params(Employee, paginate_params, [repo: repo])
       %{max_page: 2, page: 1, per_page: 1, total_count: 2}
 
   When `paginate_params` and `opts` given are valid and when the `queryable`
   passed is not a `Ecto.Schema` module, but an `Ecto.Query.t`.
 
-      iex> alias Rummage.Ecto.Hooks.Paginate
-      iex> alias Rummage.Ecto.Nopk
+      iex> alias Rummage.Ecto.Hook.Paginate
+      iex> alias Rummage.Ecto.Employee
       iex> paginate_params = %{
       ...>   per_page: 1,
       ...>   page: 1
       ...> }
       iex> repo = Rummage.Ecto.Repo
       iex> Ecto.Adapters.SQL.Sandbox.checkout(repo)
-      iex> repo.insert!(%Nopk{field: 5.0})
-      iex> repo.insert!(%Nopk{field: 6.0})
+      iex> repo.insert!(%Employee{first_name: "First"})
+      iex> repo.insert!(%Employee{first_name: "Second"})
       iex> import Ecto.Query
-      iex> queryable = from u in Nopk, where: u.field > 5.0
+      iex> queryable = from u in Employee, where: u.first_name == "First"
       iex> Paginate.format_params(queryable, paginate_params, [repo: repo])
       %{max_page: 1, page: 1, per_page: 1, total_count: 1}
 
   """
-  @spec format_params(Ecto.Query.t(), map(), keyword()) :: map()
+  @spec format_params(Ecto.Query.t(), map() | atom(), keyword()) :: map()
+  def format_params(queryable, {paginate_scope, page}, opts) do
+    module = get_module(queryable)
+    name = :"__rummage_paginate_#{paginate_scope}"
+    paginate_params = case function_exported?(module, name, 1) do
+      true -> apply(module, name, [page])
+      _ -> raise "No scope `#{paginate_scope}` of type paginate defined in the #{module}"
+    end
+
+    format_params(queryable, paginate_params, opts)
+  end
   def format_params(queryable, paginate_params, opts) do
     paginate_params = populate_params(paginate_params, opts)
 

@@ -1,14 +1,15 @@
 defmodule Rummage.Ecto.Mixfile do
   use Mix.Project
 
-  @version "1.3.0-rc.0"
-  @url "https://github.com/aditya7iyengar/rummage_ecto"
+  @version "2.0.0-rc.0"
+  @elixir "~> 1.6"
+  @url "https://github.com/annkissam/rummage_ecto"
 
   def project do
     [
       app: :rummage_ecto,
       version: @version,
-      elixir: "~> 1.4",
+      elixir: @elixir,
       deps: deps(),
       build_embedded: Mix.env == :prod,
       start_permanent: Mix.env == :prod,
@@ -49,18 +50,21 @@ defmodule Rummage.Ecto.Mixfile do
 
   defp deps do
     [
-      {:credo, "~> 0.5", only: [:dev, :test]},
+      # Development Dependency
       {:ecto, "~> 2.2"},
-      {:excoveralls, "~> 0.3", only: :test},
-      {:ex_doc, "~> 0.14", only: :dev, runtime: false},
-      {:inch_ex, "~> 0.5", only: [:dev, :test, :docs]},
-      {:postgrex, ">= 0.0.0", only: :test},
+
+      # Other Dependencies
+      {:credo, "~> 0.9.1", only: [:dev, :test], runtime: false},
+      {:excoveralls, "~> 0.8", only: :test, runtime: false},
+      {:ex_doc, "~> 0.16", only: :dev, runtime: false},
+      {:inch_ex, "~> 0.5", only: [:dev, :test, :docs], runtime: false},
+      {:postgrex, "~> 0.13", only: :test, optional: true, runtime: false},
     ]
   end
 
   defp description do
     """
-    A library that allows us to search, sort and paginate ecto queries
+    A library that allows searching, sorting and paginating ecto queries
     """
   end
 
@@ -68,28 +72,38 @@ defmodule Rummage.Ecto.Mixfile do
     [
       main: "Rummage.Ecto",
       source_url: @url,
-      extras: ["doc_readme.md", "CHANGELOG.md"],
+      extras: ["README.md",
+               "CHANGELOG.md",
+               "docs/Nomenclature.md",
+               "docs/Walkthrough.md"],
       source_ref: "v#{@version}"
     ]
   end
 
   defp aliases do
     [
-      "ecto.setup": [
-        "ecto.create",
-        "ecto.migrate"
-      ],
-     "ecto.reset": [
-        "ecto.drop",
-        "ecto.setup"
-      ],
-     "test": [
-        # "ecto.drop",
-        "ecto.create --quiet",
-        "ecto.migrate",
-        "test"
-      ],
+      "ecto.setup": ["ecto.create", "ecto.migrate"],
+      "ecto.reset": ["ecto.drop", "ecto.setup"],
+      "test": ["ecto.setup --quite", "test"],
+      "test.watch.stale": &test_watch_stale/1,
     ]
+  end
+
+  defp test_watch_stale(_) do
+    System.cmd(
+      "sh",
+      ["-c", "#{get_system_watcher()} lib/ test/ | mix test --stale --listen-on-stdin"],
+      into: IO.stream(:stdio, :line)
+    )
+  end
+
+  # Works only for Mac and Linux
+  defp get_system_watcher do
+    case System.cmd("uname", []) do
+      {"Linux\n", 0} -> "inotifywait -e modify -e create -e delete -mr" # For Linux systems inotify should work
+      {"Darwin\n", 0} -> "fswatch" # For Macs, fswatch comes directly installed
+      {kernel, 0}-> raise "Watcher not supported on kernel: #{kernel}"
+    end
   end
 
   defp elixirc_paths(:test), do: ["lib", "priv", "test/support"]

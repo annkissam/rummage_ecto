@@ -1,5 +1,5 @@
-defmodule Rummage.Ecto.Hooks.PaginateTest do
+defmodule Rummage.Ecto.Hook.PaginateTest do
   use ExUnit.Case
-  doctest Rummage.Ecto.Hooks.Paginate
+  doctest Rummage.Ecto.Hook.Paginate
 
 end

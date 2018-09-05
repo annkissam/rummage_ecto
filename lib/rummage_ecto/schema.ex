@@ -1,114 +1,90 @@
-defmodule Rummage.Schema do
+defmodule Rummage.Ecto.Schema do
   @moduledoc """
+  This module is meant to be `use`d by a module (typically an `Ecto.Schema`).
 
-  Usage:
+  This isn't a required module for using `Rummage`, but it allows us to extend
+  its functionality.
+  """
+
+  @rummage_scope_types ~w{search sort paginate custom_search custom_sort custom_paginate}a
+
+  @doc """
+  This macro allows us to leverage features in `Rummage.Ecto.Schema`. It takes
+  advantage of `Ecto`, `rummage_field` and `rummage_scope`
+
+  ## Usage:
 
   ```elixir
-  defmodule MyApp.Rummage.MyModel do
-    use Rummage.Schema,
-      paginate: MyApp.Rummage.Paginate,
-      sort: MyApp.Rummage.MyModel.Sort,
-      search: MyApp.Rummage.MyModel.Search,
-      schema: MyApp.MyModel
+  defmodule MySchema do
+    use Rummage.Ecto.Schema
+
+    schema "my_table" do
+      field :field1, :integer
+      field :field2, :integer
+
+      timestamps()
+    end
+
+    rummage_field :field1_or_field2 do
+      {:fragment, "coalesce(?, ?)", :name, :description}
+    end
+
+    rummage_scope :show_page, [type: :paginate], fn(page) ->
+      %{per_page: 10, page: page}
+    end
   end
   ```
   """
-
   defmacro __using__(opts) do
-    paginate = Keyword.fetch!(opts, :paginate)
-    sort = Keyword.fetch!(opts, :sort)
-    search = Keyword.fetch!(opts, :search)
-    schema = Keyword.fetch!(opts, :schema)
-    repo = Keyword.get(opts, :repo, Rummage.Ecto.Config.repo())
-
-    quote location: :keep do
+    quote do
       use Ecto.Schema
-      import Ecto.Changeset
-      import Ecto.Query, warn: false
+      use Rummage.Ecto, unquote(opts)
+      import Ecto.Query
+      import unquote(__MODULE__)
+    end
+  end
 
-      @primary_key false
-      embedded_schema do
-        embeds_one :paginate, unquote(paginate)
-        embeds_one :search, unquote(search)
-        embeds_one :sort, unquote(sort)
+  @doc """
+  Rummage Field is a way to define a field which can be used to search, sort,
+  paginate through. This field might not exist in the database or the schema,
+  but can be represented as a `fragments` query using multiple fields.
 
-        field :params, :map
-        field :changeset, :map
-      end
+  NOTE: Currently this feature has some limitations due to limitations put on
+  Ecto's fragments. Ecto 3.0 is expected to come out with `unsafe_fragment`,
+  which will give this feature great flexibility. This feature is also quite
+  dependent on what database engine is being used. For now, we have made
+  a few fragments available (the list can be seen [here]()) which are thoroughly
+  tested on postgres. If these fragments don't do it, you can use `rummage_scope`
+  to accomplish a similar functionality.
 
-      def changeset(nil), do: changeset(struct(__MODULE__), %{})
-      def changeset(attrs), do: changeset(struct(__MODULE__), attrs)
+  ## Usage:
 
-      def changeset(rummage_schema, attrs) do
-        attrs = Map.put_new(attrs, "paginate", %{})
-        attrs = Map.put_new(attrs, "search", %{})
-        attrs = Map.put_new(attrs, "sort", %{})
+  To use upper case name as rummage field:
 
-        rummage_schema
-        |> cast(attrs, [])
-        |> cast_embed(:paginate)
-        |> cast_embed(:search)
-        |> cast_embed(:sort)
-      end
+  ```elixir
+  rummage_field :upper_case_name do
+    {:fragment, "upper(?)", :name}
+  end
+  ```
 
-      def rummage(params, opts \\ []) do
-        query = Keyword.get(opts, :query, unquote(schema))
+  To use the hour for created_at as rummage field:
+  rummage_field :created_at_hour do
+    {:fragment, "date_part('hour', ?)", :inserted_at}
+  end
+  """
+  defmacro rummage_field(field, do: block) do
+    name = :"__rummage_field_#{field}"
 
-        changeset = changeset(params)
-        rummage = apply_changes(changeset)
+    quote do
+      def unquote(name)(), do: unquote(block)
+    end
+  end
 
-        # changest - For use w/ 'search' form
-        rummage = Map.put(rummage, :changeset, changeset)
+  defmacro rummage_scope(scope, [type: type], fun) when type in @rummage_scope_types do
+    name = :"__rummage_#{type}_#{scope}"
 
-        {query, rummage} = query
-        |> search(rummage)
-        |> sort(rummage)
-        |> paginate(rummage)
-
-        query = case Keyword.get(opts, :preload) do
-          nil -> query
-          preload -> from a in query, [preload: ^preload]
-        end
-
-        records = unquote(repo).all(query)
-
-        paginate_params = if rummage.paginate do
-          %{page: rummage.paginate.page, per_page: rummage.paginate.per_page}
-        else
-          nil
-        end
-
-        search_params = if rummage.search do
-          Map.from_struct(rummage.search)
-        else
-          nil
-        end
-
-        sort_params = if rummage.sort do
-          Map.from_struct(rummage.sort)
-        else
-          nil
-        end
-
-        # params - For use w/ sort and paginate links...
-        rummage = Map.put(rummage, :params, %{paginate: paginate_params, search: search_params, sort: sort_params})
-
-        {rummage, records}
-      end
-
-      # Note: rummage.paginate is modified - it gets a total_count
-      defp paginate(query, %{paginate: paginate} = rummage) do
-        {query, paginate} = unquote(paginate).rummage(query, paginate)
-        {query, Map.put(rummage, :paginate, paginate)}
-      end
-
-      defp search(query, %{search: search}) do
-        unquote(search).rummage(query, search)
-      end
-
-      defp sort(query, %{sort: sort}) do
-        unquote(sort).rummage(query, sort)
-      end
+    quote do
+      def unquote(name)(term), do: unquote(fun).(term)
     end
   end
 end

@@ -71,11 +71,12 @@ defmodule Rummage.Ecto.Hook do
   end
   ```
 
-  For a better example, check out `Rummage.Ecto.Hooks.Paginate` or any other
+  For a better example, check out `Rummage.Ecto.Hook.Paginate` or any other
   hooks defined in `Rumamge.Ecto`
   """
   defmacro __using__(_opts) do
     quote do
+      import unquote(__MODULE__)
       @behviour unquote(__MODULE__)
 
       @spec run(Ecto.Query.t(), map()) :: Ecto.Query.t()
@@ -91,4 +92,18 @@ defmodule Rummage.Ecto.Hook do
       defoverridable [run: 2, format_params: 3]
     end
   end
+
+  def resolve_field(field, queryable) do
+    module = get_module(queryable)
+    name = :"__rummage_field_#{field}"
+    case function_exported?(module, name, 0) do
+      true -> apply(module, name, [])
+      _ -> field
+    end
+  end
+
+  def get_module(module) when is_atom(module), do: module
+  def get_module({_, module}) when is_atom(module), do: module
+  def get_module(%Ecto.Query{from: _from} = query), do: get_module(query.from)
+  def get_module(%Ecto.SubQuery{query: query}), do: get_module(query)
 end

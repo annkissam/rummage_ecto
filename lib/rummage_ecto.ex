@@ -75,21 +75,21 @@ defmodule Rummage.Ecto do
               already configured your app to use a default `search` and/or
               specified the `search` at `__using__` level, this is a way of
               overriding those defaults. This can be used to override native
-              `Rummage.Ecto.Hooks.Search` to a custom hook.
+              `Rummage.Ecto.Hook.Search` to a custom hook.
 
   * `sort`: If you haven't set up a `sort` at the config level or `__using__`
             level, this a way of passing `sort` to `rummage`. If you have
             already configured your app to use a default `sort` and/or
             specified the `sort` at `__using__` level, this is a way of
             overriding those defaults. This can be used to override native
-            `Rummage.Ecto.Hooks.Sort` to a custom hook.
+            `Rummage.Ecto.Hook.Sort` to a custom hook.
 
   * `paginate`: If you haven't set up a `paginate` at the config level or `__using__`
                 level, this a way of passing `paginate` to `rummage`. If you have
                 already configured your app to use a default `paginate` and/or
                 specified the `paginate` at `__using__` level, this is a way of
                 overriding those defaults. This can be used to override native
-                `Rummage.Ecto.Hooks.Paginate` to a custom hook.
+                `Rummage.Ecto.Hook.Paginate` to a custom hook.
 
 
   ## Examples
@@ -124,7 +124,7 @@ defmodule Rummage.Ecto do
       iex> rummage = %{paginate: %{page: 1}}
       iex> repo = Rummage.Ecto.Repo
       iex> Ecto.Adapters.SQL.Sandbox.checkout(repo)
-      iex> opts = [paginate: Rummage.Ecto.Hooks.Paginate, repo: repo]
+      iex> opts = [paginate: Rummage.Ecto.Hook.Paginate, repo: repo]
       iex> {queryable, rummage} = rummage(Product, rummage, opts)
       iex> rummage
       %{paginate: %{max_page: 0, page: 1, per_page: 10, total_count: 0}}
@@ -140,9 +140,9 @@ defmodule Rummage.Ecto do
       iex> rummage = %{paginate: %{per_page: 1, page: 1}}
       iex> repo = Rummage.Ecto.Repo
       iex> Ecto.Adapters.SQL.Sandbox.checkout(repo)
-      iex> repo.insert!(%Product{name: "name"})
-      iex> repo.insert!(%Product{name: "name2"})
-      iex> opts = [paginate: Rummage.Ecto.Hooks.Paginate,
+      iex> repo.insert!(%Product{name: "name", internal_code: "100"})
+      iex> repo.insert!(%Product{name: "name2", internal_code: "101"})
+      iex> opts = [paginate: Rummage.Ecto.Hook.Paginate,
       ...>  repo: repo]
       iex> {queryable, rummage} = rummage(Product, rummage, opts)
       iex> rummage
@@ -237,7 +237,7 @@ defmodule Rummage.Ecto do
       end
 
       defp defaults() do
-        keys = ~w(repo per_page search sort paginate)a
+        keys = ~w{repo per_page search sort paginate}a
         Enum.map(keys, &get_defs/1)
       end
 

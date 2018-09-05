@@ -1,5 +1,5 @@
-defmodule Rummage.Ecto.CustomHooks.SimpleSortTest do
+defmodule Rummage.Ecto.CustomHook.SimpleSortTest do
   use ExUnit.Case
-  doctest Rummage.Ecto.CustomHooks.SimpleSort
+  doctest Rummage.Ecto.CustomHook.SimpleSort
 
 end

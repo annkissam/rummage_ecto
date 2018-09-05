@@ -1,6 +1,6 @@
-defmodule Rummage.Ecto.CustomHooks.KeysetPaginate do
+defmodule Rummage.Ecto.CustomHook.KeysetPaginate do
   @moduledoc """
-  `Rummage.Ecto.CustomHooks.KeysetPaginate` is an example of a Custom Hook that
+  `Rummage.Ecto.CustomHook.KeysetPaginate` is an example of a Custom Hook that
   comes with `Rummage.Ecto`.
 
   This module uses `keyset` pagination to add a pagination query expression
@@ -36,14 +36,14 @@ defmodule Rummage.Ecto.CustomHooks.KeysetPaginate do
   do the following:
 
   ```elixir
-  Rummage.Ecto.CustomHooks.KeysetPaginate.run(Product,
+  Rummage.Ecto.CustomHook.KeysetPaginate.run(Product,
     %{per_page: 10, page: 1, last_seen_pk: 10, pk: :id})
   ```
 
   ## When to Use KeysetPaginate?
 
   - Keyset Pagination is mainly here to make pagination faster for complex
-  pages. It is recommended that you use `Rummage.Ecto.Hooks.Paginate` for a
+  pages. It is recommended that you use `Rummage.Ecto.Hook.Paginate` for a
   simple pagination operation, as this module has a lot of assumptions and
   it's own ordering on top of the given query.
 
@@ -61,7 +61,7 @@ defmodule Rummage.Ecto.CustomHooks.KeysetPaginate do
   # USAGE
 
   ```elixir
-  alias Rummage.Ecto.CustomHooks.KeysetPaginate
+  alias Rummage.Ecto.CustomHook.KeysetPaginate
 
   queryable = KeysetPaginate.run(Parent,
     %{per_page: 10, page: 1, last_seen_pk: 10, pk: :id})
@@ -73,7 +73,7 @@ defmodule Rummage.Ecto.CustomHooks.KeysetPaginate do
   In the `Rummage.Ecto` call:
   ```elixir
   Rummage.Ecto.rummage(queryable, rummage,
-    paginate: Rummage.Ecto.CustomHooks.KeysetPaginate)
+    paginate: Rummage.Ecto.CustomHook.KeysetPaginate)
   ```
 
   OR
@@ -82,7 +82,7 @@ defmodule Rummage.Ecto.CustomHooks.KeysetPaginate do
   ```elixir
   config :my_app,
     Rummage.Ecto,
-    paginate: Rummage.Ecto.CustomHooks.KeysetPaginate
+    paginate: Rummage.Ecto.CustomHook.KeysetPaginate
   ```
 
   OR
@@ -91,7 +91,7 @@ defmodule Rummage.Ecto.CustomHooks.KeysetPaginate do
   ```elixir
   defmodule MySchema do
     use Rummage.Ecto, repo: SomeRepo,
-      paginate: Rummage.Ecto.CustomHooks.KeysetPaginate
+      paginate: Rummage.Ecto.CustomHook.KeysetPaginate
   end
   ```
   """
@@ -121,26 +121,26 @@ defmodule Rummage.Ecto.CustomHooks.KeysetPaginate do
   ## Examples
   When an empty map is passed as `params`:
 
-      iex> alias Rummage.Ecto.CustomHooks.KeysetPaginate
+      iex> alias Rummage.Ecto.CustomHook.KeysetPaginate
       iex> KeysetPaginate.run(Parent, %{})
       ** (RuntimeError) Error in params, No values given for keys: per_page, page, last_seen_pk, pk
 
   When a non-empty map is passed as `params`, but with a missing key:
 
-      iex> alias Rummage.Ecto.CustomHooks.KeysetPaginate
+      iex> alias Rummage.Ecto.CustomHook.KeysetPaginate
       iex> KeysetPaginate.run(Parent, %{per_page: 10})
       ** (RuntimeError) Error in params, No values given for keys: page, last_seen_pk, pk
 
   When a valid map of params is passed with an `Ecto.Schema` module:
 
-      iex> alias Rummage.Ecto.CustomHooks.KeysetPaginate
+      iex> alias Rummage.Ecto.CustomHook.KeysetPaginate
       iex> params = %{per_page: 10, page: 1, last_seen_pk: 0, pk: :id}
       iex> KeysetPaginate.run(Rummage.Ecto.Product, params)
       #Ecto.Query<from p in Rummage.Ecto.Product, where: p.id > ^0, limit: ^10>
 
   When the `queryable` passed is an `Ecto.Query` variable:
 
-      iex> alias Rummage.Ecto.CustomHooks.KeysetPaginate
+      iex> alias Rummage.Ecto.CustomHook.KeysetPaginate
       iex> import Ecto.Query
       iex> queryable = from u in "products"
       #Ecto.Query<from p in "products">
@@ -151,7 +151,7 @@ defmodule Rummage.Ecto.CustomHooks.KeysetPaginate do
 
   More examples:
 
-      iex> alias Rummage.Ecto.CustomHooks.KeysetPaginate
+      iex> alias Rummage.Ecto.CustomHook.KeysetPaginate
       iex> import Ecto.Query
       iex> params = %{per_page: 5, page: 5, last_seen_pk: 25, pk: :id}
       iex> queryable = from u in "products"
@@ -159,7 +159,7 @@ defmodule Rummage.Ecto.CustomHooks.KeysetPaginate do
       iex> KeysetPaginate.run(queryable, params)
       #Ecto.Query<from p in "products", where: p.id > ^25, limit: ^5>
 
-      iex> alias Rummage.Ecto.CustomHooks.KeysetPaginate
+      iex> alias Rummage.Ecto.CustomHook.KeysetPaginate
       iex> import Ecto.Query
       iex> params = %{per_page: 5, page: 1, last_seen_pk: 0, pk: :some_id}
       iex> queryable = from u in "products"
@@ -224,14 +224,14 @@ defmodule Rummage.Ecto.CustomHooks.KeysetPaginate do
 
   When a `repo` isn't passed in `opts` it gives an error:
 
-      iex> alias Rummage.Ecto.CustomHooks.KeysetPaginate
+      iex> alias Rummage.Ecto.CustomHook.KeysetPaginate
       iex> alias Rummage.Ecto.Category
       iex> KeysetPaginate.format_params(Category, %{per_page: 1, page: 1}, [])
       ** (RuntimeError) Expected key `repo` in `opts`, got []
 
   When `paginate_params` given aren't valid, it uses defaults to populate params:
 
-      iex> alias Rummage.Ecto.CustomHooks.KeysetPaginate
+      iex> alias Rummage.Ecto.CustomHook.KeysetPaginate
       iex> alias Rummage.Ecto.Category
       iex> Ecto.Adapters.SQL.Sandbox.checkout(Rummage.Ecto.Repo)
       iex> KeysetPaginate.format_params(Category, %{}, [repo: Rummage.Ecto.Repo])
@@ -240,7 +240,7 @@ defmodule Rummage.Ecto.CustomHooks.KeysetPaginate do
 
   When `paginate_params` and `opts` given are valid:
 
-      iex> alias Rummage.Ecto.CustomHooks.KeysetPaginate
+      iex> alias Rummage.Ecto.CustomHook.KeysetPaginate
       iex> alias Rummage.Ecto.Category
       iex> paginate_params = %{
       ...>   per_page: 1,
@@ -254,7 +254,7 @@ defmodule Rummage.Ecto.CustomHooks.KeysetPaginate do
 
   When `paginate_params` and `opts` given are valid:
 
-      iex> alias Rummage.Ecto.CustomHooks.KeysetPaginate
+      iex> alias Rummage.Ecto.CustomHook.KeysetPaginate
       iex> alias Rummage.Ecto.Category
       iex> paginate_params = %{
       ...>   per_page: 1,
@@ -262,8 +262,8 @@ defmodule Rummage.Ecto.CustomHooks.KeysetPaginate do
       ...> }
       iex> repo = Rummage.Ecto.Repo
       iex> Ecto.Adapters.SQL.Sandbox.checkout(repo)
-      iex> repo.insert!(%Category{category_name: "name"})
-      iex> repo.insert!(%Category{category_name: "name2"})
+      iex> repo.insert!(%Category{name: "name"})
+      iex> repo.insert!(%Category{name: "name2"})
       iex> KeysetPaginate.format_params(Category, paginate_params, [repo: repo])
       %{max_page: 2, last_seen_pk: 0, page: 1,
         per_page: 1, total_count: 2, pk: :id}
@@ -271,7 +271,7 @@ defmodule Rummage.Ecto.CustomHooks.KeysetPaginate do
   When `paginate_params` and `opts` given are valid and when the `queryable`
   passed has a `primary_key` defaulted to `id`.
 
-      iex> alias Rummage.Ecto.CustomHooks.KeysetPaginate
+      iex> alias Rummage.Ecto.CustomHook.KeysetPaginate
       iex> alias Rummage.Ecto.Category
       iex> paginate_params = %{
       ...>   per_page: 1,
@@ -279,8 +279,8 @@ defmodule Rummage.Ecto.CustomHooks.KeysetPaginate do
       ...> }
       iex> repo = Rummage.Ecto.Repo
       iex> Ecto.Adapters.SQL.Sandbox.checkout(repo)
-      iex> repo.insert!(%Category{category_name: "name"})
-      iex> repo.insert!(%Category{category_name: "name2"})
+      iex> repo.insert!(%Category{name: "name"})
+      iex> repo.insert!(%Category{name: "name2"})
       iex> KeysetPaginate.format_params(Category, paginate_params, [repo: repo])
       %{max_page: 2, last_seen_pk: 0, page: 1,
         per_page: 1, total_count: 2, pk: :id}
@@ -288,19 +288,19 @@ defmodule Rummage.Ecto.CustomHooks.KeysetPaginate do
   When `paginate_params` and `opts` given are valid and when the `queryable`
   passed has a custom `primary_key`.
 
-      iex> alias Rummage.Ecto.CustomHooks.KeysetPaginate
-      iex> alias Rummage.Ecto.Item
+      iex> alias Rummage.Ecto.CustomHook.KeysetPaginate
+      iex> alias Rummage.Ecto.Product
       iex> paginate_params = %{
       ...>   per_page: 1,
       ...>   page: 2
       ...> }
       iex> repo = Rummage.Ecto.Repo
       iex> Ecto.Adapters.SQL.Sandbox.checkout(repo)
-      iex> repo.insert!(%Item{item_id: 5})
-      iex> repo.insert!(%Item{item_id: 6})
-      iex> KeysetPaginate.format_params(Item, paginate_params, [repo: repo])
+      iex> repo.insert!(%Product{internal_code: "100"})
+      iex> repo.insert!(%Product{internal_code: "101"})
+      iex> KeysetPaginate.format_params(Product, paginate_params, [repo: repo])
       %{max_page: 2, last_seen_pk: 1, page: 2,
-        per_page: 1, total_count: 2, pk: :item_id}
+        per_page: 1, total_count: 2, pk: :internal_code}
 
   """
   @spec format_params(Ecto.Query.t(), map(), keyword()) :: map()

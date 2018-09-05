@@ -21,9 +21,9 @@ defmodule Rummage.Ecto.Config do
     config :app_name, Rummage.Ecto,
       per_page: 10,
       repo: AppName.Repo,
-      search: Rummage.Ecto.Hooks.Search,
-      sort: Rummage.Ecto.Hooks.Sort,
-      paginate: Rummage.Ecto.Hooks.Paginate
+      search: Rummage.Ecto.Hook.Search,
+      sort: Rummage.Ecto.Hook.Sort,
+      paginate: Rummage.Ecto.Hook.Paginate
 
   """
 
@@ -35,13 +35,13 @@ defmodule Rummage.Ecto.Config do
 
   ## Examples
   When no config is set, if returns the default hook
-  (`Rummage.Ecto.Hooks.Search`):
+  (`Rummage.Ecto.Hook.Search`):
       iex> alias Rummage.Ecto.Config
       iex> Config.search
-      Rummage.Ecto.Hooks.Search
+      Rummage.Ecto.Hook.Search
   """
   def search(application \\ :rummage_ecto) do
-    config(:search, Rummage.Ecto.Hooks.Search, application)
+    config(:search, Rummage.Ecto.Hook.Search, application)
   end
 
   @doc """
@@ -50,13 +50,13 @@ defmodule Rummage.Ecto.Config do
 
   ## Examples
   When no config is set, if returns the default hook
-  (`Rummage.Ecto.Hooks.Sort`):
+  (`Rummage.Ecto.Hook.Sort`):
       iex> alias Rummage.Ecto.Config
       iex> Config.sort
-      Rummage.Ecto.Hooks.Sort
+      Rummage.Ecto.Hook.Sort
   """
   def sort(application \\ :rummage_ecto) do
-    config(:sort, Rummage.Ecto.Hooks.Sort, application)
+    config(:sort, Rummage.Ecto.Hook.Sort, application)
   end
 
   @doc """
@@ -65,13 +65,13 @@ defmodule Rummage.Ecto.Config do
 
   ## Examples
   When no config is set, if returns the default hook
-  (`Rummage.Ecto.Hooks.Paginate`):
+  (`Rummage.Ecto.Hook.Paginate`):
       iex> alias Rummage.Ecto.Config
       iex> Config.paginate
-      Rummage.Ecto.Hooks.Paginate
+      Rummage.Ecto.Hook.Paginate
   """
   def paginate(application \\ :rummage_ecto) do
-    config(:paginate, Rummage.Ecto.Hooks.Paginate, application)
+    config(:paginate, Rummage.Ecto.Hook.Paginate, application)
   end
 
   @doc """
@@ -109,7 +109,8 @@ defmodule Rummage.Ecto.Config do
   end
 
   defp config(key, default, application) do
-    config(application)
+    application
+    |> config()
     |> Keyword.get(key, default)
     |> resolve_config(default)
   end

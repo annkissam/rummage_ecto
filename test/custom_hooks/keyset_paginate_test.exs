@@ -1,5 +1,5 @@
-defmodule Rummage.Ecto.CustomHooks.KeysetPaginateTest do
+defmodule Rummage.Ecto.CustomHook.KeysetPaginateTest do
   use ExUnit.Case
-  doctest Rummage.Ecto.CustomHooks.KeysetPaginate
+  doctest Rummage.Ecto.CustomHook.KeysetPaginate
 
 end

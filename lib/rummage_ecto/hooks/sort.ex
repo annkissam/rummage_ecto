@@ -1,6 +1,6 @@
-defmodule Rummage.Ecto.Hooks.Sort do
+defmodule Rummage.Ecto.Hook.Sort do
   @moduledoc """
-  `Rummage.Ecto.Hooks.Sort` is the default sort hook that comes with
+  `Rummage.Ecto.Hook.Sort` is the default sort hook that comes with
   `Rummage.Ecto`.
 
   This module provides a operations that can add sorting functionality to
@@ -33,7 +33,7 @@ defmodule Rummage.Ecto.Hooks.Sort do
   do the following:
 
   ```elixir
-  Rummage.Ecto.Hooks.Sort.run(Product, %{field: :price,
+  Rummage.Ecto.Hook.Sort.run(Product, %{field: :price,
     assoc: [], order: :desc})
   ```
 
@@ -48,7 +48,7 @@ defmodule Rummage.Ecto.Hooks.Sort do
   params = %{field: :category_name, assoc: [inner: :category],
     order: :asc}
 
-  Rummage.Ecto.Hooks.Sort.run(Product, params)
+  Rummage.Ecto.Hook.Sort.run(Product, params)
   ```
 
   The above operation will return an `Ecto.Query.t` struct which represents
@@ -90,7 +90,7 @@ defmodule Rummage.Ecto.Hooks.Sort do
   sorted by ascending `field_1`
 
   ```elixir
-  alias Rummage.Ecto.Hooks.Sort
+  alias Rummage.Ecto.Hook.Sort
 
   sorted_queryable = Sort.run(Parent, %{assoc: [], field: :name, order: :asc}})
   ```
@@ -103,7 +103,7 @@ defmodule Rummage.Ecto.Hooks.Sort do
   Keep in mind that `case_insensitive` can only be called for `text` fields
 
   ```elixir
-  alias Rummage.Ecto.Hooks.Sort
+  alias Rummage.Ecto.Hook.Sort
 
   sorted_queryable = Sort.run(Parent, %{assoc: [], field: :name, order: :asc, ci: true}})
   ```
@@ -128,8 +128,8 @@ defmodule Rummage.Ecto.Hooks.Sort do
 
   The `CustomHook` must use `Rummage.Ecto.Hook`. For examples of `CustomHook`,
   check out some `custom_hooks` that are shipped with `Rummage.Ecto`:
-  `Rummage.Ecto.CustomHooks.SimpleSearch`, `Rummage.Ecto.CustomHooks.SimpleSort`,
-    Rummage.Ecto.CustomHooks.SimplePaginate
+  `Rummage.Ecto.CustomHook.SimpleSearch`, `Rummage.Ecto.CustomHook.SimpleSort`,
+    Rummage.Ecto.CustomHook.SimplePaginate
 
   """
 
@@ -137,8 +137,21 @@ defmodule Rummage.Ecto.Hooks.Sort do
 
   import Ecto.Query
 
-  @expected_keys ~w(field order assoc)a
-  @err_msg "Error in params, No values given for keys: "
+  @expected_keys ~w{field order assoc}a
+  @err_msg ~s{Error in params, No values given for keys: }
+
+  # Only for Postgres (only one interpolation is supported)
+  # TODO: Fix this once Ecto 3.0 comes out with `unsafe_fragment`
+  @supported_fragments_one ["date_part('day', ?)",
+                            "date_part('month', ?)",
+                            "date_part('year', ?)",
+                            "date_part('hour', ?)",
+                            "lower(?)",
+                            "upper(?)"]
+
+  @supported_fragments_two ["concat(?, ?)",
+                            "coalesce(?, ?)"]
+
 
   @doc """
   This is the callback implementation of `Rummage.Ecto.Hook.run/2`.
@@ -158,25 +171,25 @@ defmodule Rummage.Ecto.Hooks.Sort do
   ## Examples
   When an empty map is passed as `params`:
 
-      iex> alias Rummage.Ecto.Hooks.Sort
+      iex> alias Rummage.Ecto.Hook.Sort
       iex> Sort.run(Parent, %{})
       ** (RuntimeError) Error in params, No values given for keys: field, order, assoc
 
   When a non-empty map is passed as `params`, but with a missing key:
 
-      iex> alias Rummage.Ecto.Hooks.Sort
+      iex> alias Rummage.Ecto.Hook.Sort
       iex> Sort.run(Parent, %{field: :name})
       ** (RuntimeError) Error in params, No values given for keys: order, assoc
 
   When a valid map of params is passed with an `Ecto.Schema` module:
 
-      iex> alias Rummage.Ecto.Hooks.Sort
+      iex> alias Rummage.Ecto.Hook.Sort
       iex> Sort.run(Rummage.Ecto.Product, %{field: :name, assoc: [], order: :asc})
       #Ecto.Query<from p in subquery(from p in Rummage.Ecto.Product), order_by: [asc: p.name]>
 
   When the `queryable` passed is an `Ecto.Query` variable:
 
-      iex> alias Rummage.Ecto.Hooks.Sort
+      iex> alias Rummage.Ecto.Hook.Sort
       iex> import Ecto.Query
       iex> queryable = from u in "products"
       #Ecto.Query<from p in "products">
@@ -186,7 +199,7 @@ defmodule Rummage.Ecto.Hooks.Sort do
 
   When the `queryable` passed is an `Ecto.Query` variable, with `desc` order:
 
-      iex> alias Rummage.Ecto.Hooks.Sort
+      iex> alias Rummage.Ecto.Hook.Sort
       iex> import Ecto.Query
       iex> queryable = from u in "products"
       #Ecto.Query<from p in "products">
@@ -195,7 +208,7 @@ defmodule Rummage.Ecto.Hooks.Sort do
 
   When the `queryable` passed is an `Ecto.Query` variable, with `ci` true:
 
-      iex> alias Rummage.Ecto.Hooks.Sort
+      iex> alias Rummage.Ecto.Hook.Sort
       iex> import Ecto.Query
       iex> queryable = from u in "products"
       #Ecto.Query<from p in "products">
@@ -204,7 +217,7 @@ defmodule Rummage.Ecto.Hooks.Sort do
 
   When the `queryable` passed is an `Ecto.Query` variable, with associations:
 
-      iex> alias Rummage.Ecto.Hooks.Sort
+      iex> alias Rummage.Ecto.Hook.Sort
       iex> import Ecto.Query
       iex> queryable = from u in "products"
       #Ecto.Query<from p in "products">
@@ -214,7 +227,7 @@ defmodule Rummage.Ecto.Hooks.Sort do
   When the `queryable` passed is an `Ecto.Schema` module with associations,
   `desc` order and `ci` true:
 
-      iex> alias Rummage.Ecto.Hooks.Sort
+      iex> alias Rummage.Ecto.Hook.Sort
       iex> queryable = Rummage.Ecto.Product
       Rummage.Ecto.Product
       iex> Sort.run(queryable, %{field: :name, assoc: [inner: :category], order: :desc, ci: true})
@@ -231,7 +244,10 @@ defmodule Rummage.Ecto.Hooks.Sort do
   # the sent queryable variable
   defp handle_sort(queryable, sort_params) do
     order = Map.get(sort_params, :order)
-    field = Map.get(sort_params, :field)
+    field = sort_params
+      |> Map.get(:field)
+      |> resolve_field(queryable)
+
     assocs = Map.get(sort_params, :assoc)
     ci = Map.get(sort_params, :ci, false)
 
@@ -262,6 +278,28 @@ defmodule Rummage.Ecto.Hooks.Sort do
   # case insensitivity and field
   defp handle_ordering(queryable, field, order, ci) do
     order_by_assoc(queryable, order, field, ci)
+  end
+
+  for fragment <- @supported_fragments_one do
+    defp order_by_assoc(queryable, order_type, {:fragment, unquote(fragment), field}, false) do
+      order_by(queryable, [p0, ..., p2], [{^order_type, fragment(unquote(fragment), field(p2, ^field))}])
+    end
+
+    defp order_by_assoc(queryable, order_type, {:fragment, unquote(fragment), field}, true) do
+      order_by(queryable, [p0, ..., p2],
+               [{^order_type, case_insensitive(fragment(unquote(fragment), field(p2, ^field)))}])
+    end
+  end
+
+  for fragment <- @supported_fragments_two do
+    defp order_by_assoc(queryable, order_type, {:fragment, unquote(fragment), field1, field2}, false) do
+      order_by(queryable, [p0, ..., p2], [{^order_type, fragment(unquote(fragment), field(p2, ^field1), field(p2, ^field2))}])
+    end
+
+    defp order_by_assoc(queryable, order_type, {:fragment, unquote(fragment), field1, field2}, true) do
+      order_by(queryable, [p0, ..., p2],
+               [{^order_type, case_insensitive(fragment(unquote(fragment), field(p2, ^field1), field(p2, ^field2)))}])
+    end
   end
 
   defp order_by_assoc(queryable, order_type, field, false) do
@@ -301,11 +339,21 @@ defmodule Rummage.Ecto.Hooks.Sort do
   which are essential for running this hook module.
 
   ## Examples
-      iex> alias Rummage.Ecto.Hooks.Sort
+      iex> alias Rummage.Ecto.Hook.Sort
       iex> Sort.format_params(Parent, %{}, [])
       %{assoc: [], order: :asc}
   """
-  @spec format_params(Ecto.Query.t(), map(), keyword()) :: map()
+  @spec format_params(Ecto.Query.t(), map() | tuple(), keyword()) :: map()
+  def format_params(queryable, {sort_scope, order}, opts) do
+    module = get_module(queryable)
+    name = :"__rummage_sort_#{sort_scope}"
+    sort_params = case function_exported?(module, name, 1) do
+      true -> apply(module, name, [order])
+      _ -> raise "No scope `#{sort_scope}` of type sort defined in the #{module}"
+    end
+
+    format_params(queryable, sort_params, opts)
+  end
   def format_params(_queryable, sort_params, _opts) do
     sort_params
     |> Map.put_new(:assoc, [])
