@@ -56,6 +56,3 @@ defmodule Rummage.Ecto.Hook.CustomSort do
     |> Map.put_new(:order, :asc)
   end
 end
-
-
-
