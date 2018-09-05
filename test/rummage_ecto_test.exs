@@ -406,10 +406,13 @@ defmodule Rummage.EctoTest do
 
     assert length(products) == 8
 
-    assert Enum.map(products, & &1.name) == ["Product 2->1", "Product 1->1",
-                                             "Product 2->2", "Product 1->2",
-                                             "Product 2->3", "Product 1->3",
-                                             "Product 2->4", "Product 1->4"]
+    assert (products |> Enum.map(& &1.name) |> Enum.sort()) ==
+      Enum.sort(
+                ["Product 2->1", "Product 1->1",
+                 "Product 2->2", "Product 1->2",
+                 "Product 2->3", "Product 1->3",
+                 "Product 2->4", "Product 1->4"]
+                )
     rummage = %{sort: {:invalid_scope, :asc}}
 
     assert_raise RuntimeError, ~r/No scope `invalid_scope`/, fn ->
@@ -472,10 +475,13 @@ defmodule Rummage.EctoTest do
 
     assert length(products) == 8
 
-    assert Enum.map(products, & &1.name) == ["Product 2->4", "Product 1->4",
-                                             "Product 2->3", "Product 1->3",
-                                             "Product 2->2", "Product 1->2",
-                                             "Product 2->1", "Product 1->1"]
+    assert (products |> Enum.map(& &1.name) |> Enum.sort()) ==
+      Enum.sort(
+                ["Product 2->1", "Product 1->1",
+                 "Product 2->2", "Product 1->2",
+                 "Product 2->3", "Product 1->3",
+                 "Product 2->4", "Product 1->4"]
+                )
 
     rummage = %{sort: {:category_milliseconds, :desc}}
 
