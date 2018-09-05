@@ -74,8 +74,8 @@ defmodule Rummage.Ecto.Mixfile do
       source_url: @url,
       extras: ["README.md",
                "CHANGELOG.md",
-               "docs/Nomenclature.md",
-               "docs/Walkthrough.md"],
+               "help/nomenclature.md",
+               "help/walkthrough.md"],
       source_ref: "v#{@version}"
     ]
   end
