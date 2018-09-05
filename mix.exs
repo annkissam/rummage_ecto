@@ -85,7 +85,25 @@ defmodule Rummage.Ecto.Mixfile do
       "ecto.setup": ["ecto.create", "ecto.migrate"],
       "ecto.reset": ["ecto.drop", "ecto.setup"],
       "test": ["ecto.setup --quite", "test"],
+      "test.watch.stale": &test_watch_stale/1,
     ]
+  end
+
+  defp test_watch_stale(_) do
+    System.cmd(
+      "sh",
+      ["-c", "#{get_system_watcher()} lib/ test/ | mix test --stale --listen-on-stdin"],
+      into: IO.stream(:stdio, :line)
+    )
+  end
+
+  # Works only for Mac and Linux
+  defp get_system_watcher do
+    case System.cmd("uname", []) do
+      {"Linux\n", 0} -> "inotifywait -e modify -e create -e delete -mr" # For Linux systems inotify should work
+      {"Darwin\n", 0} -> "fswatch" # For Macs, fswatch comes directly installed
+      {kernel, 0}-> raise "Watcher not supported on kernel: #{kernel}"
+    end
   end
 
   defp elixirc_paths(:test), do: ["lib", "priv", "test/support"]
