@@ -102,7 +102,7 @@ defmodule Rummage.Ecto.Mixfile do
     case System.cmd("uname", []) do
       {"Linux\n", 0} -> "inotifywait -e modify -e create -e delete -mr" # For Linux systems inotify should work
       {"Darwin\n", 0} -> "fswatch" # For Macs, fswatch comes directly installed
-      {kernel, 0}-> raise "Watcher not supported on kernel: #{kernel}"
+      {kernel, 0} -> raise "Watcher not supported on kernel: #{kernel}"
     end
   end
 
