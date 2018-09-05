@@ -5,7 +5,7 @@ defmodule Rummage.Ecto.CustomHook.SimpleSearch do
 
   This module provides a operations that can add searching functionality to
   a pipeline of `Ecto` queries. This module works by taking fields, and
-  `search_type`, `search_term` and `assoc` associated with those `fields`.
+  `search_type` and `search_term`.
 
   This module doesn't support associations and hence is a simple alternative
   to Rummage's default search hook.
