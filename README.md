@@ -2,16 +2,16 @@
 
 <img src="src/rummage_logo.png" alt="https://hexdocs.pm/rummage_ecto/Rummage.Ecto.html" width="150" height="150">
 
-[![Build Status](https://travis-ci.org/aditya7iyengar/rummage_ecto.svg?branch=master)](https://travis-ci.org/aditya7iyengar/rummage_ecto)
-[![Coverage Status](https://coveralls.io/repos/github/aditya7iyengar/rummage_ecto/badge.svg?branch=master)](https://coveralls.io/github/aditya7iyengar/rummage_ecto?branch=master)
+[![Build Status](https://travis-ci.org/annkissam/rummage_ecto.svg?branch=master)](https://travis-ci.org/annkissam/rummage_ecto)
+[![Coverage Status](https://coveralls.io/repos/github/annkissam/rummage_ecto/badge.svg?branch=master)](https://coveralls.io/github/annkissam/rummage_ecto?branch=master)
 [![Hex Version](http://img.shields.io/hexpm/v/rummage_ecto.svg?style=flat)](https://hex.pm/packages/rummage_ecto)
 [![hex.pm downloads](https://img.shields.io/hexpm/dt/rummage_ecto.svg)](https://hex.pm/packages/rummage_ecto)
 [![Hex docs](http://img.shields.io/badge/hex.pm-docs-green.svg?style=flat)](https://hexdocs.pm/rummage_ecto)
-[![docs](https://inch-ci.org/github/aditya7iyengar/rummage_ecto.svg)](http://inch-ci.org/github/aditya7iyengar/rummage_ecto)
-[![MIT licensed](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/aditya7iyengar/rummage_ecto/master/LICENSE)
+[![docs](https://inch-ci.org/github/annkissam/rummage_ecto.svg)](http://inch-ci.org/github/annkissam/rummage_ecto)
+[![MIT licensed](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/annkissam/rummage_ecto/master/LICENSE)
 
 **If you're looking for full `Phoenix` support, `Rummage.Phoenix` uses `Rummage.Ecto` and adds `HTML` and `Controller` support
-to it. You can check `Rummage.Phoenix` out by clicking [here](https://github.com/aditya7iyengar/rummage_phoenix)**
+to it. You can check `Rummage.Phoenix` out by clicking [here](https://github.com/annkissam/rummage_phoenix)**
 
 **Please refer for [CHANGELOG](CHANGELOG.md) for version specific changes**
 
@@ -28,7 +28,7 @@ hook.
 If you'd like to have something like that, you can always configure `Rummage` to use your `Search` module for that model. This
 is why Rummage has been made configurable.**
 
-To see an example usage of `rummage`, check [this](https://github.com/aditya7iyengar/rummage_ecto_example) repository.
+To see an example usage of `rummage`, check [this](https://github.com/annkissam/rummage_ecto_example) repository.
 
 ## Installation
 
@@ -46,9 +46,9 @@ This package is [available in Hex](https://hexdocs.pm/rummage_ecto/), and can be
 
 ### Current Blogs:
 
-  - [Rummage Demo & Basics](https://medium.com/@aditya7iyengar/searching-sorting-and-pagination-in-elixir-phoenix-with-rummage-part-1-933106ec50ca#.der0yrnvq)
-  - [Using Rummage.Ecto](https://medium.com/@aditya7iyengar/searching-sorting-and-pagination-in-elixir-phoenix-with-rummage-part-2-8e36558984c2#.vviioi5ia)
-  - [Using Rummage.Phoenix: Part 1](https://medium.com/@aditya7iyengar/searching-sorting-and-pagination-in-elixir-phoenix-with-rummage-part-3-7cf5023bc226#.q08478ud2)
+  - [Rummage Demo & Basics](https://medium.com/aditya7iyengar/searching-sorting-and-pagination-in-elixir-phoenix-with-rummage-part-1-933106ec50ca#.der0yrnvq)
+  - [Using Rummage.Ecto](https://medium.com/aditya7iyengar/searching-sorting-and-pagination-in-elixir-phoenix-with-rummage-part-2-8e36558984c2#.vviioi5ia)
+  - [Using Rummage.Phoenix: Part 1](https://medium.com/aditya7iyengar/searching-sorting-and-pagination-in-elixir-phoenix-with-rummage-part-3-7cf5023bc226#.q08478ud2)
 
 ### Coming up next:
 

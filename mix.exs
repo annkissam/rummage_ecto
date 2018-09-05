@@ -3,7 +3,7 @@ defmodule Rummage.Ecto.Mixfile do
 
   @version "2.0.0-rc.0"
   @elixir "~> 1.6"
-  @url "https://github.com/aditya7iyengar/rummage_ecto"
+  @url "https://github.com/annkissam/rummage_ecto"
 
   def project do
     [
