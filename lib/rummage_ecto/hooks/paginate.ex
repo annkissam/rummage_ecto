@@ -217,7 +217,7 @@ defmodule Rummage.Ecto.Hook.Paginate do
       iex> alias Rummage.Ecto.Category
       iex> Ecto.Adapters.SQL.Sandbox.checkout(Rummage.Ecto.Repo)
       iex> Paginate.format_params(Category, %{}, [repo: Rummage.Ecto.Repo])
-      %{max_page: 0, page: 1, per_page: 10, total_count: 0}
+      %{max_page: 1, page: 1, per_page: 10, total_count: 0}
 
   When `paginate_params` and `opts` given are valid:
 
@@ -230,7 +230,7 @@ defmodule Rummage.Ecto.Hook.Paginate do
       iex> repo = Rummage.Ecto.Repo
       iex> Ecto.Adapters.SQL.Sandbox.checkout(repo)
       iex> Paginate.format_params(Category, paginate_params, [repo: repo])
-      %{max_page: 0, page: 1, per_page: 1, total_count: 0}
+      %{max_page: 1, page: 1, per_page: 1, total_count: 0}
 
   When `paginate_params` and `opts` given are valid:
 

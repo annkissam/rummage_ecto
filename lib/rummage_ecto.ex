@@ -127,7 +127,7 @@ defmodule Rummage.Ecto do
       iex> opts = [paginate: Rummage.Ecto.Hook.Paginate, repo: repo]
       iex> {queryable, rummage} = rummage(Product, rummage, opts)
       iex> rummage
-      %{paginate: %{max_page: 0, page: 1, per_page: 10, total_count: 0}}
+      %{paginate: %{max_page: 1, page: 1, per_page: 10, total_count: 0}}
       iex> queryable
       #Ecto.Query<from p in Rummage.Ecto.Product, limit: ^10, offset: ^0>
 
