@@ -398,7 +398,7 @@ defmodule Rummage.EctoTest do
   test "rummage call with sort scope" do
     create_categories_and_products()
 
-    rummage = %{sort: {:category_name, :asc}}
+    rummage = %{sort: %{scope: :category_name, order: :asc}}
 
     {queryable, rummage} = Product.rummage(rummage)
 
@@ -413,7 +413,7 @@ defmodule Rummage.EctoTest do
                  "Product 2->3", "Product 1->3",
                  "Product 2->4", "Product 1->4"]
                 )
-    rummage = %{sort: {:invalid_scope, :asc}}
+    rummage = %{sort: %{scope: :invalid_scope, order: :asc}}
 
     assert_raise RuntimeError, ~r/No scope `invalid_scope`/, fn ->
       Product.rummage(rummage)
@@ -467,7 +467,7 @@ defmodule Rummage.EctoTest do
   test "rummage call with custom sort scope" do
     create_categories_and_products()
 
-    rummage = %{sort: {:category_microseconds, :desc}}
+    rummage = %{sort: %{scope: :category_microseconds, order: :desc}}
 
     {queryable, rummage} = Product.rummage(rummage)
 
@@ -483,7 +483,7 @@ defmodule Rummage.EctoTest do
                  "Product 2->4", "Product 1->4"]
                 )
 
-    rummage = %{sort: {:category_milliseconds, :desc}}
+    rummage = %{sort: %{scope: :category_milliseconds, order: :desc}}
 
     assert_raise RuntimeError, ~r/No scope `category_milliseconds`/, fn ->
       Product.rummage(rummage)

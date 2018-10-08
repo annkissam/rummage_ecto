@@ -377,6 +377,7 @@ defmodule Rummage.Ecto.Hook.Paginate do
     |> apply(:all, [distinct(query, :true)])
     |> Enum.count()
   end
+
   defp get_count(query, repo, pk) do
     query = select(query, [s], count(field(s, ^pk), :distinct))
     hd(apply(repo, :all, [query]))

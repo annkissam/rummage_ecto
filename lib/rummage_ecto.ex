@@ -229,14 +229,14 @@ defmodule Rummage.Ecto do
       alias Rummage.Ecto.Config, as: RConfig
 
       def rummage(rummage, opts \\ []) do
-        Rummage.Ecto.rummage(__MODULE__, rummage, uniq_merge(opts, defaults()))
+        Rummage.Ecto.rummage(__MODULE__, rummage, uniq_merge(opts, __rummage_defaults__()))
       end
 
       def rummageq(queryable, rummage, opts \\ []) do
-        Rummage.Ecto.rummage(queryable, rummage, uniq_merge(opts, defaults()))
+        Rummage.Ecto.rummage(queryable, rummage, uniq_merge(opts, __rummage_defaults__()))
       end
 
-      defp defaults() do
+      def __rummage_defaults__ do
         keys = ~w{repo per_page search sort paginate}a
         Enum.map(keys, &get_defs/1)
       end

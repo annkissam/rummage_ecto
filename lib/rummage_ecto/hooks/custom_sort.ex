@@ -9,13 +9,13 @@ defmodule Rummage.Ecto.Hook.CustomSort do
 
   # Helper function which handles addition of paginated query on top of
   # the sent queryable variable
-  defp handle_sort(queryable, {field, order}) do
+  defp handle_sort(queryable, %{scope: scope, order: order}) do
     module = get_module(queryable)
-    name = :"__rummage_custom_sort_#{field}"
+    name = :"__rummage_custom_sort_#{scope}"
 
     case function_exported?(module, name, 1) do
       true -> apply(module, name, [{queryable, order}])
-      _ -> "No scope `#{field}` of type custom_sort defined in #{module}"
+      _ -> "No scope `#{scope}` of type custom_sort defined in #{module}"
     end
   end
 
@@ -34,8 +34,8 @@ defmodule Rummage.Ecto.Hook.CustomSort do
       iex> Sort.format_params(Parent, %{}, [])
       %{assoc: [], order: :asc}
   """
-  @spec format_params(Ecto.Query.t(), map() | tuple(), keyword()) :: map()
-  def format_params(queryable, {sort_scope, order}, opts) do
+  @spec format_params(Ecto.Query.t(), map(), keyword()) :: map()
+  def format_params(queryable, %{scope: sort_scope, order: order}, opts) do
     module = get_module(queryable)
     name = :"__rummage_sort_#{sort_scope}"
 
@@ -44,7 +44,7 @@ defmodule Rummage.Ecto.Hook.CustomSort do
         format_params(queryable, sort_params, opts)
       _ ->
         case function_exported?(module, :"__rummage_custom_sort_#{sort_scope}", 1) do
-          true -> {sort_scope, order}
+          true -> %{scope: sort_scope, order: order}
           _ -> raise "No scope `#{sort_scope}` of type custom_sort defined in the #{module}"
         end
     end
