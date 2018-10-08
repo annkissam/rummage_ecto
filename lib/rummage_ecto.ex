@@ -157,10 +157,11 @@ defmodule Rummage.Ecto do
              sort: Keyword.get(opts, :sort, RConfig.sort()),
              paginate: Keyword.get(opts, :paginate, RConfig.paginate())]
 
-    rummage =
-      Enum.reduce(hooks, rummage, &format_hook_params(&1, &2, queryable, opts))
-
-    {Enum.reduce(hooks, queryable, &run_hook(&1, &2, rummage)), rummage}
+    Enum.reduce(hooks, {queryable, rummage}, fn(hook, {queryable, rummage}) ->
+      rummage = format_hook_params(hook, rummage, queryable, opts)
+      queryable = run_hook(hook, queryable, rummage)
+      {queryable, rummage}
+    end)
   end
 
   defp format_hook_params({_, nil}, rummage, _, _), do: rummage

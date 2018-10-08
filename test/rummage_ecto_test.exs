@@ -234,7 +234,7 @@ defmodule Rummage.EctoTest do
       search: %{price: %{search_type: :lteq, search_term: 10, assoc: [],
         search_expr: :where}},
       sort: %{field: :name, order: :asc, assoc: []},
-      paginate: %{per_page: 2, page: 2, max_page: 4, total_count: 8},
+      paginate: %{per_page: 2, page: 2, max_page: 1, total_count: 2},
     }
   end
 
@@ -263,7 +263,7 @@ defmodule Rummage.EctoTest do
       search: %{name: %{assoc: [inner: :category], search_term: "1",
         search_type: :like, search_expr: :where}},
       sort: %{field: :name, order: :asc, assoc: [inner: :category]},
-      paginate: %{per_page: 2, page: 1, max_page: 4, total_count: 8}
+      paginate: %{per_page: 2, page: 1, max_page: 1, total_count: 2}
     }
   end
 
