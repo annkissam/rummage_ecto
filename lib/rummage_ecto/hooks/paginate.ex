@@ -351,6 +351,7 @@ defmodule Rummage.Ecto.Hook.Paginate do
       |> (& &1 / per_page).()
       |> Float.ceil()
       |> trunc()
+    max_page = max_page == 0 && 1 || max_page
 
     %{page: Map.get(paginate_params, :page),
       per_page: per_page, total_count: total_count, max_page: max_page}
