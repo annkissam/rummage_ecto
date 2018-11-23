@@ -399,6 +399,8 @@ defmodule Rummage.Ecto.Hook.Paginate do
     case queryable do
       %{from: %{query: subquery}} -> schema_from_query(subquery)
       %{from: {_, schema}} -> schema
+      %{from: %{source: {_, schema}}} -> schema
+      %{from: %{source: %{query: subquery}}} -> schema_from_query(subquery)
       _ -> queryable
     end
   end

@@ -380,7 +380,7 @@ defmodule Rummage.EctoTest do
 
     rummage = %{search: %{category_name: "Category 1"}}
 
-    {queryable, rummage} = Product.rummage(rummage)
+    {queryable, _rummage} = Product.rummage(rummage)
 
     products = Repo.all(queryable)
 
@@ -400,7 +400,7 @@ defmodule Rummage.EctoTest do
 
     rummage = %{sort: %{scope: :category_name, order: :asc}}
 
-    {queryable, rummage} = Product.rummage(rummage)
+    {queryable, _rummage} = Product.rummage(rummage)
 
     products = Repo.all(queryable)
 
@@ -425,7 +425,7 @@ defmodule Rummage.EctoTest do
 
     rummage = %{paginate: {:category_show, 1}}
 
-    {queryable, rummage} = Product.rummage(rummage)
+    {queryable, _rummage} = Product.rummage(rummage)
 
     products = Repo.all(queryable)
 
@@ -446,7 +446,7 @@ defmodule Rummage.EctoTest do
 
     rummage = %{search: %{category_quarter: Float.ceil(Date.utc_today().month / 3)}}
 
-    {queryable, rummage} = Product.rummage(rummage)
+    {queryable, _rummage} = Product.rummage(rummage)
 
     products = Repo.all(queryable)
 
@@ -469,7 +469,7 @@ defmodule Rummage.EctoTest do
 
     rummage = %{sort: %{scope: :category_microseconds, order: :desc}}
 
-    {queryable, rummage} = Product.rummage(rummage)
+    {queryable, _rummage} = Product.rummage(rummage)
 
     products = Repo.all(queryable)
 
@@ -495,7 +495,7 @@ defmodule Rummage.EctoTest do
 
     rummage = %{paginate: {:small_page, 1}}
 
-    {queryable, rummage} = Product.rummage(rummage)
+    {queryable, _rummage} = Product.rummage(rummage)
 
     products = Repo.all(queryable)
 
@@ -517,7 +517,7 @@ defmodule Rummage.EctoTest do
 
     rummage = %{search: %{created_at_year: %{search_type: :eq, search_term: Date.utc_today.year}}}
 
-    {queryable, rummage} = Product.rummage(rummage)
+    {queryable, _rummage} = Product.rummage(rummage)
 
     products = Repo.all(queryable)
 
@@ -534,7 +534,7 @@ defmodule Rummage.EctoTest do
 
     rummage = %{sort: %{field: :created_at_year, order: :asc}}
 
-    {queryable, rummage} = Product.rummage(rummage)
+    {queryable, _rummage} = Product.rummage(rummage)
 
     products = Repo.all(queryable)
 
