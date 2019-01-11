@@ -62,13 +62,13 @@ defmodule Rummage.Ecto.Product do
 
   rummage_scope :category_quarter, [type: :custom_search], fn({query, term}) ->
     query
-    |> join(:inner, [q], c in Rummage.Ecto.Category, q.category_id == c.id)
+    |> join(:inner, [q], c in Rummage.Ecto.Category, on: q.category_id == c.id)
     |> where([..., c], fragment("date_part('quarter', ?)", c.inserted_at) == ^term)
   end
 
   rummage_scope :category_microseconds, [type: :custom_sort], fn({query, order}) ->
     query
-    |> join(:inner, [q], c in Rummage.Ecto.Category, q.category_id == c.id)
+    |> join(:inner, [q], c in Rummage.Ecto.Category, on: q.category_id == c.id)
     |> order_by([..., c], [{^order, fragment("date_part('microseconds', ?)", c.inserted_at)}])
   end
 
