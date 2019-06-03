@@ -1,13 +1,13 @@
 # Rummage.Ecto
 
-**If you're looking for full `Phoenix` support, `Rummage.Phoenix` uses `Rumamge.Ecto` and adds `HTML` and `Controller` support
+**If you're looking for full `Phoenix` support, `Rummage.Phoenix` uses `Rummage.Ecto` and adds `HTML` and `Controller` support
 to it. You can check `Rummage.Phoenix` out by clicking [here](https://github.com/aditya7iyengar/rummage_phoenix)**
 
 **Please refer for `CHANGELOG` for version specific changes**
 
 `Rummage.Ecto` is a light weight, but powerful framework that can be used to alter `Ecto` queries with Search, Sort and Paginate operations.
 
-It accomplishes the above operations by using `Hooks`, which are modules that implement `Rumamge.Ecto.Hook` behavior.
+It accomplishes the above operations by using `Hooks`, which are modules that implement `Rummage.Ecto.Hook` behavior.
 Each operation: `Search`, `Sort` and `Paginate` have their hooks defined in `Rummage`. By doing this, `Rummage` is completely
 configurable.
 
