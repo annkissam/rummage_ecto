@@ -25,7 +25,7 @@ defmodule Rummage.Ecto.Mixfile do
       package: package(),
 
       # Docs
-      name: "Rumamge.Ecto",
+      name: "Rummage.Ecto",
       docs: docs(),
     ]
   end

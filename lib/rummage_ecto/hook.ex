@@ -72,7 +72,7 @@ defmodule Rummage.Ecto.Hook do
   ```
 
   For a better example, check out `Rummage.Ecto.Hook.Paginate` or any other
-  hooks defined in `Rumamge.Ecto`
+  hooks defined in `Rummage.Ecto`
   """
   defmacro __using__(_opts) do
     quote do
