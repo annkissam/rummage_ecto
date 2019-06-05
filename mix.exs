@@ -51,7 +51,8 @@ defmodule Rummage.Ecto.Mixfile do
   defp deps do
     [
       # Development Dependency
-      {:ecto, "~> 2.2"},
+      {:ecto, "~> 2.2 or ~> 3.0"},
+      {:ecto_sql, "~> 3.0"},
 
       # Other Dependencies
       {:credo, "~> 0.9.1", only: [:dev, :test], runtime: false},
