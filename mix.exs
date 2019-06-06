@@ -85,7 +85,7 @@ defmodule Rummage.Ecto.Mixfile do
     [
       "ecto.setup": ["ecto.create", "ecto.migrate"],
       "ecto.reset": ["ecto.drop", "ecto.setup"],
-      "test": ["ecto.setup --quite", "test"],
+      test: ["ecto.setup --quite", "test"],
       "test.watch.stale": &test_watch_stale/1,
     ]
   end
