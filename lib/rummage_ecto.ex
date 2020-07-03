@@ -31,7 +31,7 @@ defmodule Rummage.Ecto do
       iex> rummage = %{search: %{name: %{assoc: [], search_type: :ilike, search_term: "field_!"}}}
       iex> {queryable, rummage} = Rummage.Ecto.Category.rummageq(Rummage.Ecto.Category, rummage)
       iex> queryable
-      #Ecto.Query<from c in subquery(from c in Rummage.Ecto.Category), where: ilike(c.name, ^"%field_!%")>
+      #Ecto.Query<from c0 in subquery(from c0 in Rummage.Ecto.Category), where: ilike(c0.name, ^"%field_!%")>
       iex> rummage
       %{search: %{name: %{assoc: [], search_expr: :where,
         search_term: "field_!", search_type: :ilike}}}
@@ -42,7 +42,7 @@ defmodule Rummage.Ecto do
       iex> rummage = %{search: %{name: %{assoc: [], search_type: :ilike, search_term: "field_!"}}}
       iex> {queryable, rummage} = Rummage.Ecto.Category.rummage(rummage)
       iex> queryable
-      #Ecto.Query<from c in subquery(from c in Rummage.Ecto.Category), where: ilike(c.name, ^"%field_!%")>
+      #Ecto.Query<from c0 in subquery(from c0 in Rummage.Ecto.Category), where: ilike(c0.name, ^"%field_!%")>
       iex> rummage
       %{search: %{name: %{assoc: [], search_expr: :where,
         search_term: "field_!", search_type: :ilike}}}
@@ -129,7 +129,7 @@ defmodule Rummage.Ecto do
       iex> rummage
       %{paginate: %{max_page: 0, page: 1, per_page: 10, total_count: 0}}
       iex> queryable
-      #Ecto.Query<from p in Rummage.Ecto.Product, limit: ^10, offset: ^0>
+      #Ecto.Query<from p0 in Rummage.Ecto.Product, limit: ^10, offset: ^0>
 
 
   When a hook is given, with correspondng params, it updates and returns the
@@ -148,31 +148,33 @@ defmodule Rummage.Ecto do
       iex> rummage
       %{paginate: %{max_page: 2, page: 1, per_page: 1, total_count: 2}}
       iex> queryable
-      #Ecto.Query<from p in Rummage.Ecto.Product, limit: ^1, offset: ^0>
+      #Ecto.Query<from p0 in Rummage.Ecto.Product, limit: ^1, offset: ^0>
 
   """
   @spec rummage(Ecto.Query.t(), map(), Keyword.t()) :: {Ecto.Query.t(), map()}
   def rummage(queryable, rummage, opts \\ []) do
-    hooks = [search: Keyword.get(opts, :search, RConfig.search()),
-             sort: Keyword.get(opts, :sort, RConfig.sort()),
-             paginate: Keyword.get(opts, :paginate, RConfig.paginate())]
+    hooks = [
+      search: Keyword.get(opts, :search, RConfig.search()),
+      sort: Keyword.get(opts, :sort, RConfig.sort()),
+      paginate: Keyword.get(opts, :paginate, RConfig.paginate())
+    ]
 
-    rummage =
-      Enum.reduce(hooks, rummage, &format_hook_params(&1, &2, queryable, opts))
+    rummage = Enum.reduce(hooks, rummage, &format_hook_params(&1, &2, queryable, opts))
 
     {Enum.reduce(hooks, queryable, &run_hook(&1, &2, rummage)), rummage}
   end
 
   defp format_hook_params({_, nil}, rummage, _, _), do: rummage
+
   defp format_hook_params({type, hook_mod}, rummage, queryable, opts) do
     case Map.get(rummage, type) do
       nil -> rummage
-      params -> Map.put(rummage, type,
-            apply(hook_mod, :format_params, [queryable, params, opts]))
+      params -> Map.put(rummage, type, apply(hook_mod, :format_params, [queryable, params, opts]))
     end
   end
 
   defp run_hook({_, nil}, queryable, _), do: queryable
+
   defp run_hook({type, hook_mod}, queryable, rummage) do
     case Map.get(rummage, type) do
       nil -> queryable

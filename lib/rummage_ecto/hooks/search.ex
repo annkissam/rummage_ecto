@@ -76,7 +76,7 @@ defmodule Rummage.Ecto.Hook.Search do
   a query equivalent to:
 
   ```elixir
-  from p in Product
+  from p0 in Product
   |> join(:inner, :category)
   |> where([p, c], c.category_name == ^"super")
   ```
@@ -220,7 +220,7 @@ defmodule Rummage.Ecto.Hook.Search do
       iex> search_params = %{field1: %{assoc: [],
       ...> search_type: :like, search_term: "field1", search_expr: :where}}
       iex> Search.run(Rummage.Ecto.Product, search_params)
-      #Ecto.Query<from p in subquery(from p in Rummage.Ecto.Product), where: like(p.field1, ^"%field1%")>
+      #Ecto.Query<from p0 in subquery(from p0 in Rummage.Ecto.Product), where: like(p0.field1, ^"%field1%")>
 
   When a valid map of params is passed with an `Ecto.Query.t`:
 
@@ -228,9 +228,9 @@ defmodule Rummage.Ecto.Hook.Search do
       iex> import Ecto.Query
       iex> search_params = %{field1: %{assoc: [],
       ...> search_type: :like, search_term: "field1", search_expr: :where}}
-      iex> query = from p in "products"
+      iex> query = from p0 in "products"
       iex> Search.run(query, search_params)
-      #Ecto.Query<from p in subquery(from p in "products"), where: like(p.field1, ^"%field1%")>
+      #Ecto.Query<from p0 in subquery(from p0 in "products"), where: like(p0.field1, ^"%field1%")>
 
   When a valid map of params is passed with an `Ecto.Query.t`, with `assoc`s:
 
@@ -238,9 +238,9 @@ defmodule Rummage.Ecto.Hook.Search do
       iex> import Ecto.Query
       iex> search_params = %{field1: %{assoc: [inner: :category],
       ...> search_type: :like, search_term: "field1", search_expr: :or_where}}
-      iex> query = from p in "products"
+      iex> query = from p0 in "products"
       iex> Search.run(query, search_params)
-      #Ecto.Query<from p in subquery(from p in "products"), join: c in assoc(p, :category), or_where: like(c.field1, ^"%field1%")>
+      #Ecto.Query<from p0 in subquery(from p0 in "products"), join: c1 in assoc(p0, :category), or_where: like(c1.field1, ^"%field1%")>
 
   When a valid map of params is passed with an `Ecto.Query.t`, with `assoc`s, with
   different join types:
@@ -249,9 +249,9 @@ defmodule Rummage.Ecto.Hook.Search do
       iex> import Ecto.Query
       iex> search_params = %{field1: %{assoc: [inner: :category, left: :category, cross: :category],
       ...> search_type: :like, search_term: "field1", search_expr: :where}}
-      iex> query = from p in "products"
+      iex> query = from p0 in "products"
       iex> Search.run(query, search_params)
-      #Ecto.Query<from p in subquery(from p in "products"), join: c0 in assoc(p, :category), left_join: c1 in assoc(c0, :category), cross_join: c2 in assoc(c1, :category), where: like(c2.field1, ^"%field1%")>
+      #Ecto.Query<from p0 in subquery(from p0 in "products"), join: c1 in assoc(p0, :category), left_join: c2 in assoc(c1, :category), cross_join: c3 in assoc(c2, :category), where: like(c3.field1, ^"%field1%")>
 
   When a valid map of params is passed with an `Ecto.Query.t`, searching on
   a boolean param
@@ -260,9 +260,9 @@ defmodule Rummage.Ecto.Hook.Search do
       iex> import Ecto.Query
       iex> search_params = %{available: %{assoc: [],
       ...> search_type: :eq, search_term: true, search_expr: :where}}
-      iex> query = from p in "products"
+      iex> query = from p0 in "products"
       iex> Search.run(query, search_params)
-      #Ecto.Query<from p in subquery(from p in "products"), where: p.available == ^true>
+      #Ecto.Query<from p0 in subquery(from p0 in "products"), where: p0.available == ^true>
 
   When a valid map of params is passed with an `Ecto.Query.t`, searching on
   a float param
@@ -271,9 +271,9 @@ defmodule Rummage.Ecto.Hook.Search do
       iex> import Ecto.Query
       iex> search_params = %{price: %{assoc: [],
       ...> search_type: :gteq, search_term: 10.0, search_expr: :where}}
-      iex> query = from p in "products"
+      iex> query = from p0 in "products"
       iex> Search.run(query, search_params)
-      #Ecto.Query<from p in subquery(from p in "products"), where: p.price >= ^10.0>
+      #Ecto.Query<from p0 in subquery(from p0 in "products"), where: p0.price >= ^10.0>
 
   When a valid map of params is passed with an `Ecto.Query.t`, searching on
   a boolean param, but with a wrong `search_type`.
@@ -283,7 +283,7 @@ defmodule Rummage.Ecto.Hook.Search do
       iex> import Ecto.Query
       iex> search_params = %{available: %{assoc: [],
       ...> search_type: :ilike, search_term: true, search_expr: :where}}
-      iex> query = from p in "products"
+      iex> query = from p0 in "products"
       iex> Search.run(query, search_params)
       ** (ArgumentError) argument error
 
@@ -335,7 +335,7 @@ defmodule Rummage.Ecto.Hook.Search do
   defp validate_params(params) do
     key_validations = Enum.map(@expected_keys, &Map.fetch(params, &1))
 
-    case Enum.filter(key_validations, & &1 == :error) do
+    case Enum.filter(key_validations, &(&1 == :error)) do
       [] -> :ok
       _ -> raise @err_msg <> missing_keys(key_validations)
     end
@@ -375,20 +375,24 @@ defmodule Rummage.Ecto.Hook.Search do
   end
 
   defp put_keys({field, %{} = field_params}, _queryable) do
-    field_params = field_params
+    field_params =
+      field_params
       |> Map.put_new(:assoc, [])
       |> Map.put_new(:search_type, :eq)
       |> Map.put_new(:search_expr, :where)
 
     {field, field_params}
   end
+
   defp put_keys({search_scope, field_value}, queryable) do
     module = get_module(queryable)
     name = :"__rummage_search_#{search_scope}"
-    {field, search_params} = case function_exported?(module, name, 1) do
-      true -> apply(module, name, [field_value])
-      _ -> raise "No scope `#{search_scope}` of type search defined in the #{module}"
-    end
+
+    {field, search_params} =
+      case function_exported?(module, name, 1) do
+        true -> apply(module, name, [field_value])
+        _ -> raise "No scope `#{search_scope}` of type search defined in the #{module}"
+      end
 
     put_keys({field, search_params}, queryable)
   end

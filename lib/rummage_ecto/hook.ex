@@ -89,13 +89,14 @@ defmodule Rummage.Ecto.Hook do
         raise "format_params/2 not implemented for hook: #{__MODULE__}"
       end
 
-      defoverridable [run: 2, format_params: 3]
+      defoverridable run: 2, format_params: 3
     end
   end
 
   def resolve_field(field, queryable) do
     module = get_module(queryable)
     name = :"__rummage_field_#{field}"
+
     case function_exported?(module, name, 0) do
       true -> apply(module, name, [])
       _ -> field
@@ -106,4 +107,5 @@ defmodule Rummage.Ecto.Hook do
   def get_module({_, module}) when is_atom(module), do: module
   def get_module(%Ecto.Query{from: _from} = query), do: get_module(query.from)
   def get_module(%Ecto.SubQuery{query: query}), do: get_module(query)
+  def get_module(%Ecto.Query.FromExpr{source: source}), do: get_module(source)
 end

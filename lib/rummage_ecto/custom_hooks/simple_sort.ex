@@ -141,16 +141,16 @@ defmodule Rummage.Ecto.CustomHook.SimpleSort do
 
       iex> alias Rummage.Ecto.CustomHook.SimpleSort
       iex> SimpleSort.run(Rummage.Ecto.Product, %{field: :name, order: :asc})
-      #Ecto.Query<from p in subquery(from p in Rummage.Ecto.Product), order_by: [asc: p.name]>
+      #Ecto.Query<from p0 in subquery(from p0 in Rummage.Ecto.Product), order_by: [asc: p0.name]>
 
   When the `queryable` passed is an `Ecto.Query` variable:
 
       iex> alias Rummage.Ecto.CustomHook.SimpleSort
       iex> import Ecto.Query
       iex> queryable = from u in "products"
-      #Ecto.Query<from p in "products">
+      #Ecto.Query<from p0 in "products">
       iex> SimpleSort.run(queryable, %{field: :name, order: :asc})
-      #Ecto.Query<from p in subquery(from p in "products"), order_by: [asc: p.name]>
+      #Ecto.Query<from p0 in subquery(from p0 in "products"), order_by: [asc: p0.name]>
 
 
   When the `queryable` passed is an `Ecto.Query` variable, with `desc` order:
@@ -158,18 +158,18 @@ defmodule Rummage.Ecto.CustomHook.SimpleSort do
       iex> alias Rummage.Ecto.CustomHook.SimpleSort
       iex> import Ecto.Query
       iex> queryable = from u in "products"
-      #Ecto.Query<from p in "products">
+      #Ecto.Query<from p0 in "products">
       iex> SimpleSort.run(queryable, %{field: :name, order: :desc})
-      #Ecto.Query<from p in subquery(from p in "products"), order_by: [desc: p.name]>
+      #Ecto.Query<from p0 in subquery(from p0 in "products"), order_by: [desc: p0.name]>
 
   When the `queryable` passed is an `Ecto.Query` variable, with `ci` true:
 
       iex> alias Rummage.Ecto.CustomHook.SimpleSort
       iex> import Ecto.Query
       iex> queryable = from u in "products"
-      #Ecto.Query<from p in "products">
+      #Ecto.Query<from p0 in "products">
       iex> SimpleSort.run(queryable, %{field: :name, order: :asc, ci: true})
-      #Ecto.Query<from p in subquery(from p in "products"), order_by: [asc: fragment("lower(?)", p.name)]>
+      #Ecto.Query<from p0 in subquery(from p0 in "products"), order_by: [asc: fragment("lower(?)", p0.name)]>
 
   """
   @spec run(Ecto.Query.t(), map()) :: Ecto.Query.t()
@@ -207,8 +207,7 @@ defmodule Rummage.Ecto.CustomHook.SimpleSort do
   end
 
   defp order_by_assoc(queryable, order_type, field, true) do
-    order_by(queryable, [p0, ..., p2],
-             [{^order_type, case_insensitive(field(p2, ^field))}])
+    order_by(queryable, [p0, ..., p2], [{^order_type, case_insensitive(field(p2, ^field))}])
   end
 
   # Helper function that validates the list of params based on
@@ -216,7 +215,7 @@ defmodule Rummage.Ecto.CustomHook.SimpleSort do
   defp validate_params(params) do
     key_validations = Enum.map(@expected_keys, &Map.fetch(params, &1))
 
-    case Enum.filter(key_validations, & &1 == :error) do
+    case Enum.filter(key_validations, &(&1 == :error)) do
       [] -> :ok
       _ -> raise @err_msg <> missing_keys(key_validations)
     end

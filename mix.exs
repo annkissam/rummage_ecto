@@ -2,7 +2,7 @@ defmodule Rummage.Ecto.Mixfile do
   use Mix.Project
 
   @version "2.0.0-rc.0"
-  @elixir "~> 1.6"
+  @elixir "~> 1.10"
   @url "https://github.com/annkissam/rummage_ecto"
 
   def project do
@@ -11,14 +11,14 @@ defmodule Rummage.Ecto.Mixfile do
       version: @version,
       elixir: @elixir,
       deps: deps(),
-      build_embedded: Mix.env == :prod,
-      start_permanent: Mix.env == :prod,
+      build_embedded: Mix.env() == :prod,
+      start_permanent: Mix.env() == :prod,
 
       # Test
       test_coverage: [tool: ExCoveralls],
       preferred_cli_env: [coveralls: :test],
       aliases: aliases(),
-      elixirc_paths: elixirc_paths(Mix.env),
+      elixirc_paths: elixirc_paths(Mix.env()),
 
       # Hex
       description: description(),
@@ -26,16 +26,15 @@ defmodule Rummage.Ecto.Mixfile do
 
       # Docs
       name: "Rummage.Ecto",
-      docs: docs(),
+      docs: docs()
     ]
   end
 
   def application do
     [
-      applications: [
-        :logger,
-        :ecto,
-      ],
+      extra_applications: [
+        :logger
+      ]
     ]
   end
 
@@ -44,21 +43,21 @@ defmodule Rummage.Ecto.Mixfile do
       files: ["lib", "mix.exs", "README.md"],
       maintainers: ["Adi Iyengar"],
       licenses: ["MIT"],
-      links: %{"Github" => @url},
+      links: %{"Github" => @url}
     ]
   end
 
   defp deps do
     [
       # Development Dependency
-      {:ecto, "~> 2.2"},
-
+      {:ecto, "~> 3.0"},
+      {:ecto_sql, "~> 3.4"},
       # Other Dependencies
-      {:credo, "~> 0.9.1", only: [:dev, :test], runtime: false},
-      {:excoveralls, "~> 0.8", only: :test, runtime: false},
-      {:ex_doc, "~> 0.16", only: :dev, runtime: false},
-      {:inch_ex, "~> 0.5", only: [:dev, :test, :docs], runtime: false},
-      {:postgrex, "~> 0.13", only: :test, optional: true, runtime: false},
+      {:credo, "~> 1.4.0", only: [:dev, :test], runtime: false},
+      {:excoveralls, "~> 0.13", only: :test, runtime: false},
+      {:ex_doc, "~> 0.22", only: :dev, runtime: false},
+      {:inch_ex, "~> 2.0", only: [:dev, :test, :docs], runtime: false},
+      {:postgrex, ">= 0.0.0", only: :test}
     ]
   end
 
@@ -72,10 +71,7 @@ defmodule Rummage.Ecto.Mixfile do
     [
       main: "Rummage.Ecto",
       source_url: @url,
-      extras: ["README.md",
-               "CHANGELOG.md",
-               "help/nomenclature.md",
-               "help/walkthrough.md"],
+      extras: ["README.md", "CHANGELOG.md", "help/nomenclature.md", "help/walkthrough.md"],
       source_ref: "v#{@version}"
     ]
   end
@@ -84,8 +80,8 @@ defmodule Rummage.Ecto.Mixfile do
     [
       "ecto.setup": ["ecto.create", "ecto.migrate"],
       "ecto.reset": ["ecto.drop", "ecto.setup"],
-      "test": ["ecto.setup --quite", "test"],
-      "test.watch.stale": &test_watch_stale/1,
+      test: ["ecto.setup", "test"],
+      "test.watch.stale": &test_watch_stale/1
     ]
   end
 
@@ -100,12 +96,14 @@ defmodule Rummage.Ecto.Mixfile do
   # Works only for Mac and Linux
   defp get_system_watcher do
     case System.cmd("uname", []) do
-      {"Linux\n", 0} -> "inotifywait -e modify -e create -e delete -mr" # For Linux systems inotify should work
-      {"Darwin\n", 0} -> "fswatch" # For Macs, fswatch comes directly installed
+      # For Linux systems inotify should work
+      {"Linux\n", 0} -> "inotifywait -e modify -e create -e delete -mr"
+      # For Macs, fswatch comes directly installed
+      {"Darwin\n", 0} -> "fswatch"
       {kernel, 0} -> raise "Watcher not supported on kernel: #{kernel}"
     end
   end
 
   defp elixirc_paths(:test), do: ["lib", "priv", "test/support"]
-  defp elixirc_paths(_),     do: ["lib"]
+  defp elixirc_paths(_), do: ["lib"]
 end

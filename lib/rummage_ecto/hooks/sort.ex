@@ -55,7 +55,7 @@ defmodule Rummage.Ecto.Hook.Sort do
   a query equivalent to:
 
   ```elixir
-  from p in Product
+  from p0 in Product
   |> join(:inner, :category)
   |> order_by([p, c], {asc, c.category_name})
   ```
@@ -142,16 +142,16 @@ defmodule Rummage.Ecto.Hook.Sort do
 
   # Only for Postgres (only one interpolation is supported)
   # TODO: Fix this once Ecto 3.0 comes out with `unsafe_fragment`
-  @supported_fragments_one ["date_part('day', ?)",
-                            "date_part('month', ?)",
-                            "date_part('year', ?)",
-                            "date_part('hour', ?)",
-                            "lower(?)",
-                            "upper(?)"]
+  @supported_fragments_one [
+    "date_part('day', ?)",
+    "date_part('month', ?)",
+    "date_part('year', ?)",
+    "date_part('hour', ?)",
+    "lower(?)",
+    "upper(?)"
+  ]
 
-  @supported_fragments_two ["concat(?, ?)",
-                            "coalesce(?, ?)"]
-
+  @supported_fragments_two ["concat(?, ?)", "coalesce(?, ?)"]
 
   @doc """
   This is the callback implementation of `Rummage.Ecto.Hook.run/2`.
@@ -185,16 +185,16 @@ defmodule Rummage.Ecto.Hook.Sort do
 
       iex> alias Rummage.Ecto.Hook.Sort
       iex> Sort.run(Rummage.Ecto.Product, %{field: :name, assoc: [], order: :asc})
-      #Ecto.Query<from p in subquery(from p in Rummage.Ecto.Product), order_by: [asc: p.name]>
+      #Ecto.Query<from p0 in subquery(from p0 in Rummage.Ecto.Product), order_by: [asc: p0.name]>
 
   When the `queryable` passed is an `Ecto.Query` variable:
 
       iex> alias Rummage.Ecto.Hook.Sort
       iex> import Ecto.Query
       iex> queryable = from u in "products"
-      #Ecto.Query<from p in "products">
+      #Ecto.Query<from p0 in "products">
       iex> Sort.run(queryable, %{field: :name, assoc: [], order: :asc})
-      #Ecto.Query<from p in subquery(from p in "products"), order_by: [asc: p.name]>
+      #Ecto.Query<from p0 in subquery(from p0 in "products"), order_by: [asc: p0.name]>
 
 
   When the `queryable` passed is an `Ecto.Query` variable, with `desc` order:
@@ -202,27 +202,27 @@ defmodule Rummage.Ecto.Hook.Sort do
       iex> alias Rummage.Ecto.Hook.Sort
       iex> import Ecto.Query
       iex> queryable = from u in "products"
-      #Ecto.Query<from p in "products">
+      #Ecto.Query<from p0 in "products">
       iex> Sort.run(queryable, %{field: :name, assoc: [], order: :desc})
-      #Ecto.Query<from p in subquery(from p in "products"), order_by: [desc: p.name]>
+      #Ecto.Query<from p0 in subquery(from p0 in "products"), order_by: [desc: p0.name]>
 
   When the `queryable` passed is an `Ecto.Query` variable, with `ci` true:
 
       iex> alias Rummage.Ecto.Hook.Sort
       iex> import Ecto.Query
       iex> queryable = from u in "products"
-      #Ecto.Query<from p in "products">
+      #Ecto.Query<from p0 in "products">
       iex> Sort.run(queryable, %{field: :name, assoc: [], order: :asc, ci: true})
-      #Ecto.Query<from p in subquery(from p in "products"), order_by: [asc: fragment("lower(?)", p.name)]>
+      #Ecto.Query<from p0 in subquery(from p0 in "products"), order_by: [asc: fragment("lower(?)", p0.name)]>
 
   When the `queryable` passed is an `Ecto.Query` variable, with associations:
 
       iex> alias Rummage.Ecto.Hook.Sort
       iex> import Ecto.Query
       iex> queryable = from u in "products"
-      #Ecto.Query<from p in "products">
+      #Ecto.Query<from p0 in "products">
       iex> Sort.run(queryable, %{field: :name, assoc: [inner: :category, left: :category], order: :asc})
-      #Ecto.Query<from p in subquery(from p in "products"), join: c0 in assoc(p, :category), left_join: c1 in assoc(c0, :category), order_by: [asc: c1.name]>
+      #Ecto.Query<from p0 in subquery(from p0 in "products"), join: c1 in assoc(p0, :category), left_join: c2 in assoc(c1, :category), order_by: [asc: c2.name]>
 
   When the `queryable` passed is an `Ecto.Schema` module with associations,
   `desc` order and `ci` true:
@@ -231,7 +231,7 @@ defmodule Rummage.Ecto.Hook.Sort do
       iex> queryable = Rummage.Ecto.Product
       Rummage.Ecto.Product
       iex> Sort.run(queryable, %{field: :name, assoc: [inner: :category], order: :desc, ci: true})
-      #Ecto.Query<from p in subquery(from p in Rummage.Ecto.Product), join: c in assoc(p, :category), order_by: [desc: fragment("lower(?)", c.name)]>
+      #Ecto.Query<from p0 in subquery(from p0 in Rummage.Ecto.Product), join: c1 in assoc(p0, :category), order_by: [desc: fragment("lower(?)", c1.name)]>
   """
   @spec run(Ecto.Query.t(), map()) :: Ecto.Query.t()
   def run(queryable, sort_params) do
@@ -244,7 +244,9 @@ defmodule Rummage.Ecto.Hook.Sort do
   # the sent queryable variable
   defp handle_sort(queryable, sort_params) do
     order = Map.get(sort_params, :order)
-    field = sort_params
+
+    field =
+      sort_params
       |> Map.get(:field)
       |> resolve_field(queryable)
 
@@ -282,23 +284,40 @@ defmodule Rummage.Ecto.Hook.Sort do
 
   for fragment <- @supported_fragments_one do
     defp order_by_assoc(queryable, order_type, {:fragment, unquote(fragment), field}, false) do
-      order_by(queryable, [p0, ..., p2], [{^order_type, fragment(unquote(fragment), field(p2, ^field))}])
+      order_by(queryable, [p0, ..., p2], [
+        {^order_type, fragment(unquote(fragment), field(p2, ^field))}
+      ])
     end
 
     defp order_by_assoc(queryable, order_type, {:fragment, unquote(fragment), field}, true) do
-      order_by(queryable, [p0, ..., p2],
-               [{^order_type, case_insensitive(fragment(unquote(fragment), field(p2, ^field)))}])
+      order_by(queryable, [p0, ..., p2], [
+        {^order_type, case_insensitive(fragment(unquote(fragment), field(p2, ^field)))}
+      ])
     end
   end
 
   for fragment <- @supported_fragments_two do
-    defp order_by_assoc(queryable, order_type, {:fragment, unquote(fragment), field1, field2}, false) do
-      order_by(queryable, [p0, ..., p2], [{^order_type, fragment(unquote(fragment), field(p2, ^field1), field(p2, ^field2))}])
+    defp order_by_assoc(
+           queryable,
+           order_type,
+           {:fragment, unquote(fragment), field1, field2},
+           false
+         ) do
+      order_by(queryable, [p0, ..., p2], [
+        {^order_type, fragment(unquote(fragment), field(p2, ^field1), field(p2, ^field2))}
+      ])
     end
 
-    defp order_by_assoc(queryable, order_type, {:fragment, unquote(fragment), field1, field2}, true) do
-      order_by(queryable, [p0, ..., p2],
-               [{^order_type, case_insensitive(fragment(unquote(fragment), field(p2, ^field1), field(p2, ^field2)))}])
+    defp order_by_assoc(
+           queryable,
+           order_type,
+           {:fragment, unquote(fragment), field1, field2},
+           true
+         ) do
+      order_by(queryable, [p0, ..., p2], [
+        {^order_type,
+         case_insensitive(fragment(unquote(fragment), field(p2, ^field1), field(p2, ^field2)))}
+      ])
     end
   end
 
@@ -307,8 +326,7 @@ defmodule Rummage.Ecto.Hook.Sort do
   end
 
   defp order_by_assoc(queryable, order_type, field, true) do
-    order_by(queryable, [p0, ..., p2],
-             [{^order_type, case_insensitive(field(p2, ^field))}])
+    order_by(queryable, [p0, ..., p2], [{^order_type, case_insensitive(field(p2, ^field))}])
   end
 
   # Helper function that validates the list of params based on
@@ -316,7 +334,7 @@ defmodule Rummage.Ecto.Hook.Sort do
   defp validate_params(params) do
     key_validations = Enum.map(@expected_keys, &Map.fetch(params, &1))
 
-    case Enum.filter(key_validations, & &1 == :error) do
+    case Enum.filter(key_validations, &(&1 == :error)) do
       [] -> :ok
       _ -> raise @err_msg <> missing_keys(key_validations)
     end
@@ -347,13 +365,16 @@ defmodule Rummage.Ecto.Hook.Sort do
   def format_params(queryable, {sort_scope, order}, opts) do
     module = get_module(queryable)
     name = :"__rummage_sort_#{sort_scope}"
-    sort_params = case function_exported?(module, name, 1) do
-      true -> apply(module, name, [order])
-      _ -> raise "No scope `#{sort_scope}` of type sort defined in the #{module}"
-    end
+
+    sort_params =
+      case function_exported?(module, name, 1) do
+        true -> apply(module, name, [order])
+        _ -> raise "No scope `#{sort_scope}` of type sort defined in the #{module}"
+      end
 
     format_params(queryable, sort_params, opts)
   end
+
   def format_params(_queryable, sort_params, _opts) do
     sort_params
     |> Map.put_new(:assoc, [])

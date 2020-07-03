@@ -136,17 +136,17 @@ defmodule Rummage.Ecto.CustomHook.KeysetPaginate do
       iex> alias Rummage.Ecto.CustomHook.KeysetPaginate
       iex> params = %{per_page: 10, page: 1, last_seen_pk: 0, pk: :id}
       iex> KeysetPaginate.run(Rummage.Ecto.Product, params)
-      #Ecto.Query<from p in Rummage.Ecto.Product, where: p.id > ^0, limit: ^10>
+      #Ecto.Query<from p0 in Rummage.Ecto.Product, where: p0.id > ^0, limit: ^10>
 
   When the `queryable` passed is an `Ecto.Query` variable:
 
       iex> alias Rummage.Ecto.CustomHook.KeysetPaginate
       iex> import Ecto.Query
       iex> queryable = from u in "products"
-      #Ecto.Query<from p in "products">
+      #Ecto.Query<from p0 in "products">
       iex> params = %{per_page: 10, page: 1, last_seen_pk: 0, pk: :id}
       iex> KeysetPaginate.run(queryable, params)
-      #Ecto.Query<from p in "products", where: p.id > ^0, limit: ^10>
+      #Ecto.Query<from p0 in "products", where: p0.id > ^0, limit: ^10>
 
 
   More examples:
@@ -155,17 +155,17 @@ defmodule Rummage.Ecto.CustomHook.KeysetPaginate do
       iex> import Ecto.Query
       iex> params = %{per_page: 5, page: 5, last_seen_pk: 25, pk: :id}
       iex> queryable = from u in "products"
-      #Ecto.Query<from p in "products">
+      #Ecto.Query<from p0 in "products">
       iex> KeysetPaginate.run(queryable, params)
-      #Ecto.Query<from p in "products", where: p.id > ^25, limit: ^5>
+      #Ecto.Query<from p0 in "products", where: p0.id > ^25, limit: ^5>
 
       iex> alias Rummage.Ecto.CustomHook.KeysetPaginate
       iex> import Ecto.Query
       iex> params = %{per_page: 5, page: 1, last_seen_pk: 0, pk: :some_id}
       iex> queryable = from u in "products"
-      #Ecto.Query<from p in "products">
+      #Ecto.Query<from p0 in "products">
       iex> KeysetPaginate.run(queryable, params)
-      #Ecto.Query<from p in "products", where: p.some_id > ^0, limit: ^5>
+      #Ecto.Query<from p0 in "products", where: p0.some_id > ^0, limit: ^5>
 
   """
   @spec run(Ecto.Query.t(), map()) :: Ecto.Query.t()
@@ -192,7 +192,7 @@ defmodule Rummage.Ecto.CustomHook.KeysetPaginate do
   defp validate_params(params) do
     key_validations = Enum.map(@expected_keys, &Map.fetch(params, &1))
 
-    case Enum.filter(key_validations, & &1 == :error) do
+    case Enum.filter(key_validations, &(&1 == :error)) do
       [] -> :ok
       _ -> raise @err_msg <> missing_keys(key_validations)
     end
@@ -316,7 +316,8 @@ defmodule Rummage.Ecto.CustomHook.KeysetPaginate do
   # Helper function that populate the list of params based on
   # @expected_keys list
   defp populate_params(queryable, params, opts) do
-    params = params
+    params =
+      params
       |> Map.put_new(:per_page, Keyword.get(opts, :per_page, @per_page))
       |> Map.put_new(:pk, pk(queryable))
       |> Map.put_new(:page, 1)
@@ -335,14 +336,21 @@ defmodule Rummage.Ecto.CustomHook.KeysetPaginate do
   defp get_params(queryable, paginate_params, repo) do
     per_page = Map.get(paginate_params, :per_page)
     total_count = get_total_count(queryable, repo)
-    max_page = total_count
-      |> (& &1 / per_page).()
+
+    max_page =
+      total_count
+      |> (&(&1 / per_page)).()
       |> Float.ceil()
       |> trunc()
 
-    %{page: Map.get(paginate_params, :page), pk: Map.get(paginate_params, :pk),
+    %{
+      page: Map.get(paginate_params, :page),
+      pk: Map.get(paginate_params, :pk),
       last_seen_pk: Map.get(paginate_params, :last_seen_pk),
-      per_page: per_page, total_count: total_count, max_page: max_page}
+      per_page: per_page,
+      total_count: total_count,
+      max_page: max_page
+    }
   end
 
   # Helper function which gets total count of a queryable based on
@@ -368,7 +376,7 @@ defmodule Rummage.Ecto.CustomHook.KeysetPaginate do
   # Helper function which returns the primary key associated with a
   # Queryable.
   defp pk(queryable) do
-    schema = is_map(queryable) && elem(queryable.from, 1) || queryable
+    schema = (is_map(queryable) && elem(queryable.from, 1)) || queryable
 
     case schema.__schema__(:primary_key) do
       [] -> nil
