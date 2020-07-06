@@ -398,21 +398,11 @@ defmodule Rummage.Ecto.Hook.Paginate do
     schema =
       queryable
       |> Ecto.Queryable.to_query()
-      |> schema_from_query()
+      |> Rummage.Ecto.QueryUtils.schema_from_query()
 
     case schema.__schema__(:primary_key) do
       [] -> nil
       list -> hd(list)
-    end
-  end
-
-  defp schema_from_query(queryable) do
-    case queryable do
-      %Ecto.Query{from: %Ecto.Query.FromExpr{source: {_, schema}}} ->
-        schema
-
-      _ ->
-        queryable
     end
   end
 end

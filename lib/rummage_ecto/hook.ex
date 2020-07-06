@@ -103,9 +103,5 @@ defmodule Rummage.Ecto.Hook do
     end
   end
 
-  def get_module(module) when is_atom(module), do: module
-  def get_module({_, module}) when is_atom(module), do: module
-  def get_module(%Ecto.Query{from: _from} = query), do: get_module(query.from)
-  def get_module(%Ecto.SubQuery{query: query}), do: get_module(query)
-  def get_module(%Ecto.Query.FromExpr{source: source}), do: get_module(source)
+  def get_module(module), do: Rummage.Ecto.QueryUtils.schema_from_query(module)
 end
