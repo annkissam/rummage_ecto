@@ -465,7 +465,7 @@ defmodule Rummage.EctoTest do
 
     assert length(products) == 2
 
-    assert Enum.map(products, & &1.name) == ["Product 1->1", "Product 2->1"]
+    assert Enum.map(products, & &1.name) |> Enum.sort == ["Product 1->1", "Product 2->1"] |> Enum.sort()
 
     rummage = %{search: %{invalid_scope: "Category 1"}}
 
@@ -541,7 +541,7 @@ defmodule Rummage.EctoTest do
 
     assert length(products) == 8
 
-    assert Enum.map(products, & &1.name) == [
+    assert Enum.map(products, & &1.name) |> Enum.sort() == [
              "Product 1->1",
              "Product 2->1",
              "Product 1->2",
@@ -550,7 +550,7 @@ defmodule Rummage.EctoTest do
              "Product 2->3",
              "Product 1->4",
              "Product 2->4"
-           ]
+           ] |> Enum.sort()
 
     rummage = %{search: %{invalid_scope: "Category 1"}}
 
