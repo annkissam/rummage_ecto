@@ -10,14 +10,12 @@ config :rummage_tester, Rummage.Ecto,
 case Mix.env() do
   :test ->
     config :rummage_tester, RummageTester.Repo,
-      adapter: Ecto.Adapters.Postgres,
       database: "rummage_tester_repo_test",
       username: System.get_env("POSTGRES_USER"),
       password: System.get_env("POSTGRES_PASSWORD"),
       pool: Ecto.Adapters.SQL.Sandbox
   :dev ->
     config :rummage_tester, RummageTester.Repo,
-      adapter: Ecto.Adapters.Postgres,
       database: "rummage_tester_repo_dev",
       username: System.get_env("POSTGRES_USER"),
       password: System.get_env("POSTGRES_PASSWORD")

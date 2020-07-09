@@ -10,7 +10,6 @@ config :rummage_ecto, Rummage.Ecto,
 config :rummage_ecto, ecto_repos: [Rummage.Ecto.Repo]
 
 config :rummage_ecto, Rummage.Ecto.Repo,
-  adapter: Ecto.Adapters.Postgres,
   username: System.get_env("POSTGRES_USER"),
   password: System.get_env("POSTGRES_PASSWORD"),
   database: "rummage_ecto_test",

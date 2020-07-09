@@ -3,9 +3,9 @@ defmodule Rummage.Repo.Migrations.CreateEmployees do
 
   def change do
     create table(:employees, primary_key: false) do
-      add :first_name, :string
-      add :last_name, :string
-      add :date_of_birth, :date
+      add(:first_name, :string)
+      add(:last_name, :string)
+      add(:date_of_birth, :date)
 
       timestamps()
     end

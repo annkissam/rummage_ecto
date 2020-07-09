@@ -198,7 +198,7 @@ defmodule Rummage.Ecto.CustomHook.SimpleSearch do
       ...> search_term: "field1",
       ...> search_expr: :where}}
       iex> SimpleSearch.run(Rummage.Ecto.Product, search_params)
-      #Ecto.Query<from p in subquery(from p in Rummage.Ecto.Product), where: like(p.field1, ^"%field1%")>
+      #Ecto.Query<from p0 in subquery(from p0 in Rummage.Ecto.Product), where: like(p0.field1, ^"%field1%")>
 
   When a valid map of params is passed with an `Ecto.Query.t`:
 
@@ -208,9 +208,9 @@ defmodule Rummage.Ecto.CustomHook.SimpleSearch do
       ...> search_type: :like,
       ...> search_term: "field1",
       ...> search_expr: :where}}
-      iex> query = from p in "products"
+      iex> query = from p0 in "products"
       iex> SimpleSearch.run(query, search_params)
-      #Ecto.Query<from p in subquery(from p in "products"), where: like(p.field1, ^"%field1%")>
+      #Ecto.Query<from p0 in subquery(from p0 in "products"), where: like(p0.field1, ^"%field1%")>
 
   When a valid map of params is passed with an `Ecto.Query.t` and `:on_where`:
 
@@ -220,9 +220,9 @@ defmodule Rummage.Ecto.CustomHook.SimpleSearch do
       ...> search_type: :like,
       ...> search_term: "field1",
       ...> search_expr: :or_where}}
-      iex> query = from p in "products"
+      iex> query = from p0 in "products"
       iex> SimpleSearch.run(query, search_params)
-      #Ecto.Query<from p in subquery(from p in "products"), or_where: like(p.field1, ^"%field1%")>
+      #Ecto.Query<from p0 in subquery(from p0 in "products"), or_where: like(p0.field1, ^"%field1%")>
 
   When a valid map of params is passed with an `Ecto.Query.t`, searching on
   a boolean param
@@ -233,9 +233,9 @@ defmodule Rummage.Ecto.CustomHook.SimpleSearch do
       ...> search_type: :eq,
       ...> search_term: true,
       ...> search_expr: :where}}
-      iex> query = from p in "products"
+      iex> query = from p0 in "products"
       iex> SimpleSearch.run(query, search_params)
-      #Ecto.Query<from p in subquery(from p in "products"), where: p.available == ^true>
+      #Ecto.Query<from p0 in subquery(from p0 in "products"), where: p0.available == ^true>
 
   When a valid map of params is passed with an `Ecto.Query.t`, searching on
   a float param
@@ -246,9 +246,9 @@ defmodule Rummage.Ecto.CustomHook.SimpleSearch do
       ...> search_type: :gteq,
       ...> search_term: 10.0,
       ...> search_expr: :where}}
-      iex> query = from p in "products"
+      iex> query = from p0 in "products"
       iex> SimpleSearch.run(query, search_params)
-      #Ecto.Query<from p in subquery(from p in "products"), where: p.price >= ^10.0>
+      #Ecto.Query<from p0 in subquery(from p0 in "products"), where: p0.price >= ^10.0>
 
   When a valid map of params is passed with an `Ecto.Query.t`, searching on
   a boolean param, but with a wrong `search_type`.
@@ -260,7 +260,7 @@ defmodule Rummage.Ecto.CustomHook.SimpleSearch do
       ...> search_type: :ilike,
       ...> search_term: true,
       ...> search_expr: :where}}
-      iex> query = from p in "products"
+      iex> query = from p0 in "products"
       iex> SimpleSearch.run(query, search_params)
       ** (ArgumentError) argument error
 
@@ -289,8 +289,12 @@ defmodule Rummage.Ecto.CustomHook.SimpleSearch do
     search_term = Map.get(field_params, :search_term)
     search_expr = Map.get(field_params, :search_expr, :where)
 
-    BuildSearchQuery.run(from(e in subquery(queryable)),
-      field, {search_expr, search_type}, search_term)
+    BuildSearchQuery.run(
+      from(e in subquery(queryable)),
+      field,
+      {search_expr, search_type},
+      search_term
+    )
   end
 
   # Helper function that validates the list of params based on
@@ -298,7 +302,7 @@ defmodule Rummage.Ecto.CustomHook.SimpleSearch do
   defp validate_params(params) do
     key_validations = Enum.map(@expected_keys, &Map.fetch(params, &1))
 
-    case Enum.filter(key_validations, & &1 == :error) do
+    case Enum.filter(key_validations, &(&1 == :error)) do
       [] -> :ok
       _ -> raise @err_msg <> missing_keys(key_validations)
     end
@@ -334,7 +338,8 @@ defmodule Rummage.Ecto.CustomHook.SimpleSearch do
   end
 
   defp put_keys({field, field_params}) do
-    field_params = field_params
+    field_params =
+      field_params
       |> Map.put_new(:search_type, :eq)
       |> Map.put_new(:search_expr, :where)
 

@@ -43,7 +43,8 @@ defmodule Rummage.Ecto.Hook.CustomSearch do
   end
 
   defp put_keys({field, %{} = field_params}, _queryable) do
-    field_params = field_params
+    field_params =
+      field_params
       |> Map.put_new(:assoc, [])
       |> Map.put_new(:search_type, :eq)
       |> Map.put_new(:search_expr, :where)
@@ -54,9 +55,12 @@ defmodule Rummage.Ecto.Hook.CustomSearch do
   defp put_keys({search_scope, field_value}, queryable) do
     module = get_module(queryable)
     name = :"__rummage_search_#{search_scope}"
+
     case function_exported?(module, name, 1) do
-      true -> {field, search_params} = apply(module, name, [field_value])
+      true ->
+        {field, search_params} = apply(module, name, [field_value])
         put_keys({field, search_params}, queryable)
+
       _ ->
         case function_exported?(module, :"__rummage_custom_search_#{search_scope}", 1) do
           true -> {search_scope, field_value}

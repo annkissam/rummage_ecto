@@ -9,9 +9,9 @@ defmodule Rummage.Ecto.Employee do
   @primary_key false
 
   schema "employees" do
-    field :first_name, :string
-    field :last_name, :string
-    field :date_of_birth, :date
+    field(:first_name, :string)
+    field(:last_name, :string)
+    field(:date_of_birth, :date)
 
     timestamps()
   end

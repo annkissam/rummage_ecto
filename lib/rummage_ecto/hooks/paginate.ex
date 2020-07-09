@@ -119,16 +119,16 @@ defmodule Rummage.Ecto.Hook.Paginate do
       iex> alias Rummage.Ecto.Hook.Paginate
       iex> import Ecto.Query
       iex> Paginate.run(Rummage.Ecto.Product, %{per_page: 10, page: 1})
-      #Ecto.Query<from p in Rummage.Ecto.Product, limit: ^10, offset: ^0>
+      #Ecto.Query<from p0 in Rummage.Ecto.Product, limit: ^10, offset: ^0>
 
   When the `queryable` passed is an `Ecto.Query` variable:
 
       iex> alias Rummage.Ecto.Hook.Paginate
       iex> import Ecto.Query
       iex> queryable = from u in "products"
-      #Ecto.Query<from p in "products">
+      #Ecto.Query<from p0 in "products">
       iex> Paginate.run(queryable, %{per_page: 10, page: 2})
-      #Ecto.Query<from p in "products", limit: ^10, offset: ^10>
+      #Ecto.Query<from p0 in "products", limit: ^10, offset: ^10>
 
 
   More examples:
@@ -137,17 +137,17 @@ defmodule Rummage.Ecto.Hook.Paginate do
       iex> import Ecto.Query
       iex> rummage = %{per_page: 1, page: 1}
       iex> queryable = from u in "products"
-      #Ecto.Query<from p in "products">
+      #Ecto.Query<from p0 in "products">
       iex> Paginate.run(queryable, rummage)
-      #Ecto.Query<from p in "products", limit: ^1, offset: ^0>
+      #Ecto.Query<from p0 in "products", limit: ^1, offset: ^0>
 
       iex> alias Rummage.Ecto.Hook.Paginate
       iex> import Ecto.Query
       iex> rummage = %{per_page: 5, page: 2}
       iex> queryable = from u in "products"
-      #Ecto.Query<from p in "products">
+      #Ecto.Query<from p0 in "products">
       iex> Paginate.run(queryable, rummage)
-      #Ecto.Query<from p in "products", limit: ^5, offset: ^5>
+      #Ecto.Query<from p0 in "products", limit: ^5, offset: ^5>
 
   """
   @spec run(Ecto.Query.t(), map()) :: Ecto.Query.t()
@@ -174,7 +174,7 @@ defmodule Rummage.Ecto.Hook.Paginate do
   defp validate_params(params) do
     key_validations = Enum.map(@expected_keys, &Map.fetch(params, &1))
 
-    case Enum.filter(key_validations, & &1 == :error) do
+    case Enum.filter(key_validations, &(&1 == :error)) do
       [] -> :ok
       _ -> raise @err_msg <> missing_keys(key_validations)
     end
@@ -318,13 +318,16 @@ defmodule Rummage.Ecto.Hook.Paginate do
   def format_params(queryable, {paginate_scope, page}, opts) do
     module = get_module(queryable)
     name = :"__rummage_paginate_#{paginate_scope}"
-    paginate_params = case function_exported?(module, name, 1) do
-      true -> apply(module, name, [page])
-      _ -> raise "No scope `#{paginate_scope}` of type paginate defined in the #{module}"
-    end
+
+    paginate_params =
+      case function_exported?(module, name, 1) do
+        true -> apply(module, name, [page])
+        _ -> raise "No scope `#{paginate_scope}` of type paginate defined in the #{module}"
+      end
 
     format_params(queryable, paginate_params, opts)
   end
+
   def format_params(queryable, paginate_params, opts) do
     paginate_params = populate_params(paginate_params, opts)
 
@@ -347,13 +350,19 @@ defmodule Rummage.Ecto.Hook.Paginate do
   defp get_params(queryable, paginate_params, repo) do
     per_page = Map.get(paginate_params, :per_page)
     total_count = get_total_count(queryable, repo)
-    max_page = total_count
-      |> (& &1 / per_page).()
+
+    max_page =
+      total_count
+      |> (&(&1 / per_page)).()
       |> Float.ceil()
       |> trunc()
 
-    %{page: Map.get(paginate_params, :page),
-      per_page: per_page, total_count: total_count, max_page: max_page}
+    %{
+      page: Map.get(paginate_params, :page),
+      per_page: per_page,
+      total_count: total_count,
+      max_page: max_page
+    }
   end
 
   # Helper function which gets total count of a queryable based on
@@ -374,9 +383,10 @@ defmodule Rummage.Ecto.Hook.Paginate do
   # the distinct primary keys
   defp get_count(query, repo, nil) do
     repo
-    |> apply(:all, [distinct(query, :true)])
+    |> apply(:all, [distinct(query, true)])
     |> Enum.count()
   end
+
   defp get_count(query, repo, pk) do
     query = select(query, [s], count(field(s, ^pk), :distinct))
     hd(apply(repo, :all, [query]))
@@ -385,19 +395,14 @@ defmodule Rummage.Ecto.Hook.Paginate do
   # Helper function which returns the primary key associated with a
   # Queryable.
   defp pk(queryable) do
-    schema = schema_from_query(queryable)
+    schema =
+      queryable
+      |> Ecto.Queryable.to_query()
+      |> Rummage.Ecto.QueryUtils.schema_from_query()
 
     case schema.__schema__(:primary_key) do
       [] -> nil
       list -> hd(list)
-    end
-  end
-
-  defp schema_from_query(queryable) do
-    case queryable do
-      %{from: %{query: subquery}} -> schema_from_query(subquery)
-      %{from: {_, schema}} -> schema
-      _ -> queryable
     end
   end
 end

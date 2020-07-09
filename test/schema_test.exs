@@ -7,8 +7,8 @@ defmodule Rummage.Ecto.SchemaTest do
     use Rummage.Ecto.Schema
 
     schema "test_schema" do
-      field :name, :string
-      field :age, :integer
+      field(:name, :string)
+      field(:age, :integer)
 
       timestamps()
     end
@@ -21,13 +21,13 @@ defmodule Rummage.Ecto.SchemaTest do
       {:fragment, "upper(?)", :name}
     end
 
-    rummage_scope :small_page, [type: :custom_paginate], fn({query, page}) ->
+    rummage_scope(:small_page, [type: :custom_paginate], fn {query, page} ->
       offset = 5 * (page - 1)
 
       query
       |> limit(5)
       |> offset(^offset)
-    end
+    end)
   end
 
   test "TestSchema has inserted_at_year function defined" do
