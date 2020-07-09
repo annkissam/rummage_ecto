@@ -170,7 +170,7 @@ defmodule Rummage.Ecto.Hook.Search do
   alias Rummage.Ecto.Services.BuildSearchQuery
 
   @doc ~S"""
-  This is the callback implementation of `Rummage.Ecto.Hook.run/2`.
+  This is the callback implementation of Rummage.Ecto.Hook.run/2.
 
   Builds a search `Ecto.Query.t` on top of a given `Ecto.Query.t` variable
   with given `params`.
@@ -352,7 +352,7 @@ defmodule Rummage.Ecto.Hook.Search do
   end
 
   @doc """
-  Callback implementation for `Rummage.Ecto.Hook.format_params/2`.
+  Callback implementation for Rummage.Ecto.Hook.format_params/3.
 
   This function ensures that params for each field have keys `assoc`, `search_type` and
   `search_expr` which are essential for running this hook module.

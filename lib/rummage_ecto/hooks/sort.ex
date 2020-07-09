@@ -154,7 +154,7 @@ defmodule Rummage.Ecto.Hook.Sort do
   @supported_fragments_two ["concat(?, ?)", "coalesce(?, ?)"]
 
   @doc """
-  This is the callback implementation of `Rummage.Ecto.Hook.run/2`.
+  This is the callback implementation of Rummage.Ecto.Hook.run/2.
 
   Builds a sort `Ecto.Query.t` on top of the given `Ecto.Queryable` variable
   using given `params`.
@@ -351,9 +351,9 @@ defmodule Rummage.Ecto.Hook.Sort do
   end
 
   @doc """
-  Callback implementation for `Rummage.Ecto.Hook.format_params/2`.
+  Callback implementation for Rummage.Ecto.Hook.format_params/3.
 
-  This function ensures that params for each field have keys `assoc`, `order1
+  This function ensures that params for each field have keys `assoc`, `order1`
   which are essential for running this hook module.
 
   ## Examples

@@ -55,7 +55,7 @@ defmodule Rummage.Ecto.Mixfile do
       # Other Dependencies
       {:credo, "~> 1.4.0", only: [:dev, :test], runtime: false},
       {:excoveralls, "~> 0.13", only: :test, runtime: false},
-      {:ex_doc, "~> 0.22", only: :dev, runtime: false},
+      {:ex_doc, "~> 0.20", only: :dev, runtime: false},
       {:inch_ex, "~> 2.0", only: [:dev, :test, :docs], runtime: false},
       {:postgrex, ">= 0.0.0", only: :test}
     ]
