@@ -22,7 +22,7 @@ defmodule Rummage.EctoTest do
 
       for y <- 1..2 do
         %Product{
-          internal_code: "#{x}->#{y}",
+          internal_code: "#{x*4 + y}",#, "#{x}->#{y}",
           name: "Product #{y}->#{x}",
           price: 10.0 * x,
           category: category
@@ -457,7 +457,7 @@ defmodule Rummage.EctoTest do
   test "rummage call with search scope" do
     create_categories_and_products()
 
-    rummage = %{search: %{category_name: "Category 1"}}
+    rummage = %{search: %{category_name: "Category 1"}, sort: %{field: :name, order: :asc}}
 
     {queryable, _rummage} = Product.rummage(rummage)
 
@@ -465,7 +465,7 @@ defmodule Rummage.EctoTest do
 
     assert length(products) == 2
 
-    assert Enum.map(products, & &1.name) |> Enum.sort == ["Product 1->1", "Product 2->1"] |> Enum.sort()
+    assert Enum.map(products, & &1.name) == ["Product 1->1", "Product 2->1"]
 
     rummage = %{search: %{invalid_scope: "Category 1"}}
 
@@ -533,7 +533,7 @@ defmodule Rummage.EctoTest do
   test "rummage call with custom search scope" do
     create_categories_and_products()
 
-    rummage = %{search: %{category_quarter: Float.ceil(Date.utc_today().month / 3)}}
+    rummage = %{search: %{category_quarter: Float.ceil(Date.utc_today().month / 3)}, sort: %{field: :name, order: :asc}}
 
     {queryable, _rummage} = Product.rummage(rummage)
 
@@ -541,16 +541,16 @@ defmodule Rummage.EctoTest do
 
     assert length(products) == 8
 
-    assert Enum.map(products, & &1.name) |> Enum.sort() == [
+    assert Enum.map(products, & &1.name) == [
              "Product 1->1",
-             "Product 2->1",
              "Product 1->2",
-             "Product 2->2",
              "Product 1->3",
-             "Product 2->3",
              "Product 1->4",
+             "Product 2->1",
+             "Product 2->2",
+             "Product 2->3",
              "Product 2->4"
-           ] |> Enum.sort()
+           ]
 
     rummage = %{search: %{invalid_scope: "Category 1"}}
 
