@@ -22,7 +22,7 @@ defmodule Rummage.EctoTest do
 
       for y <- 1..2 do
         %Product{
-          internal_code: "#{x*4 + y}",#, "#{x}->#{y}",
+          internal_code: "#{x}->#{y}",
           name: "Product #{y}->#{x}",
           price: 10.0 * x,
           category: category
@@ -533,7 +533,10 @@ defmodule Rummage.EctoTest do
   test "rummage call with custom search scope" do
     create_categories_and_products()
 
-    rummage = %{search: %{category_quarter: Float.ceil(Date.utc_today().month / 3)}, sort: %{field: :name, order: :asc}}
+    rummage = %{
+      search: %{category_quarter: Float.ceil(Date.utc_today().month / 3)},
+      sort: %{field: :name, order: :asc}
+    }
 
     {queryable, _rummage} = Product.rummage(rummage)
 
