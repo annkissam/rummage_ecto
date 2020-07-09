@@ -4,8 +4,6 @@ defmodule Rummage.Ecto.Hook.CustomPaginate do
 
   use Rummage.Ecto.Hook
 
-  use Rummage.Ecto.Hook
-
   @spec run(Ecto.Query.t(), map()) :: Ecto.Query.t()
   def run(q, s), do: handle_paginate(q, s)
 

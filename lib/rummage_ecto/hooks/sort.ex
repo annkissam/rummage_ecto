@@ -123,13 +123,13 @@ defmodule Rummage.Ecto.Hook.Sort do
   ```elixir
   config :rummage_ecto,
     Rummage.Ecto,
-   .sort: CustomHook
+    sort: CustomHook
   ```
 
   The `CustomHook` must use `Rummage.Ecto.Hook`. For examples of `CustomHook`,
   check out some `custom_hooks` that are shipped with `Rummage.Ecto`:
   `Rummage.Ecto.CustomHook.SimpleSearch`, `Rummage.Ecto.CustomHook.SimpleSort`,
-    Rummage.Ecto.CustomHook.SimplePaginate
+    `Rummage.Ecto.CustomHook.SimplePaginate`
 
   """
 

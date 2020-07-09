@@ -80,7 +80,7 @@ defmodule Rummage.Ecto.Config do
 
   ## Examples
   Returns default `Repo` set in the config
-  (`2 in `rummage_ecto`'s test env):
+  (2 in `rummage_ecto`'s test env):
       iex> alias Rummage.Ecto.Config
       iex> Config.per_page
       2
