@@ -81,8 +81,14 @@ defmodule Rummage.Ecto.Mixfile do
       "ecto.setup": ["ecto.create", "ecto.migrate"],
       "ecto.reset": ["ecto.drop", "ecto.setup"],
       test: ["ecto.setup", "test"],
-      "test.watch.stale": &test_watch_stale/1
+      "test.watch.stale": &test_watch_stale/1,
+      publish: ["hex.publish", &git_tag/1]
     ]
+  end
+
+  defp git_tag(_args) do
+    System.cmd("git", ["tag", Mix.Project.config()[:version]])
+    System.cmd("git", ["push", "--tags"])
   end
 
   defp test_watch_stale(_) do
