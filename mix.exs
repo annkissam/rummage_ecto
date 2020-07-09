@@ -1,7 +1,7 @@
 defmodule Rummage.Ecto.Mixfile do
   use Mix.Project
 
-  @version "2.0.0-rc.0"
+  @version "2.0.0-rc.1"
   @elixir "~> 1.10"
   @url "https://github.com/annkissam/rummage_ecto"
 
