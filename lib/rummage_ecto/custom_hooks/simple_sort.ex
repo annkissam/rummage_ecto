@@ -93,13 +93,13 @@ defmodule Rummage.Ecto.CustomHook.SimpleSort do
   ```elixir
   config :rummage_ecto,
     Rummage.Ecto,
-   .sort: CustomHook
+    sort: CustomHook
   ```
 
   The `CustomHook` must use `Rummage.Ecto.Hook`. For examples of `CustomHook`,
   check out some `custom_hooks` that are shipped with `Rummage.Ecto`:
   `Rummage.Ecto.CustomHook.SimpleSearch`, `Rummage.Ecto.CustomHook.SimpleSort`,
-    Rummage.Ecto.CustomHook.SimplePaginate
+    `Rummage.Ecto.CustomHook.SimplePaginate`
 
   """
 
@@ -111,7 +111,7 @@ defmodule Rummage.Ecto.CustomHook.SimpleSort do
   @err_msg "Error in params, No values given for keys: "
 
   @doc """
-  This is the callback implementation of `Rummage.Ecto.Hook.run/2`.
+  This is the callback implementation of Rummage.Ecto.Hook.run/2.
 
   Builds a sort `Ecto.Query.t` on top of the given `Ecto.Queryable` variable
   using given `params`.
@@ -232,9 +232,9 @@ defmodule Rummage.Ecto.CustomHook.SimpleSort do
   end
 
   @doc """
-  Callback implementation for `Rummage.Ecto.Hook.format_params/2`.
+  Callback implementation for Rummage.Ecto.Hook.format_params/3.
 
-  This function ensures that params for each field have keys `assoc`, `order1
+  This function ensures that params for each field have keys `assoc`, `order1`
   which are essential for running this hook module.
 
   ## Examples

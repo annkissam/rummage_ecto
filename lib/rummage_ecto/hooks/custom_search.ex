@@ -24,7 +24,7 @@ defmodule Rummage.Ecto.Hook.CustomSearch do
   end
 
   @doc """
-  Callback implementation for `Rummage.Ecto.Hook.format_params/2`.
+  Callback implementation for Rummage.Ecto.Hook.format_params/3.
 
   This function ensures that params for each field have keys `assoc`, `search_type` and
   `search_expr` which are essential for running this hook module.

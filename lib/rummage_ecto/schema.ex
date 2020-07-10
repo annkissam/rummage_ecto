@@ -68,9 +68,11 @@ defmodule Rummage.Ecto.Schema do
   ```
 
   To use the hour for created_at as rummage field:
+  ```elixir
   rummage_field :created_at_hour do
     {:fragment, "date_part('hour', ?)", :inserted_at}
   end
+  ```
   """
   defmacro rummage_field(field, do: block) do
     name = :"__rummage_field_#{field}"

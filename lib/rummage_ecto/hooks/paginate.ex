@@ -87,7 +87,7 @@ defmodule Rummage.Ecto.Hook.Paginate do
   @per_page 10
 
   @doc """
-  This is the callback implementation of `Rummage.Ecto.Hook.run/2`.
+  This is the callback implementation of Rummage.Ecto.Hook.run/2.
 
   Builds a paginate `Ecto.Query.t` on top of a given `Ecto.Query.t` variable
   with given `params`.
@@ -191,7 +191,7 @@ defmodule Rummage.Ecto.Hook.Paginate do
   end
 
   @doc """
-  Callback implementation for `Rummage.Ecto.Hook.format_params/2`.
+  Callback implementation for Rummage.Ecto.Hook.format_params/3.
 
   This function takes an `Ecto.Query.t` or `queryable`, `paginate_params` which
   will be passed to the `run/2` function, but also takes a list of options,

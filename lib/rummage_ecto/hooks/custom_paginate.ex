@@ -4,8 +4,6 @@ defmodule Rummage.Ecto.Hook.CustomPaginate do
 
   use Rummage.Ecto.Hook
 
-  use Rummage.Ecto.Hook
-
   @spec run(Ecto.Query.t(), map()) :: Ecto.Query.t()
   def run(q, s), do: handle_paginate(q, s)
 
@@ -26,9 +24,9 @@ defmodule Rummage.Ecto.Hook.CustomPaginate do
   end
 
   @doc """
-  Callback implementation for `Rummage.Ecto.Hook.format_params/2`.
+  Callback implementation for Rummage.Ecto.Hook.format_params/3.
 
-  This function ensures that params for each field have keys `assoc`, `order1
+  This function ensures that params for each field have keys `assoc`, `order1`
   which are essential for running this hook module.
 
   ## Examples
