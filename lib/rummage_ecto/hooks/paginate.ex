@@ -389,7 +389,10 @@ defmodule Rummage.Ecto.Hook.Paginate do
 
   defp get_count(query, repo, pk) do
     query = select(query, [s], count(field(s, ^pk), :distinct))
-    hd(apply(repo, :all, [query]))
+    case (apply(repo, :all, [query])) do
+      [hd | _] -> hd
+      _ -> 0
+    end
   end
 
   # Helper function which returns the primary key associated with a
