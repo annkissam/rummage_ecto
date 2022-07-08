@@ -1,6 +1,5 @@
 defmodule Rummage.Ecto.Hook.CustomSort do
-  @moduledoc """
-  """
+  @moduledoc false
 
   use Rummage.Ecto.Hook
 

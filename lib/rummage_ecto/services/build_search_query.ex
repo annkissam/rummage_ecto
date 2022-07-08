@@ -268,7 +268,7 @@ defmodule Rummage.Ecto.Services.BuildSearchQuery do
       iex> queryable = from u in "parents"
       #Ecto.Query<from p0 in "parents">
       iex> BuildSearchQuery.handle_like(queryable, :field_1, "field_!", :not_where)
-      #Ecto.Query<from p0 in "parents", where: not(like(p0.field_1, ^"%field_!%"))>
+      #Ecto.Query<from p0 in "parents", where: not like(p0.field_1, ^"%field_!%")>
 
   """
   @spec handle_like(Ecto.Query.t(), atom() | tuple(), String.t(), __MODULE__.search_expr()) ::
@@ -426,7 +426,7 @@ defmodule Rummage.Ecto.Services.BuildSearchQuery do
       iex> queryable = from u in "parents"
       #Ecto.Query<from p0 in "parents">
       iex> BuildSearchQuery.handle_ilike(queryable, :field_1, "field_!", :not_where)
-      #Ecto.Query<from p0 in "parents", where: not(ilike(p0.field_1, ^"%field_!%"))>
+      #Ecto.Query<from p0 in "parents", where: not ilike(p0.field_1, ^"%field_!%")>
 
   """
   @spec handle_ilike(Ecto.Query.t(), atom(), String.t(), __MODULE__.search_expr()) ::
@@ -1237,7 +1237,7 @@ defmodule Rummage.Ecto.Services.BuildSearchQuery do
       iex> BuildSearchQuery.handle_is_nil(queryable, :field_1, true, :where)
       #Ecto.Query<from p0 in "parents", where: is_nil(p0.field_1)>
       iex> BuildSearchQuery.handle_is_nil(queryable, :field_1, false, :where)
-      #Ecto.Query<from p0 in "parents", where: not(is_nil(p0.field_1))>
+      #Ecto.Query<from p0 in "parents", where: not is_nil(p0.field_1)>
 
   When `search_expr` is `:or_where`
 
@@ -1248,7 +1248,7 @@ defmodule Rummage.Ecto.Services.BuildSearchQuery do
       iex> BuildSearchQuery.handle_is_nil(queryable, :field_1, true, :or_where)
       #Ecto.Query<from p0 in "parents", or_where: is_nil(p0.field_1)>
       iex> BuildSearchQuery.handle_is_nil(queryable, :field_1, false, :or_where)
-      #Ecto.Query<from p0 in "parents", or_where: not(is_nil(p0.field_1))>
+      #Ecto.Query<from p0 in "parents", or_where: not is_nil(p0.field_1)>
 
   When `search_expr` is `:not_where`
 
@@ -1257,7 +1257,7 @@ defmodule Rummage.Ecto.Services.BuildSearchQuery do
       iex> queryable = from u in "parents"
       #Ecto.Query<from p0 in "parents">
       iex> BuildSearchQuery.handle_is_nil(queryable, :field_1, true, :not_where)
-      #Ecto.Query<from p0 in "parents", where: not(is_nil(p0.field_1))>
+      #Ecto.Query<from p0 in "parents", where: not is_nil(p0.field_1)>
       iex> BuildSearchQuery.handle_is_nil(queryable, :field_1, false, :not_where)
       #Ecto.Query<from p0 in "parents", where: is_nil(p0.field_1)>
 
@@ -1539,7 +1539,7 @@ defmodule Rummage.Ecto.Services.BuildSearchQuery do
       queryable
       |> where(
         [..., b],
-        not (fragment(unquote(fragment), field(b, ^field)) in ^list)
+        fragment(unquote(fragment), field(b, ^field)) not in ^list
       )
     end
   end
@@ -1549,7 +1549,7 @@ defmodule Rummage.Ecto.Services.BuildSearchQuery do
       queryable
       |> where(
         [..., b],
-        not (fragment(unquote(fragment), field(b, ^field1), field(b, ^field2)) in ^list)
+        fragment(unquote(fragment), field(b, ^field1), field(b, ^field2)) not in ^list
       )
     end
   end
@@ -1558,7 +1558,7 @@ defmodule Rummage.Ecto.Services.BuildSearchQuery do
     queryable
     |> where(
       [..., b],
-      not (field(b, ^field) in ^list)
+      field(b, ^field) not in ^list
     )
   end
 end

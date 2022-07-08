@@ -1,5 +1,13 @@
 # Versions CHANGELOG
 
+## Version 2.1.0
+
+- Bumps
+  * elixir version 1.13
+  * dependencies versions
+
+- Fix credo issues
+
 ## Version 2.0.0-rc.0
 
 - Change in namespace/module names:

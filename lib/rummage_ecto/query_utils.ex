@@ -1,4 +1,5 @@
 defmodule Rummage.Ecto.QueryUtils do
+  @moduledoc false
   def schema_from_query(module) when is_atom(module), do: module
   def schema_from_query({_, module}) when is_atom(module), do: module
   def schema_from_query(%Ecto.Query{from: _from} = query), do: schema_from_query(query.from)

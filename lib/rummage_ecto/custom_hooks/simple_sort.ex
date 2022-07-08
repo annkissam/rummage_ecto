@@ -226,9 +226,11 @@ defmodule Rummage.Ecto.CustomHook.SimpleSort do
     key_validations
     |> Enum.with_index()
     |> Enum.filter(fn {v, _i} -> v == :error end)
-    |> Enum.map(fn {_v, i} -> Enum.at(@expected_keys, i) end)
-    |> Enum.map(&to_string/1)
-    |> Enum.join(", ")
+    |> Enum.map_join(", ", fn {_v, i} ->
+      @expected_keys
+      |> Enum.at(i)
+      |> to_string()
+    end)
   end
 
   @doc """

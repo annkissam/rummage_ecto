@@ -1,8 +1,8 @@
 defmodule Rummage.Ecto.Mixfile do
   use Mix.Project
 
-  @version "2.0.0"
-  @elixir "~> 1.10"
+  @version "2.1.0"
+  @elixir "~> 1.13"
   @url "https://github.com/annkissam/rummage_ecto"
 
   def project do
@@ -50,13 +50,13 @@ defmodule Rummage.Ecto.Mixfile do
   defp deps do
     [
       # Development Dependency
-      {:ecto, "~> 3.0"},
-      {:ecto_sql, "~> 3.4"},
+      {:ecto, "~> 3.8"},
+      {:ecto_sql, "~> 3.8"},
       # Other Dependencies
-      {:credo, "~> 1.4.0", only: [:dev, :test], runtime: false},
-      {:excoveralls, "~> 0.13", only: :test, runtime: false},
-      {:ex_doc, "~> 0.20", only: :dev, runtime: false},
-      {:inch_ex, "~> 2.0", only: [:dev, :test, :docs], runtime: false},
+      {:credo, "~> 1.6", only: [:dev, :test], runtime: false},
+      {:excoveralls, "~> 0.14", only: :test, runtime: false},
+      {:ex_doc, "~> 0.28", only: :dev, runtime: false},
+      {:inch_ex, github: "rrrene/inch_ex", only: [:dev, :test, :docs], runtime: false},
       {:postgrex, ">= 0.0.0", only: :test}
     ]
   end

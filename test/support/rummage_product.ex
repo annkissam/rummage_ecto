@@ -1,4 +1,5 @@
 defmodule Rummage.Ecto.Rummage.Product do
+  @moduledoc false
   use Rummage.Ecto.Schema.Macro,
     paginate: Rummage.Ecto.Rummage.Paginate,
     sort: Rummage.Ecto.Rummage.Product.Sort,
@@ -7,10 +8,12 @@ defmodule Rummage.Ecto.Rummage.Product do
 end
 
 defmodule Rummage.Ecto.Rummage.Paginate do
+  @moduledoc false
   use Rummage.Ecto.Schema.Paginate
 end
 
 defmodule Rummage.Ecto.Rummage.Product.Sort do
+  @moduledoc false
   use Rummage.Ecto.Schema.Sort,
     default_name: "inserted_at",
     handlers: [
@@ -37,6 +40,7 @@ defmodule Rummage.Ecto.Rummage.Product.Sort do
 end
 
 defmodule Rummage.Ecto.Rummage.Product.Search do
+  @moduledoc false
   use Rummage.Ecto.Schema.Search,
     handlers: [
       category_name: %{search_field: :name, search_type: :like, assoc: [inner: :category]},
