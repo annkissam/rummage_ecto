@@ -62,12 +62,7 @@ defmodule Rummage.Ecto.Schema.Paginate do
           end
 
         # skip pagination if there's only one page
-        query =
-          if params.max_page == 1 do
-            query
-          else
-            Rummage.Ecto.Hook.Paginate.run(query, paginate)
-          end
+        query = Rummage.Ecto.Hook.Paginate.run(query, paginate)
 
         paginate = rummage_changeset(paginate, params) |> apply_changes()
 

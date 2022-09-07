@@ -351,19 +351,10 @@ defmodule Rummage.Ecto.Hook.Paginate do
   # page, per_page, total_count and max_page keys
   defp get_params(queryable, paginate_params, repo) do
     per_page = Map.get(paginate_params, :per_page)
-    total_count = get_total_count(queryable, repo)
-
-    max_page =
-      total_count
-      |> (&(&1 / per_page)).()
-      |> Float.ceil()
-      |> trunc()
 
     %{
       page: Map.get(paginate_params, :page),
       per_page: per_page,
-      total_count: total_count,
-      max_page: max_page
     }
   end
 
@@ -391,7 +382,10 @@ defmodule Rummage.Ecto.Hook.Paginate do
 
   defp get_count(query, repo, pk) do
     query = select(query, [s], count(field(s, ^pk), :distinct))
-    hd(apply(repo, :all, [query]))
+    case (apply(repo, :all, [query])) do
+      [hd | _] -> hd
+      _ -> 0
+    end
   end
 
   # Helper function which returns the primary key associated with a
